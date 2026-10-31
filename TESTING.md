@@ -40,3 +40,14 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] VR: vibra el controlador del arma; con un rifle/escopeta (dos manos) también vibra un poco la otra mano; con pistola/revólver no.
 - [ ] VR: el patadón se nota proporcional (pistola suave, escopeta fuerte). Si es mucho o poco, decir cuál.
 - [ ] Flat: el recoil de cámara de JEG sigue igual que antes.
+
+## Fase 6 (disparo desde el controlador, recoil de gameplay, mira)
+- [x] (auto) Los 8 mixins aplican al arrancar (incluidos `C2SMessageShootVRMixin` y `VREffectsHelperVRMixin`), sin errores.
+- [ ] VR: mirar hacia un lado y apuntar el arma hacia otro: la bala va adonde apunta el arma, no la cabeza.
+- [ ] VR: el primer disparo va exacto; en fuego continuo las balas siguientes suben y se abren a los lados, más con escopeta/rifle que con pistola. Al dejar de disparar ~1 s, vuelve a ser preciso.
+- [ ] VR: lo visual del arma no cambió respecto a la Fase 5.
+- [ ] VR: con un arma en la mano principal no se ve la mira/cursor (ni en el mundo ni en el HUD); al cambiar a otro ítem vuelve.
+- [ ] VR: arma de ráfaga (burst): ¿los disparos 2..n van al controlador o a la cabeza? (F6.2)
+- [ ] Servidor dedicado solo con JEG: las balas siguen al controlador (F6.3).
+- [ ] Flat: puntería, recoil y mira igual que JEG solo.
+- Si el recoil de puntería es mucho o poco: `AIM_CLIMB_PER_DEGREE`, `AIM_DRIFT_PER_DEGREE`, `AIM_DECAY` en `VrRecoil`.

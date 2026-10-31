@@ -83,6 +83,8 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 - `GunRenderingHandler.renderWeapon(LivingEntity, ItemStack, ItemDisplayContext, PoseStack, MultiBufferSource, int, float)` devuelve `boolean`.
 - `AnimatedGunRenderer` solo tiene `applyRecoil/Bobbing/Aiming/Sway/Sprinting`; `GunRenderingHandler` suma `Reload/Shield/Melee`.
 - `C2SMessageShoot`: campos privados `rotationYaw/rotationPitch`, ctors `()`, `(Player)`, `(float,float)`.
+- `ShootingHandler.fire` construye `C2SMessageShoot(Player)` entre `GunFireEvent.Pre` y `Post`; `C2SMessageBurst()` no lleva rotación (`handleBurst` usa la del jugador en servidor).
+- Mira: Vivecraft `VREffectsHelper.shouldRenderCrosshair()` (privado estático); JEG `CrosshairHandler.onRenderOverlay(RenderGuiOverlayEvent.Pre)`.
 - `GripType` y `ReloadType` son clases (no enums). `GunFireEvent` está en `ttv.migami.jeg.event` (`Pre`/`Post`).
 
 

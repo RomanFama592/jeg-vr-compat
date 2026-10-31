@@ -3,6 +3,7 @@ package com.jegvr.compat;
 import com.jegvr.JegVrCompat;
 import com.jegvr.compat.vivecraft.VivecraftBridge;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,6 +35,10 @@ public final class VR {
         }
         try {
             Class.forName("org.vivecraft.client_vr.render.VivecraftItemRendering");
+            Class.forName("org.vivecraft.client_vr.render.helpers.VREffectsHelper");
+            if (ModList.get().isLoaded("jeg")) {
+                Class.forName("ttv.migami.jeg.network.message.C2SMessageShoot");
+            }
         } catch (Throwable t) {
             disable(t);
         }
@@ -61,6 +66,20 @@ public final class VR {
         } catch (Throwable t) {
             disable(t);
             return false;
+        }
+    }
+
+    /** World-space aim direction of the main-hand controller, or null outside VR. */
+    public static Vec3 mainHandDirection() {
+        if (!active()) {
+            return null;
+        }
+        try {
+            VivecraftBridge.Pose pose = VivecraftBridge.mainHand();
+            return pose == null ? null : pose.dir();
+        } catch (Throwable t) {
+            disable(t);
+            return null;
         }
     }
 
