@@ -64,6 +64,18 @@ public final class VR {
         }
     }
 
+    /** Vibrates the main-hand or off-hand controller; no-op outside VR. */
+    public static void haptic(boolean mainHand, float seconds, float amplitude) {
+        if (!active()) {
+            return;
+        }
+        try {
+            VivecraftBridge.haptic(mainHand, seconds, amplitude);
+        } catch (Throwable t) {
+            disable(t);
+        }
+    }
+
     private static void disable(Throwable t) {
         broken = true;
         LOGGER.error("Vivecraft bridge failed, VR compat disabled for this session", t);

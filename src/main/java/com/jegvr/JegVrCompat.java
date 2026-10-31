@@ -3,7 +3,9 @@ package com.jegvr;
 import com.jegvr.compat.VR;
 import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrDiag;
+import com.jegvr.client.VrRecoil;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -23,6 +25,10 @@ public class JegVrCompat {
         // Client-only classes: register here, never in the constructor (dedicated servers also load this mod).
         MinecraftForge.EVENT_BUS.register(VrDiag.class);
         MinecraftForge.EVENT_BUS.register(VrDebugCommands.class);
+        if (ModList.get().isLoaded("jeg")) {
+            // VrRecoil listens to a JEG event type: only register it when JEG is present.
+            MinecraftForge.EVENT_BUS.register(VrRecoil.class);
+        }
         VR.preload();
         LOGGER.info("Vivecraft present: {}, VR active at startup: {}", VR.loaded(), VR.active());
     }

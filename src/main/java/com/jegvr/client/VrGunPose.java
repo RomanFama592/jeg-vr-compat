@@ -2,6 +2,7 @@ package com.jegvr.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -20,11 +21,17 @@ public final class VrGunPose {
         return key == null ? "" : key.toString();
     }
 
-    public static void apply(PoseStack poseStack, ItemStack stack, ItemDisplayContext context) {
+    public static void apply(PoseStack poseStack, ItemStack stack, ItemDisplayContext context, boolean mainHand) {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(gunId(stack));
         // The left hand mirrors yaw/roll and the lateral offset.
         float side = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
         poseStack.translate(pose.tx * side, pose.ty - GRIP_DOWN, pose.tz - GRIP_FORWARD);
+        // JEG only fires the main-hand gun, so only that one kicks.
+        if (mainHand) {
+            float partialTick = Minecraft.getInstance().getFrameTime();
+            poseStack.translate(0.0F, 0.0F, VrRecoil.kickBack(partialTick));
+            poseStack.mulPose(Axis.XP.rotationDegrees(VrRecoil.kickDegrees(partialTick)));
+        }
         poseStack.mulPose(Axis.YP.rotationDegrees(pose.yaw * side));
         poseStack.mulPose(Axis.XP.rotationDegrees(pose.pitch));
         poseStack.mulPose(Axis.ZP.rotationDegrees(pose.roll * side));

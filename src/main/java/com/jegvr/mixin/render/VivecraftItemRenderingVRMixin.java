@@ -30,7 +30,8 @@ public class VivecraftItemRenderingVRMixin {
         if (stack.getItem() instanceof GunItem) {
             VrDiag.once("vivecraftTransform", "Vivecraft first-person item transform replaced for JEG guns (type={})", type);
             VrGunPose.apply(poseStack, stack,
-                    rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND);
+                    rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
+                    hand == InteractionHand.MAIN_HAND);
             ci.cancel();
         }
     }

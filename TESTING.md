@@ -23,7 +23,7 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 ## Fase 3 (pose automática, sin calibrar)
 - [x] VR: revólver (izquierda) y rifle (derecha) apuntan hacia adelante sin comandos. Quedaban corridos a la izquierda en ambas manos.
 - [x] VR: tras quitar el offset de pantalla `firstperson_*` del modelo, el arma queda centrada en la mano. Faltaba bajarla y adelantarla un poco.
-- [ ] VR: con el offset de agarre en código (adelante 0.06, abajo 0.08), el mango calza en la mano en revólver y rifle.
+- [x] VR: con el offset de agarre en código (adelante 0.06, abajo 0.08), el mango calza en la mano en revólver y rifle.
 - [ ] VR: 3 armas más de distinto tipo (escopeta, pistola, clásica no animada).
 - [ ] Si alguna queda girada o corrida: enviar log (línea `jeg_vr_compat/diag`) y qué arma es; no hace falta calibrar.
 
@@ -32,3 +32,11 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [x] VR: con un arma animada solo se ven las manos de Vivecraft (no los brazos con manga de JEG).
 - [ ] VR: en una recarga animada el cargador sigue visible (hijo del bone de brazo).
 - [ ] Flat: los brazos de JEG se siguen viendo igual que antes.
+
+## Fase 5 (recoil)
+- [x] (auto) `GunRecoilVRMixin` aplica al arrancar, sin errores de inyección.
+- [ ] VR: al disparar, la cámara NO se mueve.
+- [ ] VR: cada disparo patea el arma hacia arriba y atrás, y vuelve sola en unos ticks; ráfagas no la dejan girada más de ~25°.
+- [ ] VR: vibra el controlador del arma; con un rifle/escopeta (dos manos) también vibra un poco la otra mano; con pistola/revólver no.
+- [ ] VR: el patadón se nota proporcional (pistola suave, escopeta fuerte). Si es mucho o poco, decir cuál.
+- [ ] Flat: el recoil de cámara de JEG sigue igual que antes.
