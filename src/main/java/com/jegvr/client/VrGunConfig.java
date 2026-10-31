@@ -105,6 +105,24 @@ public final class VrGunConfig {
         return result;
     }
 
+    /** Stores {@code effective} as the final pose of a gun (per-gun entry = effective minus global default). */
+    public static void setEffective(String gunId, Pose effective) {
+        reloadIfChanged();
+        if (gunId == null) {
+            data.defaults.set(effective);
+            return;
+        }
+        Pose base = data.defaults;
+        Pose entry = data.guns.computeIfAbsent(gunId, k -> new Pose());
+        entry.pitch = effective.pitch - base.pitch;
+        entry.yaw = effective.yaw - base.yaw;
+        entry.roll = effective.roll - base.roll;
+        entry.tx = effective.tx - base.tx;
+        entry.ty = effective.ty - base.ty;
+        entry.tz = effective.tz - base.tz;
+        entry.scale = base.scale == 0.0F ? 1.0F : effective.scale / base.scale;
+    }
+
     /** The raw entry being edited: the per-gun one, or the global default when {@code gunId} is null. */
     public static Pose editable(String gunId) {
         reloadIfChanged();
