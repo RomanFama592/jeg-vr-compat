@@ -46,7 +46,7 @@ public final class VrDebugCommands {
                                     p.tx = FloatArgumentType.getFloat(c, "tx");
                                     p.ty = FloatArgumentType.getFloat(c, "ty");
                                     p.tz = FloatArgumentType.getFloat(c, "tz");
-                                }))))))));
+                                })))))))));
 
         // /jegvr rot <dpitch> <dyaw> <droll>  and  /jegvr move <dx> <dy> <dz>  -> relative nudges
         root.then(Commands.literal("rot")
