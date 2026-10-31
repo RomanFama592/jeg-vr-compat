@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.jegvr.mixin",
+  "plugin": "com.jegvr.mixin.JegVrMixinPlugin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "jeg_vr_compat.refmap.json",
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

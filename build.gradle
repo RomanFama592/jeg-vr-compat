@@ -32,6 +32,7 @@ minecraft {
 
 mixin {
     add sourceSets.main, "${mod_id}.refmap.json"
+    config "${mod_id}.mixins.json"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
@@ -48,8 +49,12 @@ repositories {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
 
-    // Vivecraft 1.2.5 has no public API: the bridge uses reflection, so it is runtime-only.
-    runtimeOnly fg.deobf('maven.modrinth:vivecraft:1.20.1-1.2.5-forge')
+    // Only compat/vivecraft/VivecraftBridge may import org.vivecraft.* (Vivecraft is optional at runtime).
+    compileOnly fg.deobf('maven.modrinth:vivecraft:1.20.1-1.2.5-forge')
+    // ./gradlew runClient -PnoVivecraft  -> test the flat path without Vivecraft installed
+    if (!project.hasProperty('noVivecraft')) {
+        runtimeOnly fg.deobf('maven.modrinth:vivecraft:1.20.1-1.2.5-forge')
+    }
     compileOnly fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4')
     compileOnly fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')
     compileOnly fg.deobf('local:framework-forge:1.20.1-0.7.11')

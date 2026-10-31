@@ -1,4 +1,4 @@
-# JEG x Vivecraft — Addon de compatibilidad VR
+﻿# JEG x Vivecraft — Addon de compatibilidad VR
 
 Addon de Forge 1.20.1 (`jeg_vr_compat`) que hace compatible **Just Enough Guns 0.13.2**
 (https://github.com/MigaMiDev/Just-Enough-Guns) con **Vivecraft** sin modificar ninguno de los dos.
@@ -7,7 +7,7 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
 ## Stack
 - Minecraft 1.20.1, Forge 47.2.x, ForgeGradle 6, Java 17, mappings oficiales (Mojang).
 - JEG 0.13.2 (paquete raíz `ttv.migami.jeg`), usa GeckoLib `4.4.4` para armas animadas.
-- Vivecraft **1.20.1-1.2.5-forge** (decisión del usuario). No tiene API pública (`org.vivecraft.api` es de 1.3.0+), así que `VivecraftBridge` usa **reflexión** (`ClientDataHolderVR`, `VRState`, `VRPlayersClient`...) y Vivecraft es solo `runtimeOnly`.
+- Vivecraft **1.20.1-1.2.5-forge** (decisión del usuario). Solo trae `org.vivecraft.api_beta` (`VivecraftAPI.isVRPlayer`, `VivecraftClientAPI.isVrActive`); el resto se toma de internals (`VRPlayer.get().vrdata_world_render`: `c0` mano principal, `c1` libre, `hmd`; `MCVR.get().triggerHapticPulse`; `ClientDataHolderVR.getInstance().vrSettings.reverseHands`). `VivecraftBridge` los llama directo (Vivecraft es `compileOnly` + `runtimeOnly`), sin reflexión; `VR` captura `Throwable` y se desactiva si algo falla.
 - JEG requiere además **MrCrayfish Framework >= 0.7.0** (obligatorio) y GeckoLib >= 4.4.4. El jar de JEG es `libs/JustEnoughGuns-0.13.2-1.20.1.jar` (se referencia como `fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')`; `files()` no se deobfusca).
 - Toolchain local (no instalado en el sistema): JDK 17 en `.tools/jdk-17*`, Gradle wrapper 8.1.1. Usar `JAVA_HOME=.tools/jdk-17.0.20.1+1`.
 - Mixin (SpongePowered) + MixinExtras 0.3.5 (`@WrapWithCondition`, `@WrapOperation`).
@@ -84,3 +84,4 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 - `AnimatedGunRenderer` solo tiene `applyRecoil/Bobbing/Aiming/Sway/Sprinting`; `GunRenderingHandler` suma `Reload/Shield/Melee`.
 - `C2SMessageShoot`: campos privados `rotationYaw/rotationPitch`, ctors `()`, `(Player)`, `(float,float)`.
 - `GripType` y `ReloadType` son clases (no enums). `GunFireEvent` está en `ttv.migami.jeg.event` (`Pre`/`Post`).
+
