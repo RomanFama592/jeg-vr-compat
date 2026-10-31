@@ -18,6 +18,6 @@ Completar una secciÃ³n por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 ## Fase 3 (calibración)
 - [ ] VR: con el arma en mano, `/jegvr pose <pitch> <yaw> <roll> [tx ty tz]` cambia la pose en vivo (rotación en grados, traslación en bloques). Probar valores de 90 en cada eje hasta que el cañón apunte hacia adelante.
 - [ ] `/jegvr save` escribe `config/jeg_vr_compat/guns.json`; editarlo a mano y guardar lo recarga sin reiniciar.
-- [ ] Pasar el JSON final (pitch/yaw/roll/t por arma) para fijar los valores por defecto.
+- [x] CalibraciÃ³n inicial (revÃ³lver animado, derecha): pitch 45, ty 1 â†’ defaults en cÃ³digo. Falta validar otras armas, clÃ¡sicas y mano izquierda.
 - [ ] Mano izquierda (zurdo en Vivecraft): la pose se espeja bien.
 - [ ] Flat: nada cambia.

@@ -37,7 +37,7 @@ public final class VrDebugCommands {
                 .then(Commands.literal("reset").executes(c -> {
                     String id = heldGunId();
                     VrGunConfig.Pose pose = VrGunConfig.editable(id);
-                    pose.set(new VrGunConfig.Pose());
+                    pose.set(id == null ? VrGunConfig.factoryDefaults() : new VrGunConfig.Pose());
                     return reply(c, "Pose restablecida para " + (id == null ? "default" : id));
                 })));
     }

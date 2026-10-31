@@ -61,8 +61,16 @@ public final class VrGunConfig {
     }
 
     private static final class Data {
-        Pose defaults = new Pose();
+        Pose defaults = factoryDefaults();
         Map<String, Pose> guns = new LinkedHashMap<>();
+    }
+
+    /** Calibrated by hand in VR on the animated revolver (pitch 45, 1 block up); other guns may need per-gun tweaks. */
+    public static Pose factoryDefaults() {
+        Pose pose = new Pose();
+        pose.pitch = 45.0F;
+        pose.ty = 1.0F;
+        return pose;
     }
 
     private static Data data = new Data();
@@ -138,7 +146,7 @@ public final class VrGunConfig {
                 Data loaded = GSON.fromJson(reader, Data.class);
                 if (loaded != null) {
                     if (loaded.defaults == null) {
-                        loaded.defaults = new Pose();
+                        loaded.defaults = factoryDefaults();
                     }
                     if (loaded.guns == null) {
                         loaded.guns = new LinkedHashMap<>();
