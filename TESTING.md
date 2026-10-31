@@ -10,19 +10,24 @@ Completar una secci√≥n por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Con visor: `VR active` pasa a true al entrar en VR (verificar con un log al abrir un mundo).
 
 ## Fase 2
-- [ ] VR: sostener un arma cl·sica (p. ej. pistola) y una animada (GeckoLib): sigue al controlador sin sway, bobbing ni offset de pantalla.
+- [ ] VR: sostener un arma cl√°sica (p. ej. pistola) y una animada (GeckoLib): sigue al controlador sin sway, bobbing ni offset de pantalla.
 - [ ] VR: mantener apuntar (ADS) no mueve ni centra el arma.
-- [ ] VR: pasar `latest.log` con las lÌneas `jeg_vr_compat/diag` (decide si F2.4 requiere mover la intervenciÛn a `GunItemStackRenderer`).
+- [ ] VR: pasar `latest.log` con las l√≠neas `jeg_vr_compat/diag` (decide si F2.4 requiere mover la intervenci√≥n a `GunItemStackRenderer`).
 - [ ] Flat (sin visor): apuntar, correr, recargar y disparar se ven igual que JEG solo.
 
-## Fase 3 (calibraciÛn)
-- [ ] VR: con el arma en mano, `/jegvr pose <pitch> <yaw> <roll> [tx ty tz]` cambia la pose en vivo (rotaciÛn en grados, traslaciÛn en bloques). Probar valores de 90 en cada eje hasta que el caÒÛn apunte hacia adelante.
+## Fase 3 (calibraci√≥n manual, opcional)
+- [ ] VR: con el arma en mano, `/jegvr pose <pitch> <yaw> <roll> [tx ty tz]` cambia la pose en vivo (rotaci√≥n en grados, traslaci√≥n en bloques).
 - [ ] `/jegvr save` escribe `config/jeg_vr_compat/guns.json`; editarlo a mano y guardar lo recarga sin reiniciar.
-- [x] Calibraci√≥n inicial (rev√≥lver animado, derecha): pitch 45, ty 1 ‚Üí defaults en c√≥digo. Falta validar otras armas, cl√°sicas y mano izquierda.
-- [ ] Mano izquierda (zurdo en Vivecraft): la pose se espeja bien.
 - [ ] Flat: nada cambia.
 
-## Fase 3 (pose autom·tica, sin calibrar)
-- [ ] VR: revÛlver (animada) y una cl·sica: el caÒÛn apunta hacia donde apunta el controlador, sin ejecutar ning˙n comando.
-- [ ] VR: 3 armas m·s de distinto tipo (rifle, escopeta, pistola) y mano izquierda.
-- [ ] Si alguna queda girada: enviar log (lÌnea `jeg_vr_compat/diag`) y quÈ arma es; no hace falta calibrar.
+## Fase 3 (pose autom√°tica, sin calibrar)
+- [x] VR: rev√≥lver (izquierda) y rifle (derecha) apuntan hacia adelante sin comandos. Quedaban corridos a la izquierda en ambas manos.
+- [ ] VR: tras quitar el offset de pantalla `firstperson_*` del modelo, el arma queda centrada en la mano (ambas manos).
+- [ ] VR: 3 armas m√°s de distinto tipo (escopeta, pistola, cl√°sica no animada).
+- [ ] Si alguna queda girada o corrida: enviar log (l√≠nea `jeg_vr_compat/diag`) y qu√© arma es; no hace falta calibrar.
+
+## Fase 4 (brazos est√°ticos)
+- [x] (auto) Los mixins de brazos y offset aplican al arrancar, sin errores de inyecci√≥n.
+- [ ] VR: con un arma animada solo se ven las manos de Vivecraft (no los brazos con manga de JEG).
+- [ ] VR: en una recarga animada el cargador sigue visible (hijo del bone de brazo).
+- [ ] Flat: los brazos de JEG se siguen viendo igual que antes.

@@ -4,6 +4,8 @@ import com.jegvr.client.VrDiag;
 import com.jegvr.compat.VR;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -50,6 +52,16 @@ public class AnimatedGunRendererVRMixin {
     @WrapWithCondition(method = "renderByItem",
             at = @At(value = "INVOKE", target = POSE + "mulPose(Lorg/joml/Quaternionf;)V", remap = true, ordinal = 1))
     private boolean jegvr$noAdsRotate(PoseStack stack, Quaternionf rotation) {
+        return !VR.active();
+    }
+
+    // JEG draws static player arms (arm + sleeve, both hands) on the gun's arm bones; Vivecraft already draws the
+    // tracked hands. Only drops the draw call: the bone transforms still apply to child bones.
+    @WrapWithCondition(method = "renderRecursively(Lcom/mojang/blaze3d/vertex/PoseStack;Lttv/migami/jeg/item/AnimatedGunItem;Lsoftware/bernie/geckolib/cache/object/GeoBone;Lnet/minecraft/client/renderer/RenderType;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZFIIFFFF)V",
+            at = @At(value = "INVOKE", remap = true,
+                    target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
+    private boolean jegvr$noStaticArms(ModelPart part, PoseStack stack, VertexConsumer consumer, int light, int overlay,
+                                       float r, float g, float b, float a) {
         return !VR.active();
     }
 
