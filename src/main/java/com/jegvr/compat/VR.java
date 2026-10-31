@@ -69,14 +69,18 @@ public final class VR {
         }
     }
 
-    /** World-space aim direction of the main-hand controller, or null outside VR. */
-    public static Vec3 mainHandDirection() {
+    /** World-space position and aim direction of a controller. */
+    public record Aim(Vec3 pos, Vec3 dir) {
+    }
+
+    /** Main-hand controller aim, or null outside VR. */
+    public static Aim mainHandAim() {
         if (!active()) {
             return null;
         }
         try {
             VivecraftBridge.Pose pose = VivecraftBridge.mainHand();
-            return pose == null ? null : pose.dir();
+            return pose == null ? null : new Aim(pose.pos(), pose.dir());
         } catch (Throwable t) {
             disable(t);
             return null;

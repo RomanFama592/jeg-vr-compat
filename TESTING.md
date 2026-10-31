@@ -43,7 +43,9 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 
 ## Fase 6 (disparo desde el controlador, recoil de gameplay, mira)
 - [x] (auto) Los 8 mixins aplican al arrancar (incluidos `C2SMessageShootVRMixin` y `VREffectsHelperVRMixin`), sin errores.
-- [ ] VR: mirar hacia un lado y apuntar el arma hacia otro: la bala va adonde apunta el arma, no la cabeza.
+- [x] VR: mirar hacia un lado y apuntar el arma hacia otro: la bala va adonde apunta el arma, no la cabeza. El primer disparo salía con ángulo y atravesaba bloques cercanos (se corrigió con convergencia, F6.5).
+- [ ] VR (convergencia): el primer disparo pega justo donde apunta el cañón, de cerca y de lejos.
+- [ ] VR (convergencia): con el arma apoyada en un bloque o metida en él, la bala impacta ese bloque y no lo atraviesa.
 - [ ] VR: el primer disparo va exacto; en fuego continuo las balas siguientes suben y se abren a los lados, más con escopeta/rifle que con pistola. Al dejar de disparar ~1 s, vuelve a ser preciso.
 - [ ] VR: lo visual del arma no cambió respecto a la Fase 5.
 - [ ] VR: con un arma en la mano principal no se ve la mira/cursor (ni en el mundo ni en el HUD); al cambiar a otro ítem vuelve.
