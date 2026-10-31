@@ -1,0 +1,85 @@
+plugins {
+    id 'java'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+}
+
+group = mod_group
+version = mod_version
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.debug.export', 'true'
+            mods {
+                "${mod_id}" {
+                    source sourceSets.main
+                }
+            }
+        }
+        client {
+            property 'forge.enabledGameTestNamespaces', mod_id
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "${mod_id}.refmap.json"
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    maven {
+        url = 'https://api.modrinth.com/maven'
+        content { includeGroup 'maven.modrinth' }
+    }
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+    flatDir { dirs 'libs' }
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+
+    // Vivecraft 1.2.5 has no public API: the bridge uses reflection, so it is runtime-only.
+    runtimeOnly fg.deobf('maven.modrinth:vivecraft:1.20.1-1.2.5-forge')
+    compileOnly fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4')
+    compileOnly fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')
+
+    runtimeOnly fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4')
+    runtimeOnly fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')
+
+    compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.3.5'))
+    implementation(jarJar('io.github.llamalad7:mixinextras-forge:0.3.5')) {
+        jarJar.ranged(it, '[0.3.5,)')
+    }
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    var replaceProperties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest.attributes([
+        'Specification-Title'  : mod_id,
+        'Implementation-Title' : mod_name,
+        'Implementation-Version': mod_version
+    ])
+    finalizedBy 'reobfJar'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
