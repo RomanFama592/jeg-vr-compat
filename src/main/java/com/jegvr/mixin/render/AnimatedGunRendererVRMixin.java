@@ -1,6 +1,7 @@
 package com.jegvr.mixin.render;
 
 import com.jegvr.client.VrDiag;
+import com.jegvr.client.VrGunPose;
 import com.jegvr.compat.VR;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -54,10 +55,11 @@ public class AnimatedGunRendererVRMixin {
     }
 
     @Inject(method = "renderByItem", at = @At("HEAD"))
-    private void jegvr$diagRenderByItem(ItemStack stack, ItemDisplayContext context, PoseStack poseStack,
+    private void jegvr$vrPoseRenderByItem(ItemStack stack, ItemDisplayContext context, PoseStack poseStack,
                                         MultiBufferSource buffer, int light, int overlay, CallbackInfo ci) {
         if (VR.active() && context.firstPerson()) {
             VrDiag.once("renderByItem", "AnimatedGunRenderer.renderByItem runs in VR (context={})", context);
+            VrGunPose.apply(poseStack, stack, context);
         }
     }
 }

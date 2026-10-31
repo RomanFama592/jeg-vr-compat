@@ -1,6 +1,7 @@
 package com.jegvr;
 
 import com.jegvr.compat.VR;
+import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrDiag;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
@@ -19,7 +20,9 @@ public class JegVrCompat {
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {
+        // Client-only classes: register here, never in the constructor (dedicated servers also load this mod).
         MinecraftForge.EVENT_BUS.register(VrDiag.class);
+        MinecraftForge.EVENT_BUS.register(VrDebugCommands.class);
         LOGGER.info("Vivecraft present: {}, VR active at startup: {}", VR.loaded(), VR.active());
     }
 }

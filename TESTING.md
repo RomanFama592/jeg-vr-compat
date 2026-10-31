@@ -14,3 +14,10 @@ Completar una secciÃ³n por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] VR: mantener apuntar (ADS) no mueve ni centra el arma.
 - [ ] VR: pasar `latest.log` con las líneas `jeg_vr_compat/diag` (decide si F2.4 requiere mover la intervención a `GunItemStackRenderer`).
 - [ ] Flat (sin visor): apuntar, correr, recargar y disparar se ven igual que JEG solo.
+
+## Fase 3 (calibración)
+- [ ] VR: con el arma en mano, `/jegvr pose <pitch> <yaw> <roll> [tx ty tz]` cambia la pose en vivo (rotación en grados, traslación en bloques). Probar valores de 90 en cada eje hasta que el cañón apunte hacia adelante.
+- [ ] `/jegvr save` escribe `config/jeg_vr_compat/guns.json`; editarlo a mano y guardar lo recarga sin reiniciar.
+- [ ] Pasar el JSON final (pitch/yaw/roll/t por arma) para fijar los valores por defecto.
+- [ ] Mano izquierda (zurdo en Vivecraft): la pose se espeja bien.
+- [ ] Flat: nada cambia.
