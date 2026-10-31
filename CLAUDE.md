@@ -85,3 +85,8 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 - `C2SMessageShoot`: campos privados `rotationYaw/rotationPitch`, ctors `()`, `(Player)`, `(float,float)`.
 - `GripType` y `ReloadType` son clases (no enums). `GunFireEvent` está en `ttv.migami.jeg.event` (`Pre`/`Post`).
 
+
+## Pose de armas en VR (automática)
+- Vivecraft dibuja la mano con `VRArmHelper.renderVRHand_Main/Offhand` -> `ItemInHandRenderer.renderArmWithItem` (su mixin `vrRenderArmWithItem` lo sustituye): **no se dispara `RenderHandEvent`** en VR (verificado), así que `GunRenderingHandler.onRenderOverlay` no corre en VR; las armas pasan por `renderByItem`/`renderWeapon`.
+- Marco de la mano: `RenderHelper.setupRenderingAtController` = translate(posición controlador - cámara) · matriz del controlador · scale(worldScale). Luego `VivecraftItemRendering.applyFirstPersonItemTransforms` añade una rotación por tipo; para `GunItem` la cancelamos en `VivecraftItemRenderingVRMixin`.
+

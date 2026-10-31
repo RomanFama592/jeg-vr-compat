@@ -23,6 +23,7 @@ public class JegVrCompat {
         // Client-only classes: register here, never in the constructor (dedicated servers also load this mod).
         MinecraftForge.EVENT_BUS.register(VrDiag.class);
         MinecraftForge.EVENT_BUS.register(VrDebugCommands.class);
+        VR.preload();
         LOGGER.info("Vivecraft present: {}, VR active at startup: {}", VR.loaded(), VR.active());
     }
 }

@@ -27,6 +27,18 @@ public final class VR {
         return loaded && !broken;
     }
 
+    /** Forces Vivecraft classes that we mix into to load now, so injection problems surface at startup. */
+    public static void preload() {
+        if (!loaded()) {
+            return;
+        }
+        try {
+            Class.forName("org.vivecraft.client_vr.render.VivecraftItemRendering");
+        } catch (Throwable t) {
+            disable(t);
+        }
+    }
+
     /** True when the local player is currently playing in VR. */
     public static boolean active() {
         if (!loaded()) {

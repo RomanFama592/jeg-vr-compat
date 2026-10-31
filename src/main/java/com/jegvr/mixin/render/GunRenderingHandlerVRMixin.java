@@ -1,7 +1,6 @@
 package com.jegvr.mixin.render;
 
 import com.jegvr.client.VrDiag;
-import com.jegvr.client.VrGunPose;
 import com.jegvr.compat.VR;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -53,14 +52,12 @@ public class GunRenderingHandlerVRMixin {
     }
 
     @Inject(method = "renderWeapon", at = @At("HEAD"))
-    private void jegvr$vrPoseRenderWeapon(LivingEntity entity, ItemStack stack, ItemDisplayContext context,
+    private void jegvr$diagRenderWeapon(LivingEntity entity, ItemStack stack, ItemDisplayContext context,
                                         PoseStack poseStack, MultiBufferSource buffer, int light, float partialTick,
                                         CallbackInfoReturnable<Boolean> cir) {
-        // Animated guns get their pose in AnimatedGunRendererVRMixin.
         if (VR.active() && context.firstPerson() && stack.getItem() instanceof GunItem
                 && !(stack.getItem() instanceof AnimatedGunItem)) {
             VrDiag.once("renderWeapon", "GunRenderingHandler.renderWeapon runs in VR (context={})", context);
-            VrGunPose.apply(poseStack, stack, context);
         }
     }
 }

@@ -65,11 +65,10 @@ public final class VrGunConfig {
         Map<String, Pose> guns = new LinkedHashMap<>();
     }
 
-    /** Calibrated by hand in VR on the animated revolver (pitch 45, 1 block up); other guns may need per-gun tweaks. */
+    /** No rotation or offset: the gun uses the bare controller frame (see VivecraftItemRenderingVRMixin). */
     public static Pose factoryDefaults() {
         Pose pose = new Pose();
-        pose.pitch = 45.0F;
-        pose.ty = 1.0F;
+        pose.scale = 0.6F;
         return pose;
     }
 

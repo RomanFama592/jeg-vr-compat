@@ -21,3 +21,8 @@ Completar una secciÃ³n por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [x] CalibraciÃ³n inicial (revÃ³lver animado, derecha): pitch 45, ty 1 â†’ defaults en cÃ³digo. Falta validar otras armas, clÃ¡sicas y mano izquierda.
 - [ ] Mano izquierda (zurdo en Vivecraft): la pose se espeja bien.
 - [ ] Flat: nada cambia.
+
+## Fase 3 (pose automática, sin calibrar)
+- [ ] VR: revólver (animada) y una clásica: el cañón apunta hacia donde apunta el controlador, sin ejecutar ningún comando.
+- [ ] VR: 3 armas más de distinto tipo (rifle, escopeta, pistola) y mano izquierda.
+- [ ] Si alguna queda girada: enviar log (línea `jeg_vr_compat/diag`) y qué arma es; no hace falta calibrar.
