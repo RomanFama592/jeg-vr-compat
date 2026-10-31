@@ -22,12 +22,13 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 
 ## Fase 3 (pose automática, sin calibrar)
 - [x] VR: revólver (izquierda) y rifle (derecha) apuntan hacia adelante sin comandos. Quedaban corridos a la izquierda en ambas manos.
-- [ ] VR: tras quitar el offset de pantalla `firstperson_*` del modelo, el arma queda centrada en la mano (ambas manos).
+- [x] VR: tras quitar el offset de pantalla `firstperson_*` del modelo, el arma queda centrada en la mano. Faltaba bajarla y adelantarla un poco.
+- [ ] VR: con el offset de agarre en código (adelante 0.06, abajo 0.08), el mango calza en la mano en revólver y rifle.
 - [ ] VR: 3 armas más de distinto tipo (escopeta, pistola, clásica no animada).
 - [ ] Si alguna queda girada o corrida: enviar log (línea `jeg_vr_compat/diag`) y qué arma es; no hace falta calibrar.
 
 ## Fase 4 (brazos estáticos)
 - [x] (auto) Los mixins de brazos y offset aplican al arrancar, sin errores de inyección.
-- [ ] VR: con un arma animada solo se ven las manos de Vivecraft (no los brazos con manga de JEG).
+- [x] VR: con un arma animada solo se ven las manos de Vivecraft (no los brazos con manga de JEG).
 - [ ] VR: en una recarga animada el cargador sigue visible (hijo del bone de brazo).
 - [ ] Flat: los brazos de JEG se siguen viendo igual que antes.

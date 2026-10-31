@@ -8,6 +8,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 /** Orientation/position correction applied to a JEG gun held in a VR controller. */
 public final class VrGunPose {
+    /** Moves the model so its grip sits in Vivecraft's hand: forward (-Z) and down, in blocks of the controller frame. */
+    private static final float GRIP_FORWARD = 0.06F;
+    private static final float GRIP_DOWN = 0.08F;
+
     private VrGunPose() {
     }
 
@@ -20,7 +24,7 @@ public final class VrGunPose {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(gunId(stack));
         // The left hand mirrors yaw/roll and the lateral offset.
         float side = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
-        poseStack.translate(pose.tx * side, pose.ty, pose.tz);
+        poseStack.translate(pose.tx * side, pose.ty - GRIP_DOWN, pose.tz - GRIP_FORWARD);
         poseStack.mulPose(Axis.YP.rotationDegrees(pose.yaw * side));
         poseStack.mulPose(Axis.XP.rotationDegrees(pose.pitch));
         poseStack.mulPose(Axis.ZP.rotationDegrees(pose.roll * side));
