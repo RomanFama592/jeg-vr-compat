@@ -27,6 +27,11 @@ public final class VrNetwork {
                 .decoder(C2SVrAim::decode)
                 .consumerMainThread(C2SVrAim::handle)
                 .add();
+        CHANNEL.messageBuilder(C2SVrShootOffhand.class, 1, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrShootOffhand::encode)
+                .decoder(C2SVrShootOffhand::decode)
+                .consumerMainThread(C2SVrShootOffhand::handle)
+                .add();
     }
 
     public static boolean isPresent(Connection connection) {

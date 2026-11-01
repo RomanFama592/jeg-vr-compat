@@ -38,6 +38,7 @@ public final class VR {
             Class.forName("org.vivecraft.client_vr.render.helpers.VREffectsHelper");
             if (ModList.get().isLoaded("jeg")) {
                 Class.forName("ttv.migami.jeg.network.message.C2SMessageShoot");
+                Class.forName("ttv.migami.jeg.common.network.ServerPlayHandler");
             }
         } catch (Throwable t) {
             disable(t);
@@ -80,6 +81,20 @@ public final class VR {
         }
         try {
             VivecraftBridge.Pose pose = VivecraftBridge.mainHand();
+            return pose == null ? null : new Aim(pose.pos(), pose.dir());
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
+    /** Off-hand controller aim, or null outside VR. */
+    public static Aim offHandAim() {
+        if (!active()) {
+            return null;
+        }
+        try {
+            VivecraftBridge.Pose pose = VivecraftBridge.offHand();
             return pose == null ? null : new Aim(pose.pos(), pose.dir());
         } catch (Throwable t) {
             disable(t);

@@ -46,9 +46,8 @@ public final class VrAim {
         }
         Vec3 barrel = aim.dir().normalize();
         Vec3 dir;
-        if (VrNetwork.isPresent(connection())) {
-            Vec3 muzzle = aim.pos().add(barrel.scale(MUZZLE_FORWARD));
-            VrNetwork.CHANNEL.sendToServer(new C2SVrAim(InteractionHand.MAIN_HAND, muzzle, barrel));
+        if (serverHasAddon()) {
+            sendMuzzle(InteractionHand.MAIN_HAND, aim, barrel);
             dir = barrel;
         } else {
             Vec3 eye = player.getEyePosition();
@@ -56,9 +55,37 @@ public final class VrAim {
             // A target almost at the eye gives a meaningless angle: keep the barrel direction then.
             dir = toTarget.lengthSqr() < MIN_DISTANCE_SQR ? barrel : toTarget.normalize();
         }
+        return rotation(dir, VrRecoil.aimDrift(), VrRecoil.aimClimb());
+    }
+
+    /**
+     * Off-hand version of {@link #shotRotation}: sends the off-hand muzzle and returns the barrel {yaw, pitch}, or null
+     * when not aiming in VR. Only for servers with this addon (no JEG-only fallback: JEG cannot fire the off hand).
+     */
+    public static float[] offHandShotRotation() {
+        VR.Aim aim = VR.offHandAim();
+        if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
+            return null;
+        }
+        Vec3 barrel = aim.dir().normalize();
+        sendMuzzle(InteractionHand.OFF_HAND, aim, barrel);
+        return rotation(barrel, 0.0F, 0.0F);
+    }
+
+    /** True when the server has this addon's channel (the optional server component). */
+    public static boolean serverHasAddon() {
+        return VrNetwork.isPresent(connection());
+    }
+
+    private static void sendMuzzle(InteractionHand hand, VR.Aim aim, Vec3 barrel) {
+        Vec3 muzzle = aim.pos().add(barrel.scale(MUZZLE_FORWARD));
+        VrNetwork.CHANNEL.sendToServer(new C2SVrAim(hand, muzzle, barrel));
+    }
+
+    private static float[] rotation(Vec3 dir, float drift, float climb) {
         float yaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
         float pitch = (float) Math.toDegrees(-Math.asin(Mth.clamp(dir.y, -1.0, 1.0)));
-        return new float[]{yaw + VrRecoil.aimDrift(), Mth.clamp(pitch - VrRecoil.aimClimb(), -90.0F, 90.0F)};
+        return new float[]{yaw + drift, Mth.clamp(pitch - climb, -90.0F, 90.0F)};
     }
 
     /** First block or entity along the barrel, or a far point if it points at nothing. */

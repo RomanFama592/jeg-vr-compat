@@ -65,3 +65,15 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Servidor dedicado solo con JEG (sin addon): un cliente VR entra sin errores y dispara como en la Fase 6 (convergencia).
 - [ ] Servidor con addon + cliente flat sin addon: entra y juega normal.
 - [ ] Flat con addon en ambos lados: disparo igual que JEG solo.
+- [x] Probado por el usuario: todo bien.
+
+## S.5 (disparo con la mano libre, base de dual wield)
+- [x] (auto) Compila; al arrancar aplican los 10 mixins, incluido `server.ServerPlayHandlerVRMixin`.
+- Preparación: en Controles → "JEG VR" aparece "Disparar arma de la mano libre (VR)". Asignarla a una tecla y después al gatillo de la mano libre en los bindings de Vivecraft/SteamVR (las teclas de mods deberían aparecer en la lista de acciones).
+- [ ] VR, un jugador: arma en cada mano. El gatillo de la mano libre dispara el arma de esa mano, la bala sale de su cañón y va adonde apunta ese controlador. Vibra ese controlador.
+- [ ] La munición que baja es la del arma de la mano libre; la de la mano principal no cambia.
+- [ ] La misma arma en las dos manos: cada mano dispara a su propia cadencia y se pueden disparar a la vez.
+- [ ] Arma automática en la mano libre: dispara mientras mantenés el gatillo; semi: un disparo por pulsación.
+- [ ] Sin munición en la mano libre: no dispara (no se recarga todavía con la mano libre; ver F9.6).
+- [ ] Servidor solo con JEG: la tecla no hace nada y no hay errores.
+- [ ] Flat: nada cambia (la tecla solo actúa en VR).

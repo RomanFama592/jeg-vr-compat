@@ -30,29 +30,34 @@ public final class VrServerAim {
     }
 
     private static final Map<UUID, Aim> MAIN_HAND = new ConcurrentHashMap<>();
+    /** Off-hand gun, fired through {@link com.jegvr.network.C2SVrShootOffhand} (dual wield). */
+    private static final Map<UUID, Aim> OFF_HAND = new ConcurrentHashMap<>();
 
     private VrServerAim() {
     }
 
     public static void update(ServerPlayer player, InteractionHand hand, Vec3 muzzle, Vec3 direction) {
-        // Only the main hand fires in JEG; the off hand is reserved for dual wield (F9.6).
-        if (hand != InteractionHand.MAIN_HAND || !isFinite(muzzle) || !isFinite(direction)) {
+        if (!isFinite(muzzle) || !isFinite(direction)) {
             return;
         }
-        MAIN_HAND.put(player.getUUID(), new Aim(muzzle, direction, player.level().getGameTime()));
+        map(hand).put(player.getUUID(), new Aim(muzzle, direction, player.level().getGameTime()));
     }
 
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         MAIN_HAND.remove(event.getEntity().getUUID());
+        OFF_HAND.remove(event.getEntity().getUUID());
     }
 
-    /** Validated muzzle position for a projectile fired now by {@code shooter}, or null to keep JEG's origin. */
-    public static Vec3 muzzleFor(LivingEntity shooter) {
+    /**
+     * Validated muzzle position for a projectile fired now by {@code shooter} from {@code hand}, or null to keep JEG's
+     * origin.
+     */
+    public static Vec3 muzzleFor(LivingEntity shooter, InteractionHand hand) {
         if (!(shooter instanceof ServerPlayer player)) {
             return null;
         }
-        Aim aim = MAIN_HAND.get(player.getUUID());
+        Aim aim = map(hand).get(player.getUUID());
         if (aim == null || player.level().getGameTime() - aim.gameTime > MAX_AGE_TICKS) {
             return null;
         }
@@ -68,6 +73,10 @@ public final class VrServerAim {
             return wall.getLocation().add(back);
         }
         return aim.muzzle;
+    }
+
+    private static Map<UUID, Aim> map(InteractionHand hand) {
+        return hand == InteractionHand.OFF_HAND ? OFF_HAND : MAIN_HAND;
     }
 
     private static boolean isFinite(Vec3 v) {
