@@ -2,6 +2,7 @@ package com.jegvr.compat.vivecraft;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.vivecraft.api_beta.VivecraftAPI;
@@ -10,6 +11,7 @@ import org.vivecraft.api_beta.client.VivecraftClientAPI;
 import org.vivecraft.client_vr.ClientDataHolderVR;
 import org.vivecraft.client_vr.VRData;
 import org.vivecraft.client_vr.gameplay.VRPlayer;
+import org.vivecraft.client_vr.gameplay.trackers.BowTracker;
 import org.vivecraft.client_vr.provider.ControllerType;
 import org.vivecraft.client_vr.provider.MCVR;
 
@@ -63,6 +65,11 @@ public final class VivecraftBridge {
     public static KeyMapping[] teleportKeys() {
         VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
         return new KeyMapping[]{mod.keyTeleport, mod.keyTeleportFallback};
+    }
+
+    /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */
+    public static boolean isBow(ItemStack stack) {
+        return BowTracker.isBow(stack);
     }
 
     public static boolean isLeftHanded() {

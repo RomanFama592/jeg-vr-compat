@@ -57,7 +57,8 @@ public final class VrRecoil {
 
         float strength = Mth.clamp(angle / 10.0F, 0.2F, 1.0F);
         VR.haptic(true, 0.06F, strength);
-        if (!GripType.ONE_HANDED.equals(gun.getGeneral().getGripType())) {
+        // The supporting hand only feels a two-handed gun when it is free, not when it holds its own gun or item.
+        if (!GripType.ONE_HANDED.equals(gun.getGeneral().getGripType()) && event.getEntity().getOffhandItem().isEmpty()) {
             VR.haptic(false, 0.05F, strength * 0.6F);
         }
     }

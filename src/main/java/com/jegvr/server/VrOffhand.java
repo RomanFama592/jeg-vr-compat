@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ttv.migami.jeg.common.FireMode;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ShootTracker;
 import ttv.migami.jeg.common.network.ServerPlayHandler;
@@ -43,8 +44,17 @@ public final class VrOffhand {
     private VrOffhand() {
     }
 
+    /**
+     * Guns that can be used from the off hand. Charged guns (bows, {@code RELEASE_FIRE}) are left out: JEG keeps their
+     * charge per player (ChargeTracker, the SHOOTING flag), so it cannot charge one hand without the other.
+     */
+    public static boolean canDualWield(ItemStack stack) {
+        return stack.getItem() instanceof GunItem gunItem
+                && !FireMode.RELEASE_FIRE.equals(gunItem.getModifiedGun(stack).getGeneral().getFireMode());
+    }
+
     public static void fire(ServerPlayer player, float yaw, float pitch) {
-        if (!(player.getOffhandItem().getItem() instanceof GunItem) || firing) {
+        if (!canDualWield(player.getOffhandItem()) || firing) {
             return;
         }
         firing = true;
@@ -67,11 +77,10 @@ public final class VrOffhand {
     /** Starts a JEG reload of the off-hand gun; it ends when JEG clears its RELOADING flag. */
     public static void startReload(ServerPlayer player) {
         ItemStack stack = player.getOffhandItem();
-        if (player.isSpectator() || !(stack.getItem() instanceof GunItem gunItem)
-                || ModSyncedDataKeys.RELOADING.getValue(player)) {
+        if (player.isSpectator() || !canDualWield(stack) || ModSyncedDataKeys.RELOADING.getValue(player)) {
             return;
         }
-        Gun gun = gunItem.getModifiedGun(stack);
+        Gun gun = ((GunItem) stack.getItem()).getModifiedGun(stack);
         CompoundTag tag = stack.getTag();
         if (tag != null && tag.getInt("AmmoCount") >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
             return;

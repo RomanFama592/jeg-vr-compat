@@ -4,6 +4,7 @@ import com.jegvr.compat.VR;
 import com.jegvr.mixin.input.KeyMappingAccessor;
 import com.jegvr.network.C2SVrShootOffhand;
 import com.jegvr.network.VrNetwork;
+import com.jegvr.server.VrOffhand;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -24,7 +25,8 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * Client side of the off-hand gun (dual wield, S.5). With a gun in the off hand, in VR and on a server with this
  * addon, that hand's trigger (Vivecraft's teleport key, see {@code KeyMappingVRMixin}) or
  * {@link VrKeys#FIRE_OFFHAND} fires it at its own rate through {@link C2SVrShootOffhand}. Automatic guns fire while
- * held; every other fire mode fires once per press.
+ * held; every other fire mode fires once per press. Charged guns (bows) are not fired from the off hand, and the
+ * trigger keeps its normal role while the main hand holds a Vivecraft bow (drawn with that trigger).
  */
 public final class VrOffhandShooting {
     private static int cooldown;
@@ -49,8 +51,8 @@ public final class VrOffhandShooting {
         }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        triggerTakenOver = player != null && player.getOffhandItem().getItem() instanceof GunItem && VR.active()
-                && VrAim.serverHasAddon();
+        triggerTakenOver = player != null && VrOffhand.canDualWield(player.getOffhandItem())
+                && !VR.isBow(player.getMainHandItem()) && VR.active() && VrAim.serverHasAddon();
         boolean down = triggerTakenOver && mc.screen == null && (VrKeys.FIRE_OFFHAND.isDown() || teleportPressed());
         if (down && player.getOffhandItem().getItem() instanceof GunItem gunItem) {
             ItemStack stack = player.getOffhandItem();

@@ -55,10 +55,19 @@ public final class VrHands {
      * gun in first person, read that one instead.
      */
     public static ItemStack animatedStack(Player player, ItemStack mainHand) {
-        if (renderingHand == InteractionHand.OFF_HAND && player == Minecraft.getInstance().player && VR.active()) {
-            return player.getOffhandItem();
-        }
-        return mainHand;
+        return renderingOffhand(player) ? player.getOffhandItem() : mainHand;
+    }
+
+    /**
+     * JEG's per-player "trigger held" flag, as the gun animation sees it. It belongs to the main-hand trigger, so the
+     * off-hand gun (never charged from that hand) must not play its charge animation when the main gun fires.
+     */
+    public static boolean shootingFlag(Player player, boolean original) {
+        return original && !renderingOffhand(player);
+    }
+
+    private static boolean renderingOffhand(Player player) {
+        return renderingHand == InteractionHand.OFF_HAND && player == Minecraft.getInstance().player && VR.active();
     }
 
     private static long gameTime() {

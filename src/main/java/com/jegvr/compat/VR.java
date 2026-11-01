@@ -4,6 +4,7 @@ import com.jegvr.JegVrCompat;
 import com.jegvr.compat.vivecraft.VivecraftBridge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
@@ -45,6 +46,7 @@ public final class VR {
                 Class.forName("ttv.migami.jeg.common.ReloadTracker");
                 Class.forName("ttv.migami.jeg.animations.GunAnimations");
                 Class.forName("ttv.migami.jeg.client.handler.ReloadHandler");
+                Class.forName("ttv.migami.jeg.client.handler.AimingHandler");
             }
         } catch (Throwable t) {
             disable(t);
@@ -131,6 +133,19 @@ public final class VR {
             }
         }
         return false;
+    }
+
+    /** True when Vivecraft treats {@code stack} as a roomscale bow (false without Vivecraft). */
+    public static boolean isBow(ItemStack stack) {
+        if (!loaded()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isBow(stack);
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
     }
 
     /** Vibrates the main-hand or off-hand controller; no-op outside VR. */
