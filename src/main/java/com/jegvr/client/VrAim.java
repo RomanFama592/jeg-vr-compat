@@ -1,7 +1,13 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.network.C2SVrAim;
+import com.jegvr.network.VrNetwork;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.Connection;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -12,27 +18,44 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Turns the gun's aim into the yaw/pitch JEG's server expects. The server spawns the bullet at the player's eye, not
- * at the gun, so sending the controller direction as-is would fly parallel to the barrel and miss by the hand-to-eye
- * offset. Instead we find what the barrel points at and aim from the eye at that point.
+ * Turns the gun's aim into the yaw/pitch JEG's server expects.
+ * <ul>
+ * <li>Server with this addon: we tell it where the muzzle is ({@link C2SVrAim}), it starts the bullet there, and the
+ * rotation is simply the barrel direction.</li>
+ * <li>JEG-only server: the bullet starts at the eye, so the barrel direction alone would fly parallel to the barrel and
+ * miss by the hand-to-eye offset. Instead we find what the barrel points at and aim from the eye at that point.</li>
+ * </ul>
  */
 public final class VrAim {
     private static final double RANGE = 128.0;
     private static final double MIN_DISTANCE_SQR = 0.2 * 0.2;
+    /** From the controller to roughly the end of the barrel, in blocks. */
+    private static final double MUZZLE_FORWARD = 0.3;
 
     private VrAim() {
     }
 
-    /** {yaw, pitch} in degrees, including the recoil deviation, or null when not aiming in VR. */
+    /**
+     * {yaw, pitch} in degrees, including the recoil deviation, or null when not aiming in VR. Must be called while
+     * building the shoot message: it may send the muzzle position first.
+     */
     public static float[] shotRotation(Player player) {
         VR.Aim aim = VR.mainHandAim();
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
-        Vec3 eye = player.getEyePosition();
-        Vec3 toTarget = target(player, aim).subtract(eye);
-        // A target almost at the eye gives a meaningless angle: keep the barrel direction then.
-        Vec3 dir = (toTarget.lengthSqr() < MIN_DISTANCE_SQR ? aim.dir() : toTarget).normalize();
+        Vec3 barrel = aim.dir().normalize();
+        Vec3 dir;
+        if (VrNetwork.isPresent(connection())) {
+            Vec3 muzzle = aim.pos().add(barrel.scale(MUZZLE_FORWARD));
+            VrNetwork.CHANNEL.sendToServer(new C2SVrAim(InteractionHand.MAIN_HAND, muzzle, barrel));
+            dir = barrel;
+        } else {
+            Vec3 eye = player.getEyePosition();
+            Vec3 toTarget = target(player, aim).subtract(eye);
+            // A target almost at the eye gives a meaningless angle: keep the barrel direction then.
+            dir = toTarget.lengthSqr() < MIN_DISTANCE_SQR ? barrel : toTarget.normalize();
+        }
         float yaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
         float pitch = (float) Math.toDegrees(-Math.asin(Mth.clamp(dir.y, -1.0, 1.0)));
         return new float[]{yaw + VrRecoil.aimDrift(), Mth.clamp(pitch - VrRecoil.aimClimb(), -90.0F, 90.0F)};
@@ -51,6 +74,11 @@ public final class VrAim {
         EntityHitResult entity = ProjectileUtil.getEntityHitResult(player.level(), player, from, to, area,
                 VrAim::canHit);
         return entity != null ? entity.getLocation() : to;
+    }
+
+    private static Connection connection() {
+        ClientPacketListener listener = Minecraft.getInstance().getConnection();
+        return listener == null ? null : listener.getConnection();
     }
 
     private static boolean canHit(Entity entity) {

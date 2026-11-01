@@ -6,7 +6,9 @@ license="MIT"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-description='''Compatibilidad VR (Vivecraft) para Just Enough Guns. 100% cliente.'''
+description='''Compatibilidad VR (Vivecraft) para Just Enough Guns. Funciona solo en el cliente; instalado también en el servidor, las balas salen desde el arma.'''
+# Optional on either side: never flag a version mismatch in the server list.
+displayTest="IGNORE_ALL_VERSION"
 
 [[dependencies.${mod_id}]]
 modId="forge"

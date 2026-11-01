@@ -27,6 +27,11 @@ minecraft {
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
+        // Dedicated server for phase S: ./gradlew runServer -PnoVivecraft (JEG + addon, no Vivecraft).
+        server {
+            workingDirectory project.file('run-server')
+            args '--nogui'
+        }
     }
 }
 

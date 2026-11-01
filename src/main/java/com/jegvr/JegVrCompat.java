@@ -4,6 +4,8 @@ import com.jegvr.compat.VR;
 import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrRecoil;
+import com.jegvr.network.VrNetwork;
+import com.jegvr.server.VrServerAim;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +21,9 @@ public class JegVrCompat {
 
     public JegVrCompat() {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
+        // Common to both sides: the optional server component (phase S).
+        VrNetwork.init();
+        MinecraftForge.EVENT_BUS.register(VrServerAim.class);
     }
 
     private void onClientSetup(FMLClientSetupEvent event) {

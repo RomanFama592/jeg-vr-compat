@@ -14,8 +14,11 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
 - Todas las dependencias de mods son `compileOnly` + `fg.deobf(...)`. Nunca `implementation` salvo MixinExtras (jarJar).
 
 ## Reglas de arquitectura (no negociables)
-1. **100 % cliente.** No registrar paquetes nuevos ni cambiar lógica de servidor. El addon debe funcionar
-   en un servidor que solo tiene JEG. Reutilizar `C2SMessageReload`, `C2SMessageShoot`, etc. de JEG.
+1. **Cliente primero, servidor opcional** (Fase S, aprobada por el usuario). Todo debe funcionar en un servidor
+   que solo tiene JEG, reutilizando `C2SMessageReload`, `C2SMessageShoot`, etc. Las mejoras de servidor van por el
+   canal propio `jeg_vr_compat:main` (acepta ausencia en ambos lados) y el cliente solo lo usa si
+   `VrNetwork.serverHasAddon()`. Código de servidor en `com.jegvr.server` y mixins en `mixin.server` (lista
+   `mixins` del json, solo requieren `jeg`; nunca importan clases de cliente ni de Vivecraft).
 2. **Flat intacto.** Toda intervención está detrás de `VR.active()` (jugador local) o `VR.isVRPlayer(p)`
    (jugadores remotos). Con VR apagado o Vivecraft ausente, el comportamiento debe ser idéntico al de JEG.
 3. **Vivecraft opcional.** Ninguna clase fuera de `compat/vivecraft/VivecraftBridge.java` puede importar

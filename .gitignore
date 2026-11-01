@@ -1,6 +1,7 @@
 .gradle/
 build/
 run/
+run-server/
 .tools/
 reference/
 .idea/

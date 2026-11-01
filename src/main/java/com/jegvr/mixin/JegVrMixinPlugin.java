@@ -8,14 +8,21 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-/** Applies our mixins only when both JEG and Vivecraft are installed. */
+/**
+ * Server mixins ({@code mixin.server}) need only JEG, since dedicated servers usually lack Vivecraft. The rest
+ * (client) need both JEG and Vivecraft.
+ */
 public class JegVrMixinPlugin implements IMixinConfigPlugin {
-    private boolean enabled;
+    private static final String SERVER_PACKAGE = "com.jegvr.mixin.server.";
+
+    private boolean hasJeg;
+    private boolean hasVivecraft;
 
     @Override
     public void onLoad(String mixinPackage) {
         LoadingModList mods = LoadingModList.get();
-        enabled = mods != null && mods.getModFileById("jeg") != null && mods.getModFileById("vivecraft") != null;
+        hasJeg = mods != null && mods.getModFileById("jeg") != null;
+        hasVivecraft = mods != null && mods.getModFileById("vivecraft") != null;
     }
 
     @Override
@@ -25,7 +32,7 @@ public class JegVrMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return enabled;
+        return hasJeg && (hasVivecraft || mixinClassName.startsWith(SERVER_PACKAGE));
     }
 
     @Override

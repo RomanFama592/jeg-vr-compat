@@ -52,4 +52,16 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] VR: arma de ráfaga (burst): ¿los disparos 2..n van al controlador o a la cabeza? (F6.2)
 - [ ] Servidor dedicado solo con JEG: las balas siguen al controlador (F6.3).
 - [ ] Flat: puntería, recoil y mira igual que JEG solo.
+- [x] VR: probado por el usuario. Bien en general; en algunas armas el recoil de puntería casi no se nota (aceptable por ahora).
 - Si el recoil de puntería es mucho o poco: `AIM_CLIMB_PER_DEGREE`, `AIM_DRIFT_PER_DEGREE`, `AIM_DECAY` en `VrRecoil`.
+
+## Fase S (componente de servidor opcional)
+- [x] (auto) Compila; al arrancar el cliente aplican los 9 mixins, incluido `server.ProjectileEntityVRMixin`.
+- [ ] VR, un jugador (el servidor integrado tiene el addon): la bala sale desde la punta del arma (se ve en la estela), no desde la cabeza.
+- [ ] VR, un jugador: disparar por encima de una pared baja con el arma levantada sobre ella: la bala pasa (antes chocaba con la pared).
+- [ ] VR, un jugador: con el arma metida en un bloque, la bala impacta ese bloque y no lo atraviesa.
+- [ ] VR, un jugador: arma de ráfaga: todos los disparos siguen al controlador.
+- [ ] Servidor dedicado con JEG + addon, sin Vivecraft (`./gradlew runServer -PnoVivecraft`; la primera vez hay que aceptar el EULA en `run-server/eula.txt`): un cliente VR entra y la bala sale del arma.
+- [ ] Servidor dedicado solo con JEG (sin addon): un cliente VR entra sin errores y dispara como en la Fase 6 (convergencia).
+- [ ] Servidor con addon + cliente flat sin addon: entra y juega normal.
+- [ ] Flat con addon en ambos lados: disparo igual que JEG solo.
