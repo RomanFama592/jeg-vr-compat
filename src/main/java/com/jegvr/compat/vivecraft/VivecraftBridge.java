@@ -1,9 +1,11 @@
 package com.jegvr.compat.vivecraft;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.vivecraft.api_beta.VivecraftAPI;
+import org.vivecraft.client.VivecraftVRMod;
 import org.vivecraft.api_beta.client.VivecraftClientAPI;
 import org.vivecraft.client_vr.ClientDataHolderVR;
 import org.vivecraft.client_vr.VRData;
@@ -55,6 +57,12 @@ public final class VivecraftBridge {
         }
         boolean right = mainHand != isLeftHanded();
         vr.triggerHapticPulse(right ? ControllerType.RIGHT : ControllerType.LEFT, seconds, 160.0F, amplitude);
+    }
+
+    /** Vivecraft's teleport keys (teleport mode and free-move fallback), bound to the off-hand trigger by default. */
+    public static KeyMapping[] teleportKeys() {
+        VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
+        return new KeyMapping[]{mod.keyTeleport, mod.keyTeleportFallback};
     }
 
     public static boolean isLeftHanded() {

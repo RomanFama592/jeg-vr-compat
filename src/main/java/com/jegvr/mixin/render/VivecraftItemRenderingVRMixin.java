@@ -2,6 +2,7 @@ package com.jegvr.mixin.render;
 
 import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrGunPose;
+import com.jegvr.client.VrHands;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +30,7 @@ public class VivecraftItemRenderingVRMixin {
                                                      InteractionHand hand, CallbackInfo ci) {
         if (stack.getItem() instanceof GunItem) {
             VrDiag.once("vivecraftTransform", "Vivecraft first-person item transform replaced for JEG guns (type={})", type);
+            VrHands.setRenderingHand(hand);
             VrGunPose.apply(poseStack, stack,
                     rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
                     hand == InteractionHand.MAIN_HAND);

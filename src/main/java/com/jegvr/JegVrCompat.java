@@ -7,7 +7,7 @@ import com.jegvr.client.VrKeys;
 import com.jegvr.client.VrOffhandShooting;
 import com.jegvr.client.VrRecoil;
 import com.jegvr.network.VrNetwork;
-import com.jegvr.server.VrOffhandShot;
+import com.jegvr.server.VrOffhand;
 import com.jegvr.server.VrServerAim;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,7 +34,7 @@ public class JegVrCompat {
         VrNetwork.init();
         MinecraftForge.EVENT_BUS.register(VrServerAim.class);
         if (ModList.get().isLoaded("jeg")) {
-            MinecraftForge.EVENT_BUS.register(VrOffhandShot.class);
+            MinecraftForge.EVENT_BUS.register(VrOffhand.class);
         }
     }
 

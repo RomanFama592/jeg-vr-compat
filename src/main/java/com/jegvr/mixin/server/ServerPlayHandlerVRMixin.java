@@ -1,6 +1,6 @@
 package com.jegvr.mixin.server;
 
-import com.jegvr.server.VrOffhandShot;
+import com.jegvr.server.VrOffhand;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
@@ -16,7 +16,7 @@ import ttv.migami.jeg.common.ShootTracker;
 import ttv.migami.jeg.common.network.ServerPlayHandler;
 
 /**
- * {@code handleShoot} always fires {@code getItemInHand(MAIN_HAND)}. During a {@link VrOffhandShot} it reads the off
+ * {@code handleShoot} always fires {@code getItemInHand(MAIN_HAND)}. During a {@link VrOffhand} it reads the off
  * hand instead, with a separate fire-rate tracker. Normal shots are untouched.
  */
 @Mixin(value = ServerPlayHandler.class, remap = false)
@@ -26,19 +26,19 @@ public abstract class ServerPlayHandlerVRMixin {
             remap = true))
     private static ItemStack jegvr$offhandGun(ServerPlayer player, InteractionHand hand,
                                               Operation<ItemStack> original) {
-        return original.call(player, VrOffhandShot.firing() ? InteractionHand.OFF_HAND : hand);
+        return original.call(player, VrOffhand.firing() ? InteractionHand.OFF_HAND : hand);
     }
 
     @WrapOperation(method = "handleShoot", at = @At(value = "INVOKE",
             target = "Lttv/migami/jeg/common/ShootTracker;getShootTracker(Lnet/minecraft/world/entity/player/Player;)Lttv/migami/jeg/common/ShootTracker;"))
     private static ShootTracker jegvr$offhandTracker(Player player, Operation<ShootTracker> original) {
-        return VrOffhandShot.firing() ? VrOffhandShot.tracker(player) : original.call(player);
+        return VrOffhand.firing() ? VrOffhand.tracker(player) : original.call(player);
     }
 
     /** {@code inventoryFeed} refills the main-hand gun; skip it for off-hand shots rather than feed the wrong gun. */
     @WrapWithCondition(method = "handleShoot", at = @At(value = "INVOKE",
             target = "Lttv/migami/jeg/common/ReloadTracker;inventoryFeed(Lnet/minecraft/world/entity/player/Player;Lttv/migami/jeg/common/Gun;)V"))
     private static boolean jegvr$skipMainHandFeed(Player player, Gun gun) {
-        return !VrOffhandShot.firing();
+        return !VrOffhand.firing();
     }
 }

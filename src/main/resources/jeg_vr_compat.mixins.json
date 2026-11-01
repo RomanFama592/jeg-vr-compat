@@ -5,9 +5,10 @@
   "plugin": "com.jegvr.mixin.JegVrMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "jeg_vr_compat.refmap.json",
-  "mixins": ["server.ProjectileEntityVRMixin", "server.ServerPlayHandlerVRMixin"],
-  "client": ["net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunRendererVRMixin",
-    "render.CrosshairHandlerVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemRendererVRMixin",
+  "mixins": ["server.ProjectileEntityVRMixin", "server.ReloadTrackerVRMixin", "server.ServerPlayHandlerVRMixin"],
+  "client": ["input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
+    "input.ReloadHandlerVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunRendererVRMixin",
+    "render.CrosshairHandlerVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemRendererVRMixin",
     "render.VREffectsHelperVRMixin", "render.VivecraftItemRenderingVRMixin"],
   "injectors": {
     "defaultRequire": 1

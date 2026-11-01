@@ -1,6 +1,6 @@
 package com.jegvr.network;
 
-import com.jegvr.server.VrOffhandShot;
+import com.jegvr.server.VrOffhand;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.ModList;
@@ -21,9 +21,9 @@ public record C2SVrShootOffhand(float yaw, float pitch) {
 
     public static void handle(C2SVrShootOffhand msg, Supplier<NetworkEvent.Context> ctx) {
         ServerPlayer player = ctx.get().getSender();
-        // VrOffhandShot uses JEG classes: never load it on a server without JEG.
+        // VrOffhand uses JEG classes: never load it on a server without JEG.
         if (player != null && ModList.get().isLoaded("jeg")) {
-            VrOffhandShot.fire(player, msg.yaw, msg.pitch);
+            VrOffhand.fire(player, msg.yaw, msg.pitch);
         }
     }
 }

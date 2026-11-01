@@ -1,6 +1,6 @@
 package com.jegvr.mixin.server;
 
-import com.jegvr.server.VrOffhandShot;
+import com.jegvr.server.VrOffhand;
 import com.jegvr.server.VrServerAim;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -30,7 +30,7 @@ public abstract class ProjectileEntityVRMixin {
         if (level.isClientSide) {
             return;
         }
-        InteractionHand hand = VrOffhandShot.firing() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+        InteractionHand hand = VrOffhand.firing() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         Vec3 muzzle = VrServerAim.muzzleFor(shooter, hand);
         if (muzzle == null) {
             return;

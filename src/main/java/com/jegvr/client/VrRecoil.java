@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.jegvr.compat.VR;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.common.Gun;
@@ -44,6 +45,8 @@ public final class VrRecoil {
         if (!event.isClient() || !VR.active() || !(event.getStack().getItem() instanceof GunItem gunItem)) {
             return;
         }
+        // JEG's client fire event is only posted for the main hand (the off hand goes through VrOffhandShooting).
+        VrHands.markShot(InteractionHand.MAIN_HAND);
         Gun gun = gunItem.getModifiedGun(event.getStack());
         float angle = gun.getGeneral().getRecoilAngle() * (1.0F - GunModifierHelper.getRecoilModifier(event.getStack()));
         kick = Math.min(MAX_KICK, kick + angle * KICK_PER_DEGREE);

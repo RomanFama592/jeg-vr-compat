@@ -12,7 +12,8 @@ import net.minecraftforge.network.simple.SimpleChannel;
  * it). The client only sends on it after checking {@link #isPresent(Connection)}.
  */
 public final class VrNetwork {
-    private static final String VERSION = "1";
+    /** Bump when a packet changes; a mismatch (not an absence) is rejected on join. */
+    private static final String VERSION = "2";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(JegVrCompat.MOD_ID, "main"), () -> VERSION,
@@ -31,6 +32,11 @@ public final class VrNetwork {
                 .encoder(C2SVrShootOffhand::encode)
                 .decoder(C2SVrShootOffhand::decode)
                 .consumerMainThread(C2SVrShootOffhand::handle)
+                .add();
+        CHANNEL.messageBuilder(C2SVrReloadOffhand.class, 2, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrReloadOffhand::encode)
+                .decoder(C2SVrReloadOffhand::decode)
+                .consumerMainThread(C2SVrReloadOffhand::handle)
                 .add();
     }
 

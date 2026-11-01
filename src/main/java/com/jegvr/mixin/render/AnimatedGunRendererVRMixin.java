@@ -10,6 +10,11 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
+import com.jegvr.client.VrHands;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import ttv.migami.jeg.client.handler.ShootingHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -71,5 +76,13 @@ public class AnimatedGunRendererVRMixin {
         if (VR.active() && context.firstPerson()) {
             VrDiag.once("renderByItem", "AnimatedGunRenderer.renderByItem runs in VR (context={})", context);
         }
+    }
+
+    /** Muzzle flash and its light boost: in VR only on the gun of the hand that fired (see {@link VrHands}). */
+    @WrapOperation(method = "renderByItem", at = @At(value = "INVOKE",
+            target = "Lttv/migami/jeg/client/handler/ShootingHandler;isShooting()Z"))
+    private boolean jegvr$flashPerHand(ShootingHandler handler, Operation<Boolean> original,
+                                       @Local(argsOnly = true) ItemDisplayContext context) {
+        return VrHands.shouldFlash(original.call(handler), context);
     }
 }

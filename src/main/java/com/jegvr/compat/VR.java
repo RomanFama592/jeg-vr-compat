@@ -2,6 +2,7 @@ package com.jegvr.compat;
 
 import com.jegvr.JegVrCompat;
 import com.jegvr.compat.vivecraft.VivecraftBridge;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
@@ -11,8 +12,10 @@ import org.apache.logging.log4j.Logger;
 /** Safe facade: every method is false/null when Vivecraft is absent or its API misbehaves. */
 public final class VR {
     private static final Logger LOGGER = LogManager.getLogger(JegVrCompat.MOD_ID);
+    private static final KeyMapping[] NO_KEYS = new KeyMapping[0];
     private static Boolean loaded;
     private static boolean broken;
+    private static KeyMapping[] teleportKeys;
 
     private VR() {
     }
@@ -39,6 +42,9 @@ public final class VR {
             if (ModList.get().isLoaded("jeg")) {
                 Class.forName("ttv.migami.jeg.network.message.C2SMessageShoot");
                 Class.forName("ttv.migami.jeg.common.network.ServerPlayHandler");
+                Class.forName("ttv.migami.jeg.common.ReloadTracker");
+                Class.forName("ttv.migami.jeg.animations.GunAnimations");
+                Class.forName("ttv.migami.jeg.client.handler.ReloadHandler");
             }
         } catch (Throwable t) {
             disable(t);
@@ -100,6 +106,31 @@ public final class VR {
             disable(t);
             return null;
         }
+    }
+
+    /** Vivecraft's teleport keys (normally the off-hand trigger), or none without Vivecraft. */
+    public static KeyMapping[] teleportKeys() {
+        if (!loaded()) {
+            return NO_KEYS;
+        }
+        if (teleportKeys == null) {
+            try {
+                teleportKeys = VivecraftBridge.teleportKeys();
+            } catch (Throwable t) {
+                disable(t);
+                return NO_KEYS;
+            }
+        }
+        return teleportKeys;
+    }
+
+    public static boolean isTeleportKey(KeyMapping key) {
+        for (KeyMapping teleport : teleportKeys()) {
+            if (teleport == key) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Vibrates the main-hand or off-hand controller; no-op outside VR. */
