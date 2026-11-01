@@ -3,7 +3,6 @@ package com.jegvr.client;
 import com.jegvr.compat.VR;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -19,6 +18,8 @@ public final class VrHands {
     private static final long FLASH_TICKS = 1;
 
     private static InteractionHand renderingHand;
+    /** The hand whose gun the current JEG reload is for (JEG's RELOADING flag is per player). */
+    private static InteractionHand reloadingHand = InteractionHand.MAIN_HAND;
     private static long mainShotTick = Long.MIN_VALUE;
     private static long offShotTick = Long.MIN_VALUE;
 
@@ -67,18 +68,21 @@ public final class VrHands {
         return original && !renderingOffhand(player);
     }
 
+    public static void markReload(InteractionHand hand) {
+        reloadingHand = hand;
+    }
+
     /**
      * JEG's per-player "reloading" flag, as the gun animation sees it. It does not say which gun reloads, so a reload of
-     * one hand (even JEG's automatic one with no ammo for that gun) would animate the other hand's gun too. The gun
-     * being reloaded carries the "IsReloading" tag: an off-hand reload sets it on the off-hand gun.
+     * one hand (even JEG's automatic one with no ammo for that gun) would animate the other hand's gun too: only the
+     * gun of the hand that started the reload sees it.
      */
     public static boolean reloadingFlag(Player player, boolean original) {
         if (!original || player != Minecraft.getInstance().player || !VR.active()) {
             return original;
         }
-        CompoundTag offTag = player.getOffhandItem().getTag();
-        boolean offhandReload = offTag != null && offTag.getBoolean("IsReloading");
-        return renderingHand == InteractionHand.OFF_HAND ? offhandReload : !offhandReload;
+        InteractionHand drawn = renderingHand == null ? InteractionHand.MAIN_HAND : renderingHand;
+        return drawn == reloadingHand;
     }
 
     private static boolean renderingOffhand(Player player) {

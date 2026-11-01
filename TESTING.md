@@ -112,4 +112,6 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Si la caja de la cadera o la del arma quedan incómodas: decir hacia dónde moverlas o si son chicas.
 - [ ] Servidor solo con JEG: funciona igual (usa la recarga normal de JEG).
 - [ ] Flat: nada cambia, no se ven cajas.
-- [ ] **Bug corregido:** dos armas, la principal vacía y sin su munición, la secundaria con munición de otro tipo: al disparar con la principal la secundaria ya no hace la animación de recarga. Recargar la secundaria con el botón sigue animando solo la secundaria.
+- [ ] **Supervivencia:** pistola sin llenar y balas de pistola en el inventario: la caja de la cadera es azul (no roja) y deja agarrar.
+- [ ] **Animación de recarga con dos armas:** la principal vacía y sin su munición, la secundaria con otra munición: al disparar con la principal la secundaria no se anima. Recargar la principal anima solo la principal; recargar la secundaria (botón con la secundaria apuntando arriba) anima solo la secundaria.
+- [ ] Secundaria sin balas: volver a apretar su gatillo la recarga (como JEG con la principal).

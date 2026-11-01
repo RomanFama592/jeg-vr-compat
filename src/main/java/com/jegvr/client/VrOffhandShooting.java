@@ -16,6 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.client.handler.GunRenderingHandler;
 import ttv.migami.jeg.common.FireMode;
 import ttv.migami.jeg.common.Gun;
+import ttv.migami.jeg.common.ReloadType;
 import ttv.migami.jeg.event.GunFireEvent;
 import ttv.migami.jeg.item.GunItem;
 import ttv.migami.jeg.util.GunEnchantmentHelper;
@@ -75,7 +76,14 @@ public final class VrOffhandShooting {
     }
 
     private static void fire(LocalPlayer player, ItemStack stack, Gun gun) {
-        if (player.isSpectator() || (!Gun.hasAmmo(stack) && !player.isCreative())) {
+        if (player.isSpectator()) {
+            return;
+        }
+        if (!Gun.hasAmmo(stack) && !player.isCreative()) {
+            // JEG reloads the main-hand gun when its trigger is pulled empty (ShootingHandler); same for this hand.
+            if (!ReloadType.INVENTORY_FED.equals(gun.getReloads().getReloadType())) {
+                VrDualReload.reloadOffhand(player);
+            }
             return;
         }
         float[] rotation = VrAim.offHandShotRotation();

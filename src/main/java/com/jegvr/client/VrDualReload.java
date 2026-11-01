@@ -8,6 +8,7 @@ import com.jegvr.server.VrOffhand;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -60,6 +61,9 @@ public final class VrDualReload {
             }
         }
         aimWasDown = down;
+        if (player != null && !ModSyncedDataKeys.RELOADING.getValue(player)) {
+            VrHands.markReload(InteractionHand.MAIN_HAND);
+        }
     }
 
     private static boolean reloadsOffhand(LocalPlayer player) {
@@ -83,7 +87,8 @@ public final class VrDualReload {
         ReloadHandler.get().setReloading(true);
     }
 
-    private static void reloadOffhand(LocalPlayer player) {
+    /** Reloads the off-hand gun (also JEG's automatic reload when its trigger is pulled empty). */
+    public static void reloadOffhand(LocalPlayer player) {
         ItemStack stack = player.getOffhandItem();
         GunItem gunItem = (GunItem) stack.getItem();
         Gun gun = gunItem.getModifiedGun(stack);
@@ -96,6 +101,7 @@ public final class VrDualReload {
         // slot so JEG's slot check does not cancel it.
         tag.putBoolean("IsReloading", true);
         ModSyncedDataKeys.RELOADING.setValue(player, true);
+        VrHands.markReload(InteractionHand.OFF_HAND);
         ((ReloadHandlerAccessor) ReloadHandler.get()).jegvr$setReloadingSlot(player.getInventory().selected);
         VrNetwork.CHANNEL.sendToServer(new C2SVrReloadOffhand());
     }

@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -182,8 +183,14 @@ public final class VrGrabReload {
                 || ammo(stack) >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
             return Pouch.HIDDEN;
         }
-        boolean hasAmmo = player.isCreative() || !Gun.findAmmo(player, gun.getReloads().getReloadItem()).stack().isEmpty();
+        boolean hasAmmo = player.isCreative() || !Gun.findAmmo(player, ammoItem(gun)).stack().isEmpty();
         return hasAmmo ? Pouch.READY : Pouch.NO_AMMO;
+    }
+
+    /** The item JEG looks for in the inventory: the reload item for SINGLE_ITEM guns, the round for the rest. */
+    private static ResourceLocation ammoItem(Gun gun) {
+        return ReloadType.SINGLE_ITEM.equals(gun.getReloads().getReloadType())
+                ? gun.getReloads().getReloadItem() : gun.getProjectile().getItem();
     }
 
     private static int ammo(ItemStack stack) {
