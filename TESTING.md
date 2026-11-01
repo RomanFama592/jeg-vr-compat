@@ -77,3 +77,15 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Sin munición en la mano libre: no dispara (no se recarga todavía con la mano libre; ver F9.6).
 - [ ] Servidor solo con JEG: la tecla no hace nada y no hay errores.
 - [ ] Flat: nada cambia (la tecla solo actúa en VR).
+
+## S.5b (dos armas: destello, animación, gatillo y recarga)
+- [x] (auto) Compila; al arrancar aplican los 16 mixins (nuevos: `input.*`, `render.GunAnimationsVRMixin`, `server.ReloadTrackerVRMixin`).
+- [ ] VR, arma en cada mano: al disparar con la derecha solo destella el arma derecha; al disparar con la izquierda destella y se anima (corredera, etc.) la izquierda.
+- [ ] Misma arma animada en las dos manos: cada una se anima solo cuando dispara ella.
+- [ ] Con un arma en la mano libre el gatillo de esa mano dispara y NO teletransporta (ni aparece el arco). Sin arma en esa mano, el gatillo vuelve a teletransportar.
+- [ ] Recarga con el cañón de la mano libre hacia arriba (la principal no): recarga la de la mano libre, con animación y sonido; la munición de la principal no cambia.
+- [ ] Recarga con las dos hacia arriba, o ninguna: recarga la principal (como antes).
+- [ ] Solo arma en la mano libre (mano principal vacía u otro ítem): la tecla de recarga la recarga.
+- [ ] Cambiar de slot del hotbar durante la recarga de la mano libre la cancela (como JEG con la principal).
+- [ ] Servidor solo con JEG: el gatillo de la mano libre sigue teletransportando y la recarga es la de JEG.
+- [ ] Flat: nada cambia.
