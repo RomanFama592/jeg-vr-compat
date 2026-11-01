@@ -4,6 +4,7 @@ import com.jegvr.compat.VR;
 import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrDualReload;
+import com.jegvr.client.VrGrabReload;
 import com.jegvr.client.VrKeys;
 import com.jegvr.client.VrOffhandShooting;
 import com.jegvr.client.VrRecoil;
@@ -48,6 +49,7 @@ public class JegVrCompat {
             MinecraftForge.EVENT_BUS.register(VrRecoil.class);
             MinecraftForge.EVENT_BUS.register(VrOffhandShooting.class);
             MinecraftForge.EVENT_BUS.register(VrDualReload.class);
+            MinecraftForge.EVENT_BUS.register(VrGrabReload.class);
         }
         VR.preload();
         LOGGER.info("Vivecraft present: {}, VR active at startup: {}", VR.loaded(), VR.active());

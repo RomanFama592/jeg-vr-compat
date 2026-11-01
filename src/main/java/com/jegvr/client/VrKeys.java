@@ -13,10 +13,15 @@ public final class VrKeys {
     public static final KeyMapping FIRE_OFFHAND = new KeyMapping("key." + JegVrCompat.MOD_ID + ".fire_offhand",
             InputConstants.UNKNOWN.getValue(), CATEGORY);
 
+    /** Grab (reload by hand, F7). Optional: the off-hand grip already works with Vivecraft's default bindings. */
+    public static final KeyMapping GRAB = new KeyMapping("key." + JegVrCompat.MOD_ID + ".grab",
+            InputConstants.UNKNOWN.getValue(), CATEGORY);
+
     private VrKeys() {
     }
 
     public static void onRegister(RegisterKeyMappingsEvent event) {
         event.register(FIRE_OFFHAND);
+        event.register(GRAB);
     }
 }

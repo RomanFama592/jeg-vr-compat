@@ -97,3 +97,15 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Arco de JEG en la mano libre: el gatillo de esa mano no lo dispara (vuelve a teletransportar). Al disparar la mini gun con la principal, el arco de la mano libre no hace la animación de carga.
 - [ ] Botón de apuntar (zoom) con un arma: no hace zoom y recarga; con un arma en cada mano recarga la que tenga el cañón hacia arriba (la principal si las dos o ninguna).
 - [ ] Flat: apuntar con clic derecho sigue haciendo zoom.
+
+## Fase 7 (recarga con la mano)
+- [x] (auto) Compila; al arrancar aplican los 17 mixins.
+- Ayuda: `/jegvr zones` muestra la cadera (azul) y el pozo del cargador (verde). Volver a escribirlo las oculta.
+- [ ] VR, arma en la principal, mano libre vacía, arma sin llenar y con munición en el inventario: llevar la mano libre a la cadera y apretar el grip: vibra y suena. Sin soltar el grip, llevarla debajo del arma: recarga (animación y sonido de JEG) y vibran las dos manos.
+- [ ] Apretar el grip lejos de la cadera: cambia de slot del hotbar como siempre.
+- [ ] Soltar el grip antes de llegar al arma: no recarga. Arma llena o sin munición: el grip en la cadera cambia de slot (no agarra).
+- [ ] Escopeta: cada agarre mete un solo cartucho; la tecla de recarga sigue cargando todos.
+- [ ] La tecla de recarga y el botón de apuntar siguen recargando.
+- [ ] Si la cadera o el pozo quedan incómodos: decir hacia dónde moverlos (arriba/abajo, adelante/atrás, más al costado) o si el radio es chico.
+- [ ] Servidor solo con JEG: funciona igual (usa la recarga normal de JEG).
+- [ ] Flat: nada cambia.

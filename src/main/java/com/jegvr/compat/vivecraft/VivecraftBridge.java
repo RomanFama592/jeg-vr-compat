@@ -67,6 +67,15 @@ public final class VivecraftBridge {
         return new KeyMapping[]{mod.keyTeleport, mod.keyTeleportFallback};
     }
 
+    /**
+     * The key on the off-hand grip: Vivecraft's default bindings put "hotbar previous" on the left grip and "hotbar
+     * next" on the right one, and the off hand is the left one unless hands are reversed.
+     */
+    public static KeyMapping offHandGripKey() {
+        VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
+        return isLeftHanded() ? mod.keyHotbarNext : mod.keyHotbarPrev;
+    }
+
     /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */
     public static boolean isBow(ItemStack stack) {
         return BowTracker.isBow(stack);

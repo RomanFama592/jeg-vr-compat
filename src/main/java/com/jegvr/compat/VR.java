@@ -110,6 +110,59 @@ public final class VR {
         }
     }
 
+    /** Headset position and look direction, or null outside VR. */
+    public static Aim hmdAim() {
+        if (!active()) {
+            return null;
+        }
+        try {
+            VivecraftBridge.Pose pose = VivecraftBridge.hmd();
+            return pose == null ? null : new Aim(pose.pos(), pose.dir());
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
+    /** Vivecraft's world scale (1 = real size); distances measured in metres in the room scale with it. */
+    public static float worldScale() {
+        if (!active()) {
+            return 1.0F;
+        }
+        try {
+            return VivecraftBridge.worldScale();
+        } catch (Throwable t) {
+            disable(t);
+            return 1.0F;
+        }
+    }
+
+    /** True when Vivecraft's hands are reversed (main hand on the left controller). */
+    public static boolean leftHanded() {
+        if (!loaded()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isLeftHanded();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    /** The key on the off-hand grip with Vivecraft's default bindings, or null without Vivecraft. */
+    public static KeyMapping offHandGripKey() {
+        if (!loaded()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.offHandGripKey();
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
     /** Vivecraft's teleport keys (normally the off-hand trigger), or none without Vivecraft. */
     public static KeyMapping[] teleportKeys() {
         if (!loaded()) {

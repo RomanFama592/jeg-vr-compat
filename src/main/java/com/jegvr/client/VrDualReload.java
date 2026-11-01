@@ -75,7 +75,7 @@ public final class VrDualReload {
     }
 
     /** What JEG's reload key does (ReloadHandler.onKeyPressed). */
-    private static void reloadMainHand(LocalPlayer player) {
+    public static void reloadMainHand(LocalPlayer player) {
         CompoundTag tag = player.getMainHandItem().getTag();
         if (tag != null) {
             tag.putBoolean("IsReloading", true);
