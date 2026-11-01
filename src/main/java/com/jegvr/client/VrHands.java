@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.jegvr.compat.VR;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -64,6 +65,20 @@ public final class VrHands {
      */
     public static boolean shootingFlag(Player player, boolean original) {
         return original && !renderingOffhand(player);
+    }
+
+    /**
+     * JEG's per-player "reloading" flag, as the gun animation sees it. It does not say which gun reloads, so a reload of
+     * one hand (even JEG's automatic one with no ammo for that gun) would animate the other hand's gun too. The gun
+     * being reloaded carries the "IsReloading" tag: an off-hand reload sets it on the off-hand gun.
+     */
+    public static boolean reloadingFlag(Player player, boolean original) {
+        if (!original || player != Minecraft.getInstance().player || !VR.active()) {
+            return original;
+        }
+        CompoundTag offTag = player.getOffhandItem().getTag();
+        boolean offhandReload = offTag != null && offTag.getBoolean("IsReloading");
+        return renderingHand == InteractionHand.OFF_HAND ? offhandReload : !offhandReload;
     }
 
     private static boolean renderingOffhand(Player player) {

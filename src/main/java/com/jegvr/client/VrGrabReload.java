@@ -1,18 +1,22 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
-import com.jegvr.mixin.input.KeyMappingAccessor;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.joml.Vector3f;
 import ttv.migami.jeg.client.handler.ReloadHandler;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ReloadType;
@@ -21,60 +25,64 @@ import ttv.migami.jeg.item.GunItem;
 import ttv.migami.jeg.util.GunModifierHelper;
 
 /**
- * Reload by hand (phase 7): with the off hand free, grab a magazine at the hip with the off-hand grip, then bring it
- * to the main-hand gun. That starts JEG's normal reload (works on servers with only JEG). Guns loaded round by round
- * ({@code MANUAL}, shotguns) take one round per grab. JEG's reload key keeps working.
+ * Reload by hand (phase 7): with the off hand free, put it in the hip box and press the off-hand grip to take a
+ * magazine; the magazine box then follows the hand until it touches the gun's magazine-well box. That starts JEG's
+ * normal reload (works on servers with only JEG). Guns loaded round by round ({@code MANUAL}, shotguns) take one round
+ * per grab. JEG's reload key keeps working.
  * <p>
- * The off-hand grip is Vivecraft's "hotbar" key: a press inside the hip zone is taken from Vivecraft
+ * Guides (on by default, {@code /jegvr zones} toggles them): the hip box is red when there is no ammo, blue when a
+ * magazine can be taken and green with the hand in it; while holding, the magazine box is yellow and the
+ * magazine-well box turns green on contact.
+ * <p>
+ * The off-hand grip is Vivecraft's "hotbar" key: a press that grabs (or drops) a magazine is taken from Vivecraft
  * ({@code KeyMappingVRMixin}), anywhere else it still changes the hotbar slot. {@link VrKeys#GRAB} is an optional
  * alternative for custom bindings.
  */
 public final class VrGrabReload {
     /** Room-scale metres (multiplied by Vivecraft's world scale). */
     private static final double POUCH_DOWN = 0.65;
-    private static final double POUCH_SIDE = 0.18;
+    private static final double POUCH_SIDE = 0.2;
     private static final double POUCH_FORWARD = 0.05;
-    private static final double POUCH_RADIUS = 0.22;
-    private static final double MAGWELL_FORWARD = 0.12;
+    private static final Vec3 POUCH_HALF = new Vec3(0.17, 0.22, 0.17);
+    private static final double MAGWELL_FORWARD = 0.1;
     private static final double MAGWELL_DOWN = 0.08;
-    private static final double MAGWELL_RADIUS = 0.15;
-    private static final int TIMEOUT_TICKS = 100;
+    private static final Vec3 MAGWELL_HALF = new Vec3(0.1, 0.1, 0.1);
+    private static final Vec3 MAGAZINE_HALF = new Vec3(0.04, 0.07, 0.04);
+    private static final int TIMEOUT_TICKS = 200;
 
-    private static final DustParticleOptions POUCH_DUST = new DustParticleOptions(new Vector3f(0.2F, 0.5F, 1.0F), 0.6F);
-    private static final DustParticleOptions MAGWELL_DUST = new DustParticleOptions(new Vector3f(0.2F, 1.0F, 0.3F), 0.6F);
+    private enum Pouch { HIDDEN, NO_AMMO, READY }
 
     private static boolean holding;
     private static int heldTicks;
     private static int slot;
     private static boolean grabWasDown;
+    private static boolean handWasInPouch;
     /** MANUAL reload started by a grab: stop it once the gun has more rounds than this. */
     private static int singleRoundFrom = -1;
-    private static boolean showZones;
+    private static boolean showGuides = true;
 
     private VrGrabReload() {
     }
 
-    /** {@code /jegvr zones}: show the hip and magazine-well zones as particles. */
+    /** {@code /jegvr zones}: show or hide the hip and magazine-well boxes. */
     public static boolean toggleZones() {
-        showZones = !showZones;
-        return showZones;
+        showGuides = !showGuides;
+        return showGuides;
     }
 
     /**
-     * The off-hand grip was pressed (from {@code KeyMappingVRMixin}). Returns true when the press grabbed a magazine,
-     * so Vivecraft must not also use it.
+     * The off-hand grip was pressed (from {@code KeyMappingVRMixin}). Returns true when the press grabbed or dropped a
+     * magazine, so Vivecraft must not also use it.
      */
     public static boolean onGripPressed() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (holding) {
+            // A second press puts the magazine back.
+            holding = false;
+            VR.haptic(false, 0.03F, 0.3F);
             return true;
         }
-        if (player == null || !canGrab(player)) {
-            return false;
-        }
-        Vec3 pouch = pouch();
-        VR.Aim hand = VR.offHandAim();
-        if (pouch == null || hand == null || hand.pos().distanceTo(pouch) > POUCH_RADIUS * VR.worldScale()) {
+        if (player == null || pouchState(player) != Pouch.READY || !handInPouch()) {
             return false;
         }
         holding = true;
@@ -102,26 +110,29 @@ public final class VrGrabReload {
         grabWasDown = grabDown;
         if (player == null || !VR.active()) {
             holding = false;
+            handWasInPouch = false;
             singleRoundFrom = -1;
             return;
         }
         tickSingleRound(player);
         if (holding) {
             tickHolding(player);
-        }
-        if (showZones && player.tickCount % 2 == 0) {
-            showZones(player);
+        } else {
+            // A light buzz when the hand enters the hip box, so it can be found without looking.
+            boolean inPouch = pouchState(player) == Pouch.READY && handInPouch();
+            if (inPouch && !handWasInPouch) {
+                VR.haptic(false, 0.02F, 0.25F);
+            }
+            handWasInPouch = inPouch;
         }
     }
 
     private static void tickHolding(LocalPlayer player) {
-        if (!gripDown() || ++heldTicks > TIMEOUT_TICKS || player.getInventory().selected != slot || !canGrab(player)) {
+        if (++heldTicks > TIMEOUT_TICKS || player.getInventory().selected != slot || !canGrab(player)) {
             holding = false;
             return;
         }
-        Vec3 magwell = magwell();
-        VR.Aim hand = VR.offHandAim();
-        if (magwell == null || hand == null || hand.pos().distanceTo(magwell) > MAGWELL_RADIUS * VR.worldScale()) {
+        if (!magazineTouchesGun()) {
             return;
         }
         holding = false;
@@ -149,27 +160,30 @@ public final class VrGrabReload {
         }
     }
 
-    private static boolean gripDown() {
-        KeyMapping grip = VR.offHandGripKey();
-        return VrKeys.GRAB.isDown() || (grip != null && ((KeyMappingAccessor) grip).jegvr$isDownRaw());
+    private static boolean canGrab(LocalPlayer player) {
+        return pouchState(player) == Pouch.READY;
     }
 
-    /** Off hand free, a main-hand gun that is reloaded (not inventory fed), not full, and ammo to load. */
-    private static boolean canGrab(LocalPlayer player) {
+    /**
+     * READY: off hand free, a main-hand gun that is reloaded (not inventory fed), not full, and ammo to load. NO_AMMO:
+     * the same without ammo. HIDDEN: anything else.
+     */
+    private static Pouch pouchState(LocalPlayer player) {
         ItemStack stack = player.getMainHandItem();
         if (!VR.active() || player.isSpectator() || Minecraft.getInstance().screen != null
                 || !player.getOffhandItem().isEmpty() || !(stack.getItem() instanceof GunItem gunItem)
                 || ModSyncedDataKeys.RELOADING.getValue(player)) {
-            return false;
+            return Pouch.HIDDEN;
         }
         Gun gun = gunItem.getModifiedGun(stack);
         CompoundTag tag = stack.getTag();
         if (tag == null || tag.getBoolean("IgnoreAmmo")
                 || ReloadType.INVENTORY_FED.equals(gun.getReloads().getReloadType())
                 || ammo(stack) >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
-            return false;
+            return Pouch.HIDDEN;
         }
-        return player.isCreative() || !Gun.findAmmo(player, gun.getReloads().getReloadItem()).stack().isEmpty();
+        boolean hasAmmo = player.isCreative() || !Gun.findAmmo(player, gun.getReloads().getReloadItem()).stack().isEmpty();
+        return hasAmmo ? Pouch.READY : Pouch.NO_AMMO;
     }
 
     private static int ammo(ItemStack stack) {
@@ -177,8 +191,20 @@ public final class VrGrabReload {
         return tag == null ? 0 : tag.getInt("AmmoCount");
     }
 
+    private static boolean handInPouch() {
+        AABB pouch = pouchBox();
+        VR.Aim hand = VR.offHandAim();
+        return pouch != null && hand != null && pouch.contains(hand.pos());
+    }
+
+    private static boolean magazineTouchesGun() {
+        AABB magazine = magazineBox();
+        AABB magwell = magwellBox();
+        return magazine != null && magwell != null && magazine.intersects(magwell);
+    }
+
     /** Hip on the off-hand side, following the headset's yaw. */
-    private static Vec3 pouch() {
+    private static AABB pouchBox() {
         VR.Aim hmd = VR.hmdAim();
         if (hmd == null) {
             return null;
@@ -191,30 +217,83 @@ public final class VrGrabReload {
         Vec3 right = new Vec3(-forward.z, 0.0, forward.x);
         double side = VR.leftHanded() ? 1.0 : -1.0;
         double scale = VR.worldScale();
-        return hmd.pos()
+        Vec3 center = hmd.pos()
                 .add(0.0, -POUCH_DOWN * scale, 0.0)
                 .add(right.scale(POUCH_SIDE * side * scale))
                 .add(forward.scale(POUCH_FORWARD * scale));
+        return box(center, POUCH_HALF);
     }
 
     /** Just below and ahead of the main hand, where the magazine goes in. */
-    private static Vec3 magwell() {
+    private static AABB magwellBox() {
         VR.Aim main = VR.mainHandAim();
         if (main == null || main.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
         double scale = VR.worldScale();
-        return main.pos().add(main.dir().normalize().scale(MAGWELL_FORWARD * scale)).add(0.0, -MAGWELL_DOWN * scale, 0.0);
+        Vec3 center = main.pos().add(main.dir().normalize().scale(MAGWELL_FORWARD * scale)).add(0.0, -MAGWELL_DOWN * scale, 0.0);
+        return box(center, MAGWELL_HALF);
     }
 
-    private static void showZones(LocalPlayer player) {
-        Vec3 pouch = pouch();
-        Vec3 magwell = magwell();
-        if (pouch != null) {
-            player.level().addParticle(POUCH_DUST, pouch.x, pouch.y, pouch.z, 0.0, 0.0, 0.0);
+    /** The magazine held in the off hand. */
+    private static AABB magazineBox() {
+        VR.Aim hand = VR.offHandAim();
+        return hand == null ? null : box(hand.pos(), MAGAZINE_HALF);
+    }
+
+    private static AABB box(Vec3 center, Vec3 half) {
+        Vec3 h = half.scale(VR.worldScale());
+        return new AABB(center.subtract(h), center.add(h));
+    }
+
+    @SubscribeEvent
+    public static void onRenderLevel(RenderLevelStageEvent event) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !showGuides) {
+            return;
         }
-        if (magwell != null) {
-            player.level().addParticle(MAGWELL_DUST, magwell.x, magwell.y, magwell.z, 0.0, 0.0, 0.0);
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player == null || !VR.active()) {
+            return;
         }
+        PoseStack pose = event.getPoseStack();
+        Vec3 cam = event.getCamera().getPosition();
+        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
+        pose.pushPose();
+        pose.translate(-cam.x, -cam.y, -cam.z);
+        if (holding) {
+            boolean touching = magazineTouchesGun();
+            drawBox(pose, buffers, magazineBox(), 1.0F, 0.85F, 0.2F);
+            if (touching) {
+                drawBox(pose, buffers, magwellBox(), 0.2F, 1.0F, 0.3F);
+            } else {
+                drawBox(pose, buffers, magwellBox(), 1.0F, 1.0F, 1.0F);
+            }
+        } else {
+            Pouch state = pouchState(player);
+            if (state == Pouch.NO_AMMO) {
+                drawBox(pose, buffers, pouchBox(), 1.0F, 0.25F, 0.2F);
+            } else if (state == Pouch.READY) {
+                if (handInPouch()) {
+                    drawBox(pose, buffers, pouchBox(), 0.2F, 1.0F, 0.3F);
+                } else {
+                    drawBox(pose, buffers, pouchBox(), 0.25F, 0.55F, 1.0F);
+                }
+            }
+        }
+        pose.popPose();
+    }
+
+    private static void drawBox(PoseStack pose, MultiBufferSource.BufferSource buffers, AABB box, float r, float g, float b) {
+        if (box == null) {
+            return;
+        }
+        VertexConsumer fill = buffers.getBuffer(RenderType.debugFilledBox());
+        LevelRenderer.addChainedFilledBoxVertices(pose, fill, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ,
+                r, g, b, 0.2F);
+        buffers.endBatch(RenderType.debugFilledBox());
+        VertexConsumer lines = buffers.getBuffer(RenderType.lines());
+        LevelRenderer.renderLineBox(pose, lines, box, r, g, b, 1.0F);
+        buffers.endBatch(RenderType.lines());
     }
 }

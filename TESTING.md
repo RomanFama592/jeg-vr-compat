@@ -100,12 +100,16 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 
 ## Fase 7 (recarga con la mano)
 - [x] (auto) Compila; al arrancar aplican los 17 mixins.
-- Ayuda: `/jegvr zones` muestra la cadera (azul) y el pozo del cargador (verde). Volver a escribirlo las oculta.
-- [ ] VR, arma en la principal, mano libre vacía, arma sin llenar y con munición en el inventario: llevar la mano libre a la cadera y apretar el grip: vibra y suena. Sin soltar el grip, llevarla debajo del arma: recarga (animación y sonido de JEG) y vibran las dos manos.
-- [ ] Apretar el grip lejos de la cadera: cambia de slot del hotbar como siempre.
-- [ ] Soltar el grip antes de llegar al arma: no recarga. Arma llena o sin munición: el grip en la cadera cambia de slot (no agarra).
+- Guías visibles por defecto; `/jegvr zones` las oculta o las vuelve a mostrar.
+- [ ] VR, arma en la principal sin llenar, mano libre vacía, con munición: aparece una caja **azul** en la cadera del lado de la mano libre. Al meter la mano se pone **verde** y vibra suave.
+- [ ] Sin munición para esa arma: la caja de la cadera es **roja** y el grip no agarra. Arma llena: no hay caja.
+- [ ] Mano en la caja verde + grip (se puede soltar): vibra y suena; una caja **amarilla** sigue la mano y aparece una caja **blanca** debajo del arma.
+- [ ] Tocar la caja blanca con la amarilla: se pone verde, recarga (animación y sonido de JEG) y vibran las dos manos.
+- [ ] Volver a apretar el grip sostiendo el cargador: lo suelta. También se cancela al cambiar de slot o a los 10 s.
+- [ ] Apretar el grip fuera de la caja de la cadera: cambia de slot del hotbar como siempre.
 - [ ] Escopeta: cada agarre mete un solo cartucho; la tecla de recarga sigue cargando todos.
 - [ ] La tecla de recarga y el botón de apuntar siguen recargando.
-- [ ] Si la cadera o el pozo quedan incómodos: decir hacia dónde moverlos (arriba/abajo, adelante/atrás, más al costado) o si el radio es chico.
+- [ ] Si la caja de la cadera o la del arma quedan incómodas: decir hacia dónde moverlas o si son chicas.
 - [ ] Servidor solo con JEG: funciona igual (usa la recarga normal de JEG).
-- [ ] Flat: nada cambia.
+- [ ] Flat: nada cambia, no se ven cajas.
+- [ ] **Bug corregido:** dos armas, la principal vacía y sin su munición, la secundaria con munición de otro tipo: al disparar con la principal la secundaria ya no hace la animación de recarga. Recargar la secundaria con el botón sigue animando solo la secundaria.

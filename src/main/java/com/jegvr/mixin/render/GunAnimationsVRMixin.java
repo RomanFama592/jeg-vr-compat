@@ -15,7 +15,8 @@ import ttv.migami.jeg.init.ModSyncedDataKeys;
 /**
  * JEG's animation controller drives every animated gun from the main-hand gun's tags (and plays nothing when the
  * animated gun is not the main-hand item). While Vivecraft draws the off-hand gun, feed it the off-hand gun instead,
- * so it plays its own shoot/reload animations, and keep the main-hand trigger's SHOOTING flag from charging it.
+ * so it plays its own shoot/reload animations, keep the main-hand trigger's SHOOTING flag from charging it, and let
+ * the per-player RELOADING flag animate only the gun that reloads.
  */
 @Mixin(value = GunAnimations.class, remap = false)
 public abstract class GunAnimationsVRMixin {
@@ -29,8 +30,13 @@ public abstract class GunAnimationsVRMixin {
             target = "Lcom/mrcrayfish/framework/api/sync/SyncedDataKey;getValue(Lnet/minecraft/world/entity/Entity;)Ljava/lang/Object;"))
     private static Object jegvr$shootingFlag(SyncedDataKey<?, ?> key, Entity entity, Operation<Object> original) {
         Object value = original.call(key, entity);
-        if (key == ModSyncedDataKeys.SHOOTING && value instanceof Boolean shooting && entity instanceof Player player) {
-            return VrHands.shootingFlag(player, shooting);
+        if (value instanceof Boolean flag && entity instanceof Player player) {
+            if (key == ModSyncedDataKeys.SHOOTING) {
+                return VrHands.shootingFlag(player, flag);
+            }
+            if (key == ModSyncedDataKeys.RELOADING) {
+                return VrHands.reloadingFlag(player, flag);
+            }
         }
         return value;
     }

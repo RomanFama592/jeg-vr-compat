@@ -70,8 +70,8 @@ public final class VrDebugCommands {
         root.then(Commands.literal("show").executes(c -> edit(c, p -> {
         })));
         root.then(Commands.literal("zones").executes(c -> reply(c, VrGrabReload.toggleZones()
-                ? "Zonas de recarga visibles: azul = cadera (agarrar), verde = pozo del cargador (meter)"
-                : "Zonas de recarga ocultas")));
+                ? "Guías de recarga visibles: caja en la cadera (azul = agarrar, verde = mano adentro, roja = sin munición)"
+                : "Guías de recarga ocultas")));
         root.then(Commands.literal("save").executes(c -> {
             VrGunConfig.save();
             return reply(c, "Guardado en config/jeg_vr_compat/guns.json");
