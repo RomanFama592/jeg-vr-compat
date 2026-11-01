@@ -27,12 +27,35 @@ minecraft {
         client {
             property 'forge.enabledGameTestNamespaces', mod_id
         }
+        // Second client for multiplayer tests (see MULTIJUGADOR.md): its own folder, name and Vivecraft settings
+        // (starts with VR off), so it can run next to runClient. ./gradlew runClient2 [-PnoVivecraft]
+        client2 {
+            parent runs.client
+            workingDirectory project.file('run-client2')
+            args '--username', 'Flat'
+        }
         // Dedicated server for phase S: ./gradlew runServer -PnoVivecraft (JEG + addon, no Vivecraft).
         server {
             workingDirectory project.file('run-server')
             args '--nogui'
         }
     }
+}
+
+// Seed configs for the multiplayer setup, only when missing (never overwrite what the game or the user wrote).
+def seedFile = { String path, String text ->
+    def file = project.file(path)
+    if (!file.exists()) {
+        file.parentFile.mkdirs()
+        file.text = text
+    }
+}
+tasks.matching { it.name == 'runClient2' }.configureEach {
+    doFirst { seedFile('run-client2/config/vivecraft-client-config.json', '{"vrEnabled": "false", "rememberVr": "true"}\n') }
+}
+tasks.matching { it.name == 'runServer' }.configureEach {
+    // Dev clients have no Mojang session, so the test server must not authenticate them.
+    doFirst { seedFile('run-server/server.properties', 'online-mode=false\n') }
 }
 
 mixin {
