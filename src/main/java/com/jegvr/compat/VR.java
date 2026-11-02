@@ -138,13 +138,13 @@ public final class VR {
     }
 
     /** True when Vivecraft's hands are reversed (main hand on the left controller). */
-    /** A world direction in the main controller's axes (where the held gun is drawn), or null outside VR. */
-    public static Vec3 toMainHandLocal(Vec3 dir) {
+    /** A world direction in a controller's axes (where the gun in that hand is drawn), or null outside VR. */
+    public static Vec3 toHandLocal(boolean mainHand, Vec3 dir) {
         if (!active()) {
             return null;
         }
         try {
-            return VivecraftBridge.toMainHandLocal(dir);
+            return VivecraftBridge.toHandLocal(mainHand, dir);
         } catch (Throwable t) {
             disable(t);
             return null;
@@ -196,6 +196,19 @@ public final class VR {
         }
         try {
             return VivecraftBridge.offHandGripKey();
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
+    /** The key on the main-hand grip with Vivecraft's default bindings, or null without Vivecraft. */
+    public static KeyMapping mainHandGripKey() {
+        if (!loaded()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.mainHandGripKey();
         } catch (Throwable t) {
             disable(t);
             return null;

@@ -52,15 +52,16 @@ public final class VivecraftBridge {
         return d == null ? null : pose(d.hmd);
     }
 
-    /** {@code dir} (world space) in the main controller's own axes, the frame the held gun is drawn in. */
-    public static Vec3 toMainHandLocal(Vec3 dir) {
+    /** {@code dir} (world space) in a controller's own axes, the frame the gun held in that hand is drawn in. */
+    public static Vec3 toHandLocal(boolean mainHand, Vec3 dir) {
         VRData d = data();
-        if (d == null || d.c0 == null) {
+        VRData.VRDevicePose c = d == null ? null : mainHand ? d.c0 : d.c1;
+        if (c == null) {
             return null;
         }
-        Vector3f x = d.c0.getCustomVector(new Vector3f(1.0F, 0.0F, 0.0F));
-        Vector3f y = d.c0.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
-        Vector3f z = d.c0.getCustomVector(new Vector3f(0.0F, 0.0F, 1.0F));
+        Vector3f x = c.getCustomVector(new Vector3f(1.0F, 0.0F, 0.0F));
+        Vector3f y = c.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
+        Vector3f z = c.getCustomVector(new Vector3f(0.0F, 0.0F, 1.0F));
         return new Vec3(dir.x * x.x + dir.y * x.y + dir.z * x.z,
                 dir.x * y.x + dir.y * y.y + dir.z * y.z,
                 dir.x * z.x + dir.y * z.y + dir.z * z.z);
@@ -95,6 +96,12 @@ public final class VivecraftBridge {
     public static KeyMapping offHandGripKey() {
         VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
         return isLeftHanded() ? mod.keyHotbarNext : mod.keyHotbarPrev;
+    }
+
+    /** The key on the main-hand grip: the other "hotbar" key. */
+    public static KeyMapping mainHandGripKey() {
+        VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
+        return isLeftHanded() ? mod.keyHotbarPrev : mod.keyHotbarNext;
     }
 
     /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */

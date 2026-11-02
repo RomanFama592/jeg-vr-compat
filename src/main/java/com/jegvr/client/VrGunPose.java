@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -27,8 +28,8 @@ public final class VrGunPose {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(gunId(stack));
         // The left hand mirrors yaw/roll and the lateral offset.
         float side = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
-        // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the main hand to the free hand.
-        Vec3 twoHand = mainHand ? VrPrecision.localAimDir() : null;
+        // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the gun hand to the free hand.
+        Vec3 twoHand = VrPrecision.localAimDir(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
         if (twoHand != null) {
             poseStack.mulPose(new Quaternionf().rotationTo(0.0F, 0.0F, -1.0F,
                     (float) twoHand.x, (float) twoHand.y, (float) twoHand.z));

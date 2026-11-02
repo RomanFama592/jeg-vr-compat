@@ -40,6 +40,9 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * magazine can be taken and green with the hand in it; while holding, the magazine box is yellow and the
  * magazine-well box turns green on contact.
  * <p>
+ * The gun may also be in the off hand with the main hand empty ({@link VrGunHand}, needs the addon on the server): the
+ * main hand then takes the magazine from the hip on its own side and loads the off-hand gun.
+ * <p>
  * The off-hand grip is Vivecraft's "hotbar" key: a press that grabs (or drops) a magazine is taken from Vivecraft
  * ({@code KeyMappingVRMixin}), anywhere else it still changes the hotbar slot. {@link VrKeys#GRAB} is an optional
  * alternative for custom bindings.
@@ -61,6 +64,8 @@ public final class VrGrabReload {
     private enum Pouch { HIDDEN, NO_AMMO, READY }
 
     private static boolean holding;
+    /** While holding: the hand with the gun being loaded (the other hand holds the magazine). */
+    private static InteractionHand heldGunHand = InteractionHand.MAIN_HAND;
     private static int heldTicks;
     private static int slot;
     private static boolean grabWasDown;
@@ -87,22 +92,26 @@ public final class VrGrabReload {
         if (holding) {
             // A second press puts the magazine back.
             holding = false;
-            VR.haptic(false, 0.03F, 0.3F);
+            VrGunHand.haptic(VrGunHand.other(heldGunHand), 0.03F, 0.3F);
             return true;
         }
-        if (player == null || pouchState(player) != Pouch.READY || !handInPouch()) {
+        if (player == null || pouchState(player) != Pouch.READY || !handInPouch(player)) {
             return false;
         }
         holding = true;
+        heldGunHand = VrGunHand.of(player);
         heldTicks = 0;
         slot = player.getInventory().selected;
-        VR.haptic(false, 0.05F, 0.6F);
+        VrGunHand.haptic(VrGunHand.other(heldGunHand), 0.05F, 0.6F);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC, 0.6F, 1.3F);
         return true;
     }
 
+    /** The grip key of the free hand (the off hand, or the main hand when the gun is in the off hand). */
     public static boolean isGripKey(KeyMapping key) {
-        return key == VR.offHandGripKey();
+        LocalPlayer player = Minecraft.getInstance().player;
+        InteractionHand gunHand = holding ? heldGunHand : player == null ? null : VrGunHand.of(player);
+        return gunHand != null && key == VrGunHand.gripKey(VrGunHand.other(gunHand));
     }
 
     @SubscribeEvent
@@ -127,38 +136,46 @@ public final class VrGrabReload {
             tickHolding(player);
         } else {
             // A light buzz when the hand enters the hip box, so it can be found without looking.
-            boolean inPouch = pouchState(player) == Pouch.READY && handInPouch();
+            boolean inPouch = pouchState(player) == Pouch.READY && handInPouch(player);
             if (inPouch && !handWasInPouch) {
-                VR.haptic(false, 0.02F, 0.25F);
+                VrGunHand.haptic(VrGunHand.other(VrGunHand.of(player)), 0.02F, 0.25F);
             }
             handWasInPouch = inPouch;
         }
     }
 
     private static void tickHolding(LocalPlayer player) {
-        if (++heldTicks > TIMEOUT_TICKS || player.getInventory().selected != slot || !canGrab(player)) {
+        if (++heldTicks > TIMEOUT_TICKS || player.getInventory().selected != slot || VrGunHand.of(player) != heldGunHand
+                || !canGrab(player)) {
             holding = false;
             return;
         }
-        if (!magazineTouchesGun()) {
+        if (!magazineTouchesGun(heldGunHand)) {
             return;
         }
         holding = false;
-        ItemStack stack = player.getMainHandItem();
+        ItemStack stack = player.getItemInHand(heldGunHand);
         GunItem gunItem = (GunItem) stack.getItem();
         VR.haptic(true, 0.08F, 0.8F);
         VR.haptic(false, 0.08F, 0.8F);
+        boolean main = heldGunHand == InteractionHand.MAIN_HAND;
         if (ReloadType.MANUAL.equals(gunItem.getModifiedGun(stack).getReloads().getReloadType())) {
             if (VrAim.serverHasAddon()) {
                 // F7.8: the server loads this round at once (no JEG reload, no wait); the gun gives a short jolt.
-                VrNetwork.CHANNEL.sendToServer(new C2SVrInsertRound(InteractionHand.MAIN_HAND));
-                VrRecoil.jolt(ROUND_JOLT_DEGREES);
+                VrNetwork.CHANNEL.sendToServer(new C2SVrInsertRound(heldGunHand));
+                if (main) {
+                    VrRecoil.jolt(ROUND_JOLT_DEGREES);
+                }
                 return;
             }
             // JEG-only server: start JEG's reload and stop it after one round (slower).
             singleRoundFrom = ammo(stack);
         }
-        VrDualReload.reloadMainHand(player);
+        if (main) {
+            VrDualReload.reloadMainHand(player);
+        } else {
+            VrDualReload.reloadOffhand(player);
+        }
     }
 
     /** JEG keeps loading rounds while reloading; a grab inserts one, so stop the reload after it. */
@@ -180,14 +197,15 @@ public final class VrGrabReload {
     }
 
     /**
-     * READY: off hand free, a main-hand gun that is reloaded (not inventory fed), not full, and ammo to load. NO_AMMO:
-     * the same without ammo. HIDDEN: anything else.
+     * READY: one hand free and a gun in the other ({@link VrGunHand}) that is reloaded (not inventory fed), not full,
+     * and ammo to load. NO_AMMO: the same without ammo. HIDDEN: anything else.
      */
     private static Pouch pouchState(LocalPlayer player) {
-        ItemStack stack = player.getMainHandItem();
+        InteractionHand gunHand = VrGunHand.of(player);
+        ItemStack stack = gunHand == null ? ItemStack.EMPTY : player.getItemInHand(gunHand);
         if (!VR.active() || VR.seated() || VrClientConfig.grabZone() == VrClientConfig.GrabZone.OFF
                 || player.isSpectator() || Minecraft.getInstance().screen != null
-                || !player.getOffhandItem().isEmpty() || !(stack.getItem() instanceof GunItem gunItem)
+                || !(stack.getItem() instanceof GunItem gunItem)
                 || ModSyncedDataKeys.RELOADING.getValue(player)) {
             return Pouch.HIDDEN;
         }
@@ -213,20 +231,24 @@ public final class VrGrabReload {
         return tag == null ? 0 : tag.getInt("AmmoCount");
     }
 
-    private static boolean handInPouch() {
-        AABB pouch = pouchBox();
-        VR.Aim hand = VR.offHandAim();
-        return pouch != null && hand != null && pouch.contains(hand.pos());
+    private static boolean handInPouch(LocalPlayer player) {
+        InteractionHand gunHand = VrGunHand.of(player);
+        if (gunHand == null) {
+            return false;
+        }
+        AABB pouch = pouchBox(gunHand);
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        return pouch != null && free != null && pouch.contains(free.pos());
     }
 
-    private static boolean magazineTouchesGun() {
-        AABB magazine = magazineBox();
-        AABB magwell = magwellBox();
+    private static boolean magazineTouchesGun(InteractionHand gunHand) {
+        AABB magazine = magazineBox(gunHand);
+        AABB magwell = magwellBox(gunHand);
         return magazine != null && magwell != null && magazine.intersects(magwell);
     }
 
-    /** Hip (or, seated, belly) on the off-hand side, following the headset's yaw. */
-    private static AABB pouchBox() {
+    /** Hip (or, seated, belly) on the free hand's side, following the headset's yaw. */
+    private static AABB pouchBox(InteractionHand gunHand) {
         VR.Aim hmd = VR.hmdAim();
         if (hmd == null) {
             return null;
@@ -238,7 +260,9 @@ public final class VrGrabReload {
         forward = forward.normalize();
         Vec3 right = new Vec3(-forward.z, 0.0, forward.x);
         Vec3 offset = VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT ? FRONT : HIP;
-        double side = VR.leftHanded() ? 1.0 : -1.0;
+        // The off hand is on the -right side (left hand) unless hands are reversed; the main hand on the other side.
+        double offSide = VR.leftHanded() ? 1.0 : -1.0;
+        double side = gunHand == InteractionHand.MAIN_HAND ? offSide : -offSide;
         double scale = VR.worldScale();
         Vec3 center = hmd.pos()
                 .add(0.0, -offset.x * scale, 0.0)
@@ -247,21 +271,21 @@ public final class VrGrabReload {
         return box(center, POUCH_HALF);
     }
 
-    /** Just below and ahead of the main hand, where the magazine goes in. */
-    private static AABB magwellBox() {
-        VR.Aim main = VR.mainHandAim();
-        if (main == null || main.dir().lengthSqr() < 1.0E-6) {
+    /** Just below and ahead of the gun hand, where the magazine goes in. */
+    private static AABB magwellBox(InteractionHand gunHand) {
+        VR.Aim gun = VrGunHand.aim(gunHand);
+        if (gun == null || gun.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
         double scale = VR.worldScale();
-        Vec3 center = main.pos().add(main.dir().normalize().scale(MAGWELL_FORWARD * scale)).add(0.0, -MAGWELL_DOWN * scale, 0.0);
+        Vec3 center = gun.pos().add(gun.dir().normalize().scale(MAGWELL_FORWARD * scale)).add(0.0, -MAGWELL_DOWN * scale, 0.0);
         return box(center, MAGWELL_HALF);
     }
 
-    /** The magazine held in the off hand. */
-    private static AABB magazineBox() {
-        VR.Aim hand = VR.offHandAim();
-        return hand == null ? null : box(hand.pos(), MAGAZINE_HALF);
+    /** The magazine held in the free hand. */
+    private static AABB magazineBox(InteractionHand gunHand) {
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        return free == null ? null : box(free.pos(), MAGAZINE_HALF);
     }
 
     private static AABB box(Vec3 center, Vec3 half) {
@@ -286,22 +310,26 @@ public final class VrGrabReload {
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
         if (holding) {
-            boolean touching = magazineTouchesGun();
-            drawBox(pose, buffers, magazineBox(), 1.0F, 0.85F, 0.2F);
+            boolean touching = magazineTouchesGun(heldGunHand);
+            drawBox(pose, buffers, magazineBox(heldGunHand), 1.0F, 0.85F, 0.2F);
             if (touching) {
-                drawBox(pose, buffers, magwellBox(), 0.2F, 1.0F, 0.3F);
+                drawBox(pose, buffers, magwellBox(heldGunHand), 0.2F, 1.0F, 0.3F);
             } else {
-                drawBox(pose, buffers, magwellBox(), 1.0F, 1.0F, 1.0F);
+                drawBox(pose, buffers, magwellBox(heldGunHand), 1.0F, 1.0F, 1.0F);
             }
         } else {
             Pouch state = pouchState(player);
+            InteractionHand gunHand = VrGunHand.of(player);
+            if (gunHand == null) {
+                state = Pouch.HIDDEN;
+            }
             if (state == Pouch.NO_AMMO) {
-                drawBox(pose, buffers, pouchBox(), 1.0F, 0.25F, 0.2F);
+                drawBox(pose, buffers, pouchBox(gunHand), 1.0F, 0.25F, 0.2F);
             } else if (state == Pouch.READY) {
-                if (handInPouch()) {
-                    drawBox(pose, buffers, pouchBox(), 0.2F, 1.0F, 0.3F);
+                if (handInPouch(player)) {
+                    drawBox(pose, buffers, pouchBox(gunHand), 0.2F, 1.0F, 0.3F);
                 } else {
-                    drawBox(pose, buffers, pouchBox(), 0.25F, 0.55F, 1.0F);
+                    drawBox(pose, buffers, pouchBox(gunHand), 0.25F, 0.55F, 1.0F);
                 }
             }
         }

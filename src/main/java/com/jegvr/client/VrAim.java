@@ -41,7 +41,7 @@ public final class VrAim {
      */
     public static float[] shotRotation(Player player) {
         // In precision mode the gun points along the line between both hands.
-        VR.Aim aim = VrPrecision.aim(VR.mainHandAim());
+        VR.Aim aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
@@ -64,7 +64,7 @@ public final class VrAim {
      * when not aiming in VR. Only for servers with this addon (no JEG-only fallback: JEG cannot fire the off hand).
      */
     public static float[] offHandShotRotation() {
-        VR.Aim aim = VR.offHandAim();
+        VR.Aim aim = VrPrecision.aim(InteractionHand.OFF_HAND, VR.offHandAim());
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return null;
         }

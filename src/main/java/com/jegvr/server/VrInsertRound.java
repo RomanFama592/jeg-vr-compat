@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Hand loading (F7.8): a VR player pushed one round into a gun loaded round by round ({@code ReloadType.MANUAL}). Loads
  * that round at once, the way JEG's {@code ReloadTracker.increaseAmmo} does for each round of its own reload, without
- * JEG's per-round wait or reload animation. Only the main hand for now (the off hand comes with ambidextrous play).
+ * JEG's per-round wait or reload animation. Either hand: the off-hand gun when it is held alone (ambidextrous play).
  */
 public final class VrInsertRound {
     /** Fewest ticks between two rounds, so it is only faster than JEG for a quick player. */
@@ -37,7 +37,8 @@ public final class VrInsertRound {
 
     public static void insert(ServerPlayer player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (hand != InteractionHand.MAIN_HAND || player.isSpectator() || !(stack.getItem() instanceof GunItem gunItem)
+        if ((hand == InteractionHand.OFF_HAND && !VrOffhand.canDualWield(stack)) || player.isSpectator()
+                || !(stack.getItem() instanceof GunItem gunItem)
                 || ModSyncedDataKeys.RELOADING.getValue(player)) {
             return;
         }

@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -28,7 +29,10 @@ import ttv.migami.jeg.network.message.C2SMessageAim;
  * held gun is drawn that way ({@link VrGunPose}) and the shots follow it ({@link VrAim}).
  * <p>
  * It ends on a second grip press, when the free hand leaves the gun (too close, too far, or the line turns too far
- * from the main controller), on reload, or when the gun or the hands change.
+ * from the gun hand's controller), on reload, or when the gun or the hands change.
+ * <p>
+ * The gun may also be in the off hand with the main hand free ({@link VrGunHand}): then the main hand takes the
+ * foregrip and everything is mirrored.
  */
 public final class VrPrecision {
     /** Room-scale metres (multiplied by Vivecraft's world scale), along the main-hand aim from the controller. */
@@ -47,6 +51,8 @@ public final class VrPrecision {
 
     private static boolean active;
     private static int slot;
+    /** The hand holding the gun while active. */
+    private static InteractionHand hand = InteractionHand.MAIN_HAND;
 
     private VrPrecision() {
     }
@@ -63,17 +69,19 @@ public final class VrPrecision {
         }
         if (active) {
             stop(player);
-            VR.haptic(false, 0.03F, 0.3F);
+            VrGunHand.haptic(VrGunHand.other(hand), 0.03F, 0.3F);
             return true;
         }
-        if (!canHold(player) || !handOnForegrip()) {
+        InteractionHand gunHand = holdableHand(player);
+        if (gunHand == null || !handOnForegrip(gunHand)) {
             return false;
         }
         active = true;
+        hand = gunHand;
         slot = player.getInventory().selected;
         sendAiming(player, true);
-        VR.haptic(false, 0.05F, 0.5F);
-        VR.haptic(true, 0.05F, 0.3F);
+        VrGunHand.haptic(VrGunHand.other(hand), 0.05F, 0.5F);
+        VrGunHand.haptic(hand, 0.05F, 0.3F);
         player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.4F);
         return true;
     }
@@ -88,7 +96,7 @@ public final class VrPrecision {
             active = false;
             return;
         }
-        if (!canHold(player) || player.getInventory().selected != slot || twoHandDir() == null) {
+        if (holdableHand(player) != hand || player.getInventory().selected != slot || twoHandDir(hand) == null) {
             stop(player);
         } else if (!ModSyncedDataKeys.AIMING.getValue(player)) {
             // The server answered with its own value (e.g. after a respawn): ask again.
@@ -106,26 +114,32 @@ public final class VrPrecision {
         PacketHandler.getPlayChannel().sendToServer(new C2SMessageAim(aiming));
     }
 
-    /** VR with tracked hands, a two-handed gun in the main hand, the off hand free and no reload going on. */
-    private static boolean canHold(LocalPlayer player) {
-        ItemStack stack = player.getMainHandItem();
-        return VR.active() && !VR.seated() && !player.isSpectator() && Minecraft.getInstance().screen == null
-                && stack.getItem() instanceof GunItem gunItem && player.getOffhandItem().isEmpty()
-                && !GripType.ONE_HANDED.equals(gunItem.getModifiedGun(stack).getGeneral().getGripType())
-                && !ModSyncedDataKeys.RELOADING.getValue(player);
+    /**
+     * VR with tracked hands, a two-handed gun in one hand ({@link VrGunHand}), the other hand free and no reload going
+     * on: the hand with the gun, or null.
+     */
+    private static InteractionHand holdableHand(LocalPlayer player) {
+        if (!VR.active() || VR.seated() || player.isSpectator() || Minecraft.getInstance().screen != null
+                || ModSyncedDataKeys.RELOADING.getValue(player)) {
+            return null;
+        }
+        InteractionHand gunHand = VrGunHand.of(player);
+        ItemStack stack = gunHand == null ? ItemStack.EMPTY : player.getItemInHand(gunHand);
+        return stack.getItem() instanceof GunItem gunItem
+                && !GripType.ONE_HANDED.equals(gunItem.getModifiedGun(stack).getGeneral().getGripType()) ? gunHand : null;
     }
 
-    private static Vec3 foregrip() {
-        VR.Aim main = VR.mainHandAim();
-        if (main == null || main.dir().lengthSqr() < 1.0E-6) {
+    private static Vec3 foregrip(InteractionHand gunHand) {
+        VR.Aim gun = VrGunHand.aim(gunHand);
+        if (gun == null || gun.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
         double scale = VR.worldScale();
-        return main.pos().add(main.dir().normalize().scale(FOREGRIP_FORWARD * scale)).add(0.0, -FOREGRIP_DOWN * scale, 0.0);
+        return gun.pos().add(gun.dir().normalize().scale(FOREGRIP_FORWARD * scale)).add(0.0, -FOREGRIP_DOWN * scale, 0.0);
     }
 
-    private static AABB foregripBox() {
-        Vec3 center = foregrip();
+    private static AABB foregripBox(InteractionHand gunHand) {
+        Vec3 center = foregrip(gunHand);
         if (center == null) {
             return null;
         }
@@ -135,61 +149,62 @@ public final class VrPrecision {
 
     /** While holding the foregrip, the box sits on the free hand (the gun turns towards it). */
     private static AABB heldBox() {
-        VR.Aim hand = VR.offHandAim();
-        if (hand == null) {
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(hand));
+        if (free == null) {
             return null;
         }
         Vec3 h = FOREGRIP_HALF.scale(VR.worldScale());
-        return new AABB(hand.pos().subtract(h), hand.pos().add(h));
+        return new AABB(free.pos().subtract(h), free.pos().add(h));
     }
 
-    private static boolean handOnForegrip() {
-        AABB box = foregripBox();
-        VR.Aim hand = VR.offHandAim();
-        return box != null && hand != null && box.contains(hand.pos());
+    private static boolean handOnForegrip(InteractionHand gunHand) {
+        AABB box = foregripBox(gunHand);
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        return box != null && free != null && box.contains(free.pos());
     }
 
     /**
-     * In precision mode, the main hand's aim with the direction from the main hand to the free hand (both hands on the
-     * gun); otherwise {@code mainAim} unchanged.
+     * In precision mode with the gun in {@code shotHand}, that hand's aim with the direction from it to the free hand
+     * (both hands on the gun); otherwise {@code aim} unchanged.
      */
-    public static VR.Aim aim(VR.Aim mainAim) {
-        if (!active || mainAim == null) {
-            return mainAim;
+    public static VR.Aim aim(InteractionHand shotHand, VR.Aim aim) {
+        if (!active || shotHand != hand || aim == null) {
+            return aim;
         }
-        Vec3 dir = twoHandDir();
-        return dir == null ? mainAim : new VR.Aim(mainAim.pos(), dir);
+        Vec3 dir = twoHandDir(hand);
+        return dir == null ? aim : new VR.Aim(aim.pos(), dir);
     }
 
     /**
-     * The two-hand direction in the main controller's axes, for drawing the held gun; null when not in precision mode.
+     * The two-hand direction in the axes of {@code drawnHand}'s controller, for drawing the gun held there; null unless
+     * that gun is in precision mode.
      */
-    public static Vec3 localAimDir() {
-        Vec3 dir = active ? twoHandDir() : null;
-        return dir == null ? null : VR.toMainHandLocal(dir);
+    public static Vec3 localAimDir(InteractionHand drawnHand) {
+        Vec3 dir = active && drawnHand == hand ? twoHandDir(hand) : null;
+        return dir == null ? null : VR.toHandLocal(hand == InteractionHand.MAIN_HAND, dir);
     }
 
-    /** Unit vector from the main hand to the free hand, or null when they are not holding one gun together. */
-    private static Vec3 twoHandDir() {
-        VR.Aim main = VR.mainHandAim();
-        VR.Aim off = VR.offHandAim();
-        if (main == null || off == null || main.dir().lengthSqr() < 1.0E-6) {
+    /** Unit vector from the gun hand to the free hand, or null when they are not holding one gun together. */
+    private static Vec3 twoHandDir(InteractionHand gunHand) {
+        VR.Aim gun = VrGunHand.aim(gunHand);
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        if (gun == null || free == null || gun.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
-        Vec3 line = off.pos().subtract(main.pos());
+        Vec3 line = free.pos().subtract(gun.pos());
         double gap = line.length();
         double scale = VR.worldScale();
         if (gap < MIN_HAND_GAP * scale || gap > MAX_HAND_GAP * scale) {
             return null;
         }
         Vec3 dir = line.scale(1.0 / gap);
-        return dir.dot(main.dir().normalize()) < MAX_TWIST_COS ? null : dir;
+        return dir.dot(gun.dir().normalize()) < MAX_TWIST_COS ? null : dir;
     }
 
-    private static double handDistance() {
-        Vec3 center = foregrip();
-        VR.Aim hand = VR.offHandAim();
-        return center == null || hand == null ? Double.MAX_VALUE : hand.pos().distanceTo(center);
+    private static double handDistance(InteractionHand gunHand) {
+        Vec3 center = foregrip(gunHand);
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        return center == null || free == null ? Double.MAX_VALUE : free.pos().distanceTo(center);
     }
 
     @SubscribeEvent
@@ -200,7 +215,8 @@ public final class VrPrecision {
         }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || !canHold(player) || (!active && handDistance() > SHOW_DISTANCE * VR.worldScale())) {
+        InteractionHand gunHand = player == null ? null : active ? hand : holdableHand(player);
+        if (gunHand == null || (!active && handDistance(gunHand) > SHOW_DISTANCE * VR.worldScale())) {
             return;
         }
         PoseStack pose = event.getPoseStack();
@@ -209,10 +225,10 @@ public final class VrPrecision {
         pose.translate(-cam.x, -cam.y, -cam.z);
         if (active) {
             VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), heldBox(), 0.8F, 0.3F, 1.0F);
-        } else if (handOnForegrip()) {
-            VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), foregripBox(), 0.2F, 1.0F, 0.3F);
+        } else if (handOnForegrip(gunHand)) {
+            VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), foregripBox(gunHand), 0.2F, 1.0F, 0.3F);
         } else {
-            VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), foregripBox(), 0.25F, 0.55F, 1.0F);
+            VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), foregripBox(gunHand), 0.25F, 0.55F, 1.0F);
         }
         pose.popPose();
     }
