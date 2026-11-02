@@ -115,3 +115,11 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] **Supervivencia:** pistola sin llenar y balas de pistola en el inventario: la caja de la cadera es azul (no roja) y deja agarrar.
 - [ ] **Animación de recarga con dos armas:** la principal vacía y sin su munición, la secundaria con otra munición: al disparar con la principal la secundaria no se anima. Recargar la principal anima solo la principal; recargar la secundaria (botón con la secundaria apuntando arriba) anima solo la secundaria.
 - [ ] Secundaria sin balas: volver a apretar su gatillo la recarga (como JEG con la principal).
+
+## F7.4 (modo sentado y config)
+- [x] (auto) Compila; aplican los 17 mixins; se crea `config/jeg_vr_compat-client.toml` con `grabZone = "HIP"` y `showGuides = true`.
+- [ ] Sentado con controles, `/jegvr grabzone front`: la caja aparece delante de la panza del lado de la mano libre; agarrar y meter el cargador funciona igual que de pie.
+- [ ] `/jegvr grabzone off`: no hay cajas y el grip siempre cambia de slot; la tecla de recarga y el botón secundario siguen recargando.
+- [ ] `/jegvr grabzone hip`: vuelve a la cadera.
+- [ ] `/jegvr zones` oculta las cajas; al cerrar y abrir el juego siguen ocultas (se guarda).
+- [ ] Modo sentado de Vivecraft (manos sin tracking): no hay cajas; recargar con la tecla funciona.

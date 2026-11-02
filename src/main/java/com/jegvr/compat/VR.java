@@ -138,6 +138,19 @@ public final class VR {
     }
 
     /** True when Vivecraft's hands are reversed (main hand on the left controller). */
+    /** True in Vivecraft's seated mode (hands not tracked). */
+    public static boolean seated() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isSeated();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
     public static boolean leftHanded() {
         if (!loaded()) {
             return false;

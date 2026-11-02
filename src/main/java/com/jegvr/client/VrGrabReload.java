@@ -1,6 +1,7 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.config.VrClientConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
@@ -40,10 +41,10 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * alternative for custom bindings.
  */
 public final class VrGrabReload {
-    /** Room-scale metres (multiplied by Vivecraft's world scale). */
-    private static final double POUCH_DOWN = 0.65;
-    private static final double POUCH_SIDE = 0.2;
-    private static final double POUCH_FORWARD = 0.05;
+    /** Room-scale metres (multiplied by Vivecraft's world scale), from the headset: down, to the side, forward. */
+    private static final Vec3 HIP = new Vec3(0.65, 0.2, 0.05);
+    /** Seated: in front of the belly, clear of the chair. */
+    private static final Vec3 FRONT = new Vec3(0.45, 0.15, 0.3);
     private static final Vec3 POUCH_HALF = new Vec3(0.17, 0.22, 0.17);
     private static final double MAGWELL_FORWARD = 0.1;
     private static final double MAGWELL_DOWN = 0.08;
@@ -60,15 +61,15 @@ public final class VrGrabReload {
     private static boolean handWasInPouch;
     /** MANUAL reload started by a grab: stop it once the gun has more rounds than this. */
     private static int singleRoundFrom = -1;
-    private static boolean showGuides = true;
 
     private VrGrabReload() {
     }
 
-    /** {@code /jegvr zones}: show or hide the hip and magazine-well boxes. */
+    /** {@code /jegvr zones}: show or hide the hip and magazine-well boxes (saved in the client config). */
     public static boolean toggleZones() {
-        showGuides = !showGuides;
-        return showGuides;
+        boolean show = !VrClientConfig.showGuides();
+        VrClientConfig.setShowGuides(show);
+        return show;
     }
 
     /**
@@ -171,7 +172,8 @@ public final class VrGrabReload {
      */
     private static Pouch pouchState(LocalPlayer player) {
         ItemStack stack = player.getMainHandItem();
-        if (!VR.active() || player.isSpectator() || Minecraft.getInstance().screen != null
+        if (!VR.active() || VR.seated() || VrClientConfig.grabZone() == VrClientConfig.GrabZone.OFF
+                || player.isSpectator() || Minecraft.getInstance().screen != null
                 || !player.getOffhandItem().isEmpty() || !(stack.getItem() instanceof GunItem gunItem)
                 || ModSyncedDataKeys.RELOADING.getValue(player)) {
             return Pouch.HIDDEN;
@@ -210,7 +212,7 @@ public final class VrGrabReload {
         return magazine != null && magwell != null && magazine.intersects(magwell);
     }
 
-    /** Hip on the off-hand side, following the headset's yaw. */
+    /** Hip (or, seated, belly) on the off-hand side, following the headset's yaw. */
     private static AABB pouchBox() {
         VR.Aim hmd = VR.hmdAim();
         if (hmd == null) {
@@ -222,12 +224,13 @@ public final class VrGrabReload {
         }
         forward = forward.normalize();
         Vec3 right = new Vec3(-forward.z, 0.0, forward.x);
+        Vec3 offset = VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT ? FRONT : HIP;
         double side = VR.leftHanded() ? 1.0 : -1.0;
         double scale = VR.worldScale();
         Vec3 center = hmd.pos()
-                .add(0.0, -POUCH_DOWN * scale, 0.0)
-                .add(right.scale(POUCH_SIDE * side * scale))
-                .add(forward.scale(POUCH_FORWARD * scale));
+                .add(0.0, -offset.x * scale, 0.0)
+                .add(right.scale(offset.y * side * scale))
+                .add(forward.scale(offset.z * scale));
         return box(center, POUCH_HALF);
     }
 
@@ -255,7 +258,7 @@ public final class VrGrabReload {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !showGuides) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !VrClientConfig.showGuides()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();

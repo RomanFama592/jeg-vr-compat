@@ -81,6 +81,11 @@ public final class VivecraftBridge {
         return BowTracker.isBow(stack);
     }
 
+    /** Vivecraft's seated mode: the hands follow the view, they are not tracked. */
+    public static boolean isSeated() {
+        return ClientDataHolderVR.getInstance().vrSettings.seated;
+    }
+
     public static boolean isLeftHanded() {
         return ClientDataHolderVR.getInstance().vrSettings.reverseHands;
     }

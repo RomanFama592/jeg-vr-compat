@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.config.VrClientConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -12,6 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.item.GunItem;
+
+import java.util.Locale;
 
 /**
  * Client commands to calibrate gun poses with the headset on. Values are always the final pose of the held gun
@@ -72,6 +75,18 @@ public final class VrDebugCommands {
         root.then(Commands.literal("zones").executes(c -> reply(c, VrGrabReload.toggleZones()
                 ? "Guías de recarga visibles: caja en la cadera (azul = agarrar, verde = mano adentro, roja = sin munición)"
                 : "Guías de recarga ocultas")));
+        LiteralArgumentBuilder<CommandSourceStack> grabZone = Commands.literal("grabzone");
+        for (VrClientConfig.GrabZone zone : VrClientConfig.GrabZone.values()) {
+            grabZone.then(Commands.literal(zone.name().toLowerCase(Locale.ROOT)).executes(c -> {
+                VrClientConfig.setGrabZone(zone);
+                return reply(c, switch (zone) {
+                    case HIP -> "Cargador en la cadera (de pie)";
+                    case FRONT -> "Cargador delante de la panza (sentado)";
+                    case OFF -> "Recarga con la mano apagada (la tecla de recarga y el botón secundario siguen recargando)";
+                });
+            }));
+        }
+        root.then(grabZone);
         root.then(Commands.literal("save").executes(c -> {
             VrGunConfig.save();
             return reply(c, "Guardado en config/jeg_vr_compat/guns.json");
