@@ -258,7 +258,8 @@ public final class VrGrabReload {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !VrClientConfig.showGuides()) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !VrClientConfig.showGuides()
+                || !VR.isEyePass()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();

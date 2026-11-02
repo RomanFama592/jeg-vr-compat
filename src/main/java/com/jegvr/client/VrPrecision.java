@@ -24,7 +24,11 @@ import ttv.migami.jeg.network.message.C2SMessageAim;
  * only JEG): JEG halves the spread and stops it from growing. The recoil deviation of {@link VrRecoil} is also smaller.
  * The client never aims down sights (JEG's isAiming stays false in VR), so nothing about the view changes.
  * <p>
- * It ends on a second grip press, when the free hand leaves the gun, on reload, or when the gun or the hands change.
+ * Like a real rifle held with both hands, the gun points along the line from the main hand to the free hand: the
+ * held gun is drawn that way ({@link VrGunPose}) and the shots follow it ({@link VrAim}).
+ * <p>
+ * It ends on a second grip press, when the free hand leaves the gun (too close, too far, or the line turns too far
+ * from the main controller), on reload, or when the gun or the hands change.
  */
 public final class VrPrecision {
     /** Room-scale metres (multiplied by Vivecraft's world scale), along the main-hand aim from the controller. */
@@ -33,7 +37,11 @@ public final class VrPrecision {
     private static final Vec3 FOREGRIP_HALF = new Vec3(0.08, 0.08, 0.08);
     /** The box is drawn when the free hand is this close, and the mode ends when the hand goes farther. */
     private static final double SHOW_DISTANCE = 0.45;
-    private static final double RELEASE_DISTANCE = 0.35;
+    /** With both hands on the gun, the hands may be this far apart (between the grip and the end of the barrel). */
+    private static final double MIN_HAND_GAP = 0.1;
+    private static final double MAX_HAND_GAP = 0.7;
+    /** The line between the hands may turn this far from the main controller before the free hand lets go. */
+    private static final double MAX_TWIST_COS = Math.cos(Math.toRadians(50.0));
     /** Recoil deviation and kick while in precision mode. */
     public static final float RECOIL_FACTOR = 0.4F;
 
@@ -80,7 +88,7 @@ public final class VrPrecision {
             active = false;
             return;
         }
-        if (!canHold(player) || player.getInventory().selected != slot || handDistance() > RELEASE_DISTANCE * VR.worldScale()) {
+        if (!canHold(player) || player.getInventory().selected != slot || twoHandDir() == null) {
             stop(player);
         } else if (!ModSyncedDataKeys.AIMING.getValue(player)) {
             // The server answered with its own value (e.g. after a respawn): ask again.
@@ -125,10 +133,57 @@ public final class VrPrecision {
         return new AABB(center.subtract(h), center.add(h));
     }
 
+    /** While holding the foregrip, the box sits on the free hand (the gun turns towards it). */
+    private static AABB heldBox() {
+        VR.Aim hand = VR.offHandAim();
+        if (hand == null) {
+            return null;
+        }
+        Vec3 h = FOREGRIP_HALF.scale(VR.worldScale());
+        return new AABB(hand.pos().subtract(h), hand.pos().add(h));
+    }
+
     private static boolean handOnForegrip() {
         AABB box = foregripBox();
         VR.Aim hand = VR.offHandAim();
         return box != null && hand != null && box.contains(hand.pos());
+    }
+
+    /**
+     * In precision mode, the main hand's aim with the direction from the main hand to the free hand (both hands on the
+     * gun); otherwise {@code mainAim} unchanged.
+     */
+    public static VR.Aim aim(VR.Aim mainAim) {
+        if (!active || mainAim == null) {
+            return mainAim;
+        }
+        Vec3 dir = twoHandDir();
+        return dir == null ? mainAim : new VR.Aim(mainAim.pos(), dir);
+    }
+
+    /**
+     * The two-hand direction in the main controller's axes, for drawing the held gun; null when not in precision mode.
+     */
+    public static Vec3 localAimDir() {
+        Vec3 dir = active ? twoHandDir() : null;
+        return dir == null ? null : VR.toMainHandLocal(dir);
+    }
+
+    /** Unit vector from the main hand to the free hand, or null when they are not holding one gun together. */
+    private static Vec3 twoHandDir() {
+        VR.Aim main = VR.mainHandAim();
+        VR.Aim off = VR.offHandAim();
+        if (main == null || off == null || main.dir().lengthSqr() < 1.0E-6) {
+            return null;
+        }
+        Vec3 line = off.pos().subtract(main.pos());
+        double gap = line.length();
+        double scale = VR.worldScale();
+        if (gap < MIN_HAND_GAP * scale || gap > MAX_HAND_GAP * scale) {
+            return null;
+        }
+        Vec3 dir = line.scale(1.0 / gap);
+        return dir.dot(main.dir().normalize()) < MAX_TWIST_COS ? null : dir;
     }
 
     private static double handDistance() {
@@ -139,7 +194,8 @@ public final class VrPrecision {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !VrClientConfig.showGuides()) {
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !VrClientConfig.showGuides()
+                || !VR.isEyePass()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
@@ -152,7 +208,7 @@ public final class VrPrecision {
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
         if (active) {
-            VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), foregripBox(), 0.8F, 0.3F, 1.0F);
+            VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), heldBox(), 0.8F, 0.3F, 1.0F);
         } else if (handOnForegrip()) {
             VrGrabReload.drawBox(pose, mc.renderBuffers().bufferSource(), foregripBox(), 0.2F, 1.0F, 0.3F);
         } else {

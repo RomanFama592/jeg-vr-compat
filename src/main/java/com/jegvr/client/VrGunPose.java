@@ -5,7 +5,9 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.joml.Quaternionf;
 
 /** Orientation/position correction applied to a JEG gun held in a VR controller. */
 public final class VrGunPose {
@@ -25,6 +27,12 @@ public final class VrGunPose {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(gunId(stack));
         // The left hand mirrors yaw/roll and the lateral offset.
         float side = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
+        // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the main hand to the free hand.
+        Vec3 twoHand = mainHand ? VrPrecision.localAimDir() : null;
+        if (twoHand != null) {
+            poseStack.mulPose(new Quaternionf().rotationTo(0.0F, 0.0F, -1.0F,
+                    (float) twoHand.x, (float) twoHand.y, (float) twoHand.z));
+        }
         poseStack.translate(pose.tx * side, pose.ty - GRIP_DOWN, pose.tz - GRIP_FORWARD);
         // JEG only fires the main-hand gun, so only that one kicks.
         if (mainHand) {

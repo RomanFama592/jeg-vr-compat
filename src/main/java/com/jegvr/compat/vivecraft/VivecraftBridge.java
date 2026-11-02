@@ -14,6 +14,7 @@ import org.vivecraft.client_vr.gameplay.VRPlayer;
 import org.vivecraft.client_vr.gameplay.trackers.BowTracker;
 import org.vivecraft.client_vr.provider.ControllerType;
 import org.vivecraft.client_vr.provider.MCVR;
+import org.vivecraft.client_vr.render.RenderPass;
 
 /**
  * The only class that touches Vivecraft 1.2.5 directly. Never load it unless the "vivecraft" mod is present;
@@ -49,6 +50,26 @@ public final class VivecraftBridge {
     public static Pose hmd() {
         VRData d = data();
         return d == null ? null : pose(d.hmd);
+    }
+
+    /** {@code dir} (world space) in the main controller's own axes, the frame the held gun is drawn in. */
+    public static Vec3 toMainHandLocal(Vec3 dir) {
+        VRData d = data();
+        if (d == null || d.c0 == null) {
+            return null;
+        }
+        Vector3f x = d.c0.getCustomVector(new Vector3f(1.0F, 0.0F, 0.0F));
+        Vector3f y = d.c0.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
+        Vector3f z = d.c0.getCustomVector(new Vector3f(0.0F, 0.0F, 1.0F));
+        return new Vec3(dir.x * x.x + dir.y * x.y + dir.z * x.z,
+                dir.x * y.x + dir.y * y.y + dir.z * y.z,
+                dir.x * z.x + dir.y * z.y + dir.z * z.z);
+    }
+
+    /** False while Vivecraft draws the third-person or the mixed-reality camera view (not the player's own eyes). */
+    public static boolean isEyePass() {
+        RenderPass pass = ClientDataHolderVR.getInstance().currentPass;
+        return pass != RenderPass.THIRD && pass != RenderPass.CAMERA;
     }
 
     /** Vibrates a controller; {@code mainHand} false targets the free hand. */

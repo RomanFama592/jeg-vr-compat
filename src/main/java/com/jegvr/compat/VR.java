@@ -138,6 +138,32 @@ public final class VR {
     }
 
     /** True when Vivecraft's hands are reversed (main hand on the left controller). */
+    /** A world direction in the main controller's axes (where the held gun is drawn), or null outside VR. */
+    public static Vec3 toMainHandLocal(Vec3 dir) {
+        if (!active()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.toMainHandLocal(dir);
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
+    /** False while Vivecraft draws a view that is not the player's eyes (third-person or mixed-reality camera). */
+    public static boolean isEyePass() {
+        if (!active()) {
+            return true;
+        }
+        try {
+            return VivecraftBridge.isEyePass();
+        } catch (Throwable t) {
+            disable(t);
+            return true;
+        }
+    }
+
     /** True in Vivecraft's seated mode (hands not tracked). */
     public static boolean seated() {
         if (!active()) {

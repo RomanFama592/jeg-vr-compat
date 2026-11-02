@@ -136,3 +136,11 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] `/jegvr zones` oculta también esta caja.
 - [ ] Servidor solo con JEG: el modo funciona igual (usa el mensaje de apuntar de JEG).
 - [ ] Flat: el botón de apuntar sigue haciendo zoom como siempre.
+
+## S.7b/S.7c (apuntar con las dos manos)
+- [x] (auto) Compila; aplican los 17 mixins.
+- [ ] En modo precisión (caja violeta), mover la mano libre a izquierda, derecha, arriba y abajo: el arma gira alrededor de la mano principal y apunta hacia la mano libre; la caja violeta sigue a la mano libre.
+- [ ] Disparar en modo precisión: las balas salen por donde apunta el cañón dibujado (probar apuntando solo moviendo la mano libre).
+- [ ] La mano libre suelta el arma (sale del modo) al acercarla mucho a la principal, al alejarla mucho o al llevarla muy al costado.
+- [ ] Fuera del modo precisión el arma sigue solo a la mano principal, como antes.
+- [ ] Cámara de Vivecraft (tercera persona / cámara de mano): no se ven las cajas; en los ojos sí.

@@ -40,7 +40,8 @@ public final class VrAim {
      * building the shoot message: it may send the muzzle position first.
      */
     public static float[] shotRotation(Player player) {
-        VR.Aim aim = VR.mainHandAim();
+        // In precision mode the gun points along the line between both hands.
+        VR.Aim aim = VrPrecision.aim(VR.mainHandAim());
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return null;
         }
