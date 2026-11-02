@@ -2,6 +2,8 @@ package com.jegvr.mixin.server;
 
 import com.jegvr.server.VrOffhand;
 import com.jegvr.server.VrServerAim;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -10,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -40,5 +43,18 @@ public abstract class ProjectileEntityVRMixin {
         self.xo = muzzle.x;
         self.yo = muzzle.y;
         self.zo = muzzle.z;
+    }
+
+    @Shadow
+    private ItemStack weapon;
+
+    /**
+     * JEG decides some hit rules (the Holy Shotgun spares non-hostile targets) from the shooter's main-hand item. Read
+     * the gun that fired instead, so a shot from the off hand follows that gun's rules. Same item in flat play.
+     */
+    @WrapOperation(method = "ignoreEntity", at = @At(value = "INVOKE", remap = true,
+            target = "Lnet/minecraft/world/entity/LivingEntity;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"))
+    private ItemStack jegvr$firingGun(LivingEntity shooter, Operation<ItemStack> original) {
+        return weapon == null || weapon.isEmpty() ? original.call(shooter) : weapon;
     }
 }

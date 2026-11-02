@@ -159,3 +159,8 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] "Agarrar cargador" cambia entre cadera / delante de la panza / apagado; el texto al pasar el mouse explica cada una.
 - [ ] "Cajas de ayuda" sí/no; al volver al juego (VR) se ven o no las cajas.
 - [ ] Lo elegido queda en `config/jeg_vr_compat-client.toml` y se mantiene al reiniciar; `/jegvr zones` y `/jegvr grabzone` cambian lo mismo.
+
+## F8.5 (arreglos tras la prueba con dos jugadores)
+- [x] (auto) Compila; aplican las 22 mezclas.
+- [ ] Cámara de Vivecraft y jugador flat: el rifle (y la minigun) se ven en la mano del jugador VR, no solo la pistola.
+- [ ] Supervivencia, dos armas distintas: disparar al otro jugador con cada mano. Los dos disparos le bajan vida (corazones de su barra y sonido de golpe).
