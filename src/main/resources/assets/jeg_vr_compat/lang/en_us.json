@@ -1,5 +1,15 @@
 {
   "key.categories.jeg_vr_compat": "JEG VR",
   "key.jeg_vr_compat.fire_offhand": "Fire off-hand gun (VR)",
-  "key.jeg_vr_compat.grab": "Grab magazine (VR, optional)"
+  "key.jeg_vr_compat.grab": "Grab magazine (VR, optional)",
+  "jeg_vr_compat.config.title": "JEG x Vivecraft: options",
+  "jeg_vr_compat.config.grabZone": "Grab magazine",
+  "jeg_vr_compat.config.grabZone.hip": "At the hip (standing)",
+  "jeg_vr_compat.config.grabZone.hip.tooltip": "Bring the free hand to the hip on its side and press the grip to take a magazine.",
+  "jeg_vr_compat.config.grabZone.front": "In front of the belly (seated)",
+  "jeg_vr_compat.config.grabZone.front.tooltip": "For playing seated with tracked controllers: take the magazine in front of the belly, on the free hand's side.",
+  "jeg_vr_compat.config.grabZone.off": "Off",
+  "jeg_vr_compat.config.grabZone.off.tooltip": "No reloading by hand. The reload key and the secondary button still reload.",
+  "jeg_vr_compat.config.showGuides": "Helper boxes",
+  "jeg_vr_compat.config.showGuides.tooltip": "Shows the coloured boxes of the hip, the magazine and the foregrip. Also: /jegvr zones."
 }

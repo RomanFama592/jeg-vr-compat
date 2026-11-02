@@ -1,5 +1,15 @@
 {
   "key.categories.jeg_vr_compat": "JEG VR",
   "key.jeg_vr_compat.fire_offhand": "Disparar arma de la mano libre (VR)",
-  "key.jeg_vr_compat.grab": "Agarrar cargador (VR, opcional)"
+  "key.jeg_vr_compat.grab": "Agarrar cargador (VR, opcional)",
+  "jeg_vr_compat.config.title": "JEG x Vivecraft: opciones",
+  "jeg_vr_compat.config.grabZone": "Agarrar cargador",
+  "jeg_vr_compat.config.grabZone.hip": "En la cadera (de pie)",
+  "jeg_vr_compat.config.grabZone.hip.tooltip": "Llevá la mano libre a la cadera de su lado y apretá el grip para agarrar un cargador.",
+  "jeg_vr_compat.config.grabZone.front": "Delante de la panza (sentado)",
+  "jeg_vr_compat.config.grabZone.front.tooltip": "Para jugar sentado con los controles: el cargador se agarra delante de la panza, del lado de la mano libre.",
+  "jeg_vr_compat.config.grabZone.off": "Apagado",
+  "jeg_vr_compat.config.grabZone.off.tooltip": "Sin recarga con la mano. La tecla de recarga y el botón secundario siguen recargando.",
+  "jeg_vr_compat.config.showGuides": "Cajas de ayuda",
+  "jeg_vr_compat.config.showGuides.tooltip": "Muestra las cajas de colores de la cadera, el cargador y el guardamanos. También: /jegvr zones."
 }

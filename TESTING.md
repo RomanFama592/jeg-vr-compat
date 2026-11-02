@@ -152,3 +152,10 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Servidor con Vivecraft (`runServer`) + `runClient` (VR) + `runClient2` (flat): el jugador flat ve los brazos del jugador VR siguiendo los controles, con el arma en la mano.
 - [ ] El jugador flat, visto desde el VR, tiene la pose de armas normal de JEG (brazos al frente apuntando).
 - [ ] Flat solo: la tercera persona (F5) se ve como en JEG.
+
+## Pantalla de opciones (botón Config de Forge)
+- [x] (auto) Compila; el juego arranca con las 22 mezclas.
+- [ ] Mods → JEG x Vivecraft Compat → Config: abre "JEG x Vivecraft: opciones" con dos botones y Listo.
+- [ ] "Agarrar cargador" cambia entre cadera / delante de la panza / apagado; el texto al pasar el mouse explica cada una.
+- [ ] "Cajas de ayuda" sí/no; al volver al juego (VR) se ven o no las cajas.
+- [ ] Lo elegido queda en `config/jeg_vr_compat-client.toml` y se mantiene al reiniciar; `/jegvr zones` y `/jegvr grabzone` cambian lo mismo.

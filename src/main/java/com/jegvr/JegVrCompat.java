@@ -2,6 +2,7 @@ package com.jegvr;
 
 import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
+import com.jegvr.client.VrConfigScreen;
 import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrDualReload;
@@ -33,6 +34,7 @@ public class JegVrCompat {
         modBus.addListener(this::onClientSetup);
         if (FMLEnvironment.dist.isClient()) {
             VrClientConfig.register();
+            VrConfigScreen.register();
             modBus.addListener(VrKeys::onRegister);
         }
         // Common to both sides: the optional server component (phase S).
