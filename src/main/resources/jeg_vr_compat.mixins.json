@@ -7,7 +7,7 @@
   "refmap": "jeg_vr_compat.refmap.json",
   "mixins": ["server.ProjectileEntityVRMixin", "server.ReloadTrackerVRMixin", "server.ServerPlayHandlerVRMixin"],
   "client": ["input.AimingHandlerVRMixin", "input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
-    "input.ReloadHandlerVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunRendererVRMixin",
+    "input.ReloadHandlerVRMixin", "model.OneHandedPoseVRMixin", "model.WeaponPoseVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunRendererVRMixin",
     "render.CrosshairHandlerVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemRendererVRMixin",
     "render.VREffectsHelperVRMixin", "render.VivecraftItemRenderingVRMixin"],
   "injectors": {

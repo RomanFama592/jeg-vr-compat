@@ -144,3 +144,11 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] La mano libre suelta el arma (sale del modo) al acercarla mucho a la principal, al alejarla mucho o al llevarla muy al costado.
 - [ ] Fuera del modo precisión el arma sigue solo a la mano principal, como antes.
 - [ ] Cámara de Vivecraft (tercera persona / cámara de mano): no se ven las cajas; en los ojos sí.
+
+## F8.1/F8.2 (brazos del jugador VR vistos desde afuera)
+- [x] (auto) Compila; aplican 22 mezclas (las 17 de antes + 5 de las poses de JEG).
+- [ ] VR, cámara de tercera persona o de mano de Vivecraft, con pistola, rifle y minigun: los brazos siguen a los controles (como sin arma) y el arma está en la mano, no flotando ni pegada al pecho.
+- [ ] Con dos armas: los dos brazos siguen a sus controles.
+- [ ] Servidor con Vivecraft (`runServer`) + `runClient` (VR) + `runClient2` (flat): el jugador flat ve los brazos del jugador VR siguiendo los controles, con el arma en la mano.
+- [ ] El jugador flat, visto desde el VR, tiene la pose de armas normal de JEG (brazos al frente apuntando).
+- [ ] Flat solo: la tercera persona (F5) se ve como en JEG.
