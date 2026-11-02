@@ -199,9 +199,9 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 
 ## F9.12 (ambidiestro: arma en la secundaria, principal libre)
 - [x] (auto) Compila; aplican 24 mezclas.
-- [ ] Un jugador. Arma con cargador **solo en la secundaria**, principal vacía, sin llenar y con munición: la caja (con `/jegvr zones`) aparece en la cadera del lado de la **mano principal**. Meter la principal (vibra), grip de la principal: agarra; tocar el pozo del arma de la secundaria: recarga esa arma (animación en la secundaria). El hotbar no cambia de slot.
-- [ ] Escopeta solo en la secundaria: cada cartucho entra al instante, como del otro lado.
-- [ ] Rifle solo en la secundaria: la caja del guardamanos aparece delante de la secundaria; grip de la principal → modo precisión (violeta). El rifle apunta por la línea secundaria → principal y los disparos van por ahí.
-- [ ] Sale del modo igual que del otro lado (otro grip, alejar la mano, recargar, cambiar de slot).
-- [ ] Del lado normal (arma en la principal) todo sigue igual.
-- [ ] Con un arma en cada mano: no hay cajas, se recarga con el botón.
+- [x] Un jugador. Arma con cargador **solo en la secundaria**, principal vacía, sin llenar y con munición: la caja (con `/jegvr zones`) aparece en la cadera del lado de la **mano principal**. Meter la principal (vibra), grip de la principal: agarra; tocar el pozo del arma de la secundaria: recarga esa arma (animación en la secundaria). El hotbar no cambia de slot.
+- [x] Escopeta solo en la secundaria: cada cartucho entra al instante, como del otro lado.
+- [x] Rifle solo en la secundaria: la caja del guardamanos aparece delante de la secundaria; grip de la principal → modo precisión (violeta). El rifle apunta por la línea secundaria → principal y los disparos van por ahí.
+- [x] Sale del modo igual que del otro lado (otro grip, alejar la mano, recargar, cambiar de slot).
+- [x] Del lado normal (arma en la principal) todo sigue igual.
+- [x] Con un arma en cada mano: no hay cajas, se recarga con el botón.
