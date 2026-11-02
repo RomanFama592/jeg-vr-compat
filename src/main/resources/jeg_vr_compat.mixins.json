@@ -8,7 +8,7 @@
   "mixins": ["server.GunEventBusVRMixin", "server.ProjectileEntityVRMixin", "server.ReloadTrackerVRMixin", "server.ServerPlayHandlerVRMixin"],
   "client": ["input.AimingHandlerVRMixin", "input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
     "input.ReloadHandlerVRMixin", "model.ItemInHandLayerVRMixin", "model.OneHandedPoseVRMixin", "model.WeaponPoseVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunRendererVRMixin",
-    "render.CrosshairHandlerVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemRendererVRMixin",
+    "render.CrosshairHandlerVRMixin", "render.GuiHandlerVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemRendererVRMixin",
     "render.VREffectsHelperVRMixin", "render.VivecraftItemRenderingVRMixin"],
   "injectors": {
     "defaultRequire": 1

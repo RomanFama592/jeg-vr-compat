@@ -11,5 +11,7 @@
   "jeg_vr_compat.config.grabZone.off": "Apagado",
   "jeg_vr_compat.config.grabZone.off.tooltip": "Sin recarga con la mano. La tecla de recarga y el botón secundario siguen recargando.",
   "jeg_vr_compat.config.showGuides": "Cajas de ayuda",
-  "jeg_vr_compat.config.showGuides.tooltip": "Muestra las cajas de colores de la cadera, el cargador y el guardamanos. También: /jegvr zones."
+  "jeg_vr_compat.config.showGuides.tooltip": "Muestra las cajas de colores de la cadera, el cargador y el guardamanos. También: /jegvr zones.",
+  "jeg_vr_compat.config.hotbarOnForearm": "Hotbar en el antebrazo",
+  "jeg_vr_compat.config.hotbarOnForearm.tooltip": "Con un arma en la mano secundaria, corre la HUD de mano o muñeca de Vivecraft hacia el codo para que el arma no la tape."
 }

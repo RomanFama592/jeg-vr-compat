@@ -15,6 +15,7 @@ import org.vivecraft.client_vr.gameplay.trackers.BowTracker;
 import org.vivecraft.client_vr.provider.ControllerType;
 import org.vivecraft.client_vr.provider.MCVR;
 import org.vivecraft.client_vr.render.RenderPass;
+import org.vivecraft.client_vr.settings.VRSettings;
 
 /**
  * The only class that touches Vivecraft 1.2.5 directly. Never load it unless the "vivecraft" mod is present;
@@ -107,6 +108,12 @@ public final class VivecraftBridge {
     /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */
     public static boolean isBow(ItemStack stack) {
         return BowTracker.isBow(stack);
+    }
+
+    /** True when Vivecraft's HUD (with the hotbar) is locked to the off-hand controller, not to the head. */
+    public static boolean isHudOnHand() {
+        VRSettings.HUDLock lock = ClientDataHolderVR.getInstance().vrSettings.vrHudLockMode;
+        return lock == VRSettings.HUDLock.HAND || lock == VRSettings.HUDLock.WRIST;
     }
 
     /** Vivecraft's seated mode: the hands follow the view, they are not tracked. */

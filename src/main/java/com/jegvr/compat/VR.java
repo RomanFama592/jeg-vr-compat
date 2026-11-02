@@ -164,6 +164,19 @@ public final class VR {
         }
     }
 
+    /** True when Vivecraft's HUD is locked to the off-hand controller (hand or wrist). */
+    public static boolean hudOnHand() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isHudOnHand();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
     /** True in Vivecraft's seated mode (hands not tracked). */
     public static boolean seated() {
         if (!active()) {

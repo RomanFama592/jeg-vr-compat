@@ -19,6 +19,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
+    public static final ForgeConfigSpec.BooleanValue HOTBAR_ON_FOREARM;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -31,6 +32,11 @@ public final class VrClientConfig {
                 .comment("Show the coloured helper boxes (hip pouch, magazine well, foregrip). Off by default;",
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
+        builder.pop();
+        builder.push("visuals");
+        HOTBAR_ON_FOREARM = builder
+                .comment("With a gun in the off hand, move Vivecraft's hand or wrist HUD (hotbar) back along the forearm.")
+                .define("hotbarOnForearm", true);
         builder.pop();
         SPEC = builder.build();
     }
@@ -49,6 +55,15 @@ public final class VrClientConfig {
 
     public static boolean showGuides() {
         return SPEC.isLoaded() && SHOW_GUIDES.get();
+    }
+
+    public static boolean hotbarOnForearm() {
+        return !SPEC.isLoaded() || HOTBAR_ON_FOREARM.get();
+    }
+
+    public static void setHotbarOnForearm(boolean on) {
+        HOTBAR_ON_FOREARM.set(on);
+        HOTBAR_ON_FOREARM.save();
     }
 
     public static void setGrabZone(GrabZone zone) {

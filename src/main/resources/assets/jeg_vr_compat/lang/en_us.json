@@ -11,5 +11,7 @@
   "jeg_vr_compat.config.grabZone.off": "Off",
   "jeg_vr_compat.config.grabZone.off.tooltip": "No reloading by hand. The reload key and the secondary button still reload.",
   "jeg_vr_compat.config.showGuides": "Helper boxes",
-  "jeg_vr_compat.config.showGuides.tooltip": "Shows the coloured boxes of the hip, the magazine and the foregrip. Also: /jegvr zones."
+  "jeg_vr_compat.config.showGuides.tooltip": "Shows the coloured boxes of the hip, the magazine and the foregrip. Also: /jegvr zones.",
+  "jeg_vr_compat.config.hotbarOnForearm": "Hotbar on the forearm",
+  "jeg_vr_compat.config.hotbarOnForearm.tooltip": "With a gun in the off hand, slide Vivecraft's hand or wrist HUD towards the elbow so the gun does not cover it."
 }
