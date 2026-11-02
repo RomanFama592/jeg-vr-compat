@@ -106,8 +106,8 @@ public final class VrGrabReload {
         }
         LocalPlayer player = Minecraft.getInstance().player;
         boolean grabDown = VrKeys.GRAB.isDown();
-        if (grabDown && !grabWasDown) {
-            onGripPressed();
+        if (grabDown && !grabWasDown && !onGripPressed()) {
+            VrPrecision.onGripPressed();
         }
         grabWasDown = grabDown;
         if (player == null || !VR.active()) {
@@ -294,7 +294,8 @@ public final class VrGrabReload {
         pose.popPose();
     }
 
-    private static void drawBox(PoseStack pose, MultiBufferSource.BufferSource buffers, AABB box, float r, float g, float b) {
+    /** A see-through box with its outline, in world coordinates (the pose is already moved by -camera). */
+    static void drawBox(PoseStack pose, MultiBufferSource.BufferSource buffers, AABB box, float r, float g, float b) {
         if (box == null) {
             return;
         }

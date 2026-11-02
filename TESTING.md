@@ -123,3 +123,16 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] `/jegvr grabzone hip`: vuelve a la cadera.
 - [ ] `/jegvr zones` oculta las cajas; al cerrar y abrir el juego siguen ocultas (se guarda).
 - [ ] Modo sentado de Vivecraft (manos sin tracking): no hay cajas; recargar con la tecla funciona.
+
+## S.7 (modo precisión con las dos manos)
+- [x] (auto) Compila; aplican los 17 mixins.
+- [ ] Rifle (dos manos) en la principal, mano libre vacía: acercar la mano libre al guardamanos: aparece una caja azul unos 30 cm adelante de la mano del arma; con la mano adentro se pone verde.
+- [ ] Grip en la caja verde: vibran las dos manos, suena, la caja pasa a violeta. El hotbar no cambia de slot.
+- [ ] Disparar ráfagas largas con y sin modo precisión contra una pared: con precisión los impactos quedan más juntos y el arma patea menos.
+- [ ] Sale del modo (caja vuelve a azul o desaparece): otro clic del grip; alejar la mano libre; recargar (botón o cargador); cambiar de slot.
+- [ ] Pistola (una mano): no hay caja de guardamanos.
+- [ ] Con un arma en cada mano: no hay caja.
+- [ ] El cargador de la cadera sigue funcionando igual.
+- [ ] `/jegvr zones` oculta también esta caja.
+- [ ] Servidor solo con JEG: el modo funciona igual (usa el mensaje de apuntar de JEG).
+- [ ] Flat: el botón de apuntar sigue haciendo zoom como siempre.

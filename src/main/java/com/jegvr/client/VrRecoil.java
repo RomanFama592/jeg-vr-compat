@@ -49,10 +49,12 @@ public final class VrRecoil {
         VrHands.markShot(InteractionHand.MAIN_HAND);
         Gun gun = gunItem.getModifiedGun(event.getStack());
         float angle = gun.getGeneral().getRecoilAngle() * (1.0F - GunModifierHelper.getRecoilModifier(event.getStack()));
-        kick = Math.min(MAX_KICK, kick + angle * KICK_PER_DEGREE);
+        // Both hands on the gun (precision mode) keep it steadier: less kick and less deviation of the next shots.
+        float steady = VrPrecision.active() ? VrPrecision.RECOIL_FACTOR : 1.0F;
+        kick = Math.min(MAX_KICK, kick + angle * steady * KICK_PER_DEGREE);
         // Post fires after the shot message is built, so this deviates the next shots, not this one.
-        aimClimb = Math.min(MAX_AIM_CLIMB, aimClimb + angle * AIM_CLIMB_PER_DEGREE);
-        aimDrift = Mth.clamp(aimDrift + (RANDOM.nextFloat() - 0.5F) * 2.0F * angle * AIM_DRIFT_PER_DEGREE,
+        aimClimb = Math.min(MAX_AIM_CLIMB, aimClimb + angle * steady * AIM_CLIMB_PER_DEGREE);
+        aimDrift = Mth.clamp(aimDrift + (RANDOM.nextFloat() - 0.5F) * 2.0F * angle * steady * AIM_DRIFT_PER_DEGREE,
                 -MAX_AIM_DRIFT, MAX_AIM_DRIFT);
 
         float strength = Mth.clamp(angle / 10.0F, 0.2F, 1.0F);
