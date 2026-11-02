@@ -68,6 +68,19 @@ public final class VivecraftBridge {
                 dir.x * z.x + dir.y * z.y + dir.z * z.z);
     }
 
+    /** A controller's own X, Y and Z axes in world space. */
+    public static Vec3[] handAxes(boolean mainHand) {
+        VRData d = data();
+        VRData.VRDevicePose c = d == null ? null : mainHand ? d.c0 : d.c1;
+        if (c == null) {
+            return null;
+        }
+        Vector3f x = c.getCustomVector(new Vector3f(1.0F, 0.0F, 0.0F));
+        Vector3f y = c.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
+        Vector3f z = c.getCustomVector(new Vector3f(0.0F, 0.0F, 1.0F));
+        return new Vec3[]{new Vec3(x.x, x.y, x.z), new Vec3(y.x, y.y, y.z), new Vec3(z.x, z.y, z.z)};
+    }
+
     /** False while Vivecraft draws the third-person or the mixed-reality camera view (not the player's own eyes). */
     public static boolean isEyePass() {
         RenderPass pass = ClientDataHolderVR.getInstance().currentPass;

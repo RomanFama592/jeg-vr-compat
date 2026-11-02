@@ -151,6 +151,19 @@ public final class VR {
         }
     }
 
+    /** A controller's X, Y and Z axes in world space, or null outside VR. */
+    public static Vec3[] handAxes(boolean mainHand) {
+        if (!active()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.handAxes(mainHand);
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
     /** False while Vivecraft draws a view that is not the player's eyes (third-person or mixed-reality camera). */
     public static boolean isEyePass() {
         if (!active()) {

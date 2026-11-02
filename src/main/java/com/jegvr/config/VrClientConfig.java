@@ -16,10 +16,20 @@ public final class VrClientConfig {
         OFF
     }
 
+    /** Where Vivecraft's hand or wrist HUD (hotbar) goes while the off hand holds a gun. */
+    public enum HudPlacement {
+        /** Where Vivecraft puts it. */
+        VIVECRAFT,
+        /** Slid back towards the elbow, facing as Vivecraft faces it. */
+        ELBOW,
+        /** Lying along the inner side of the forearm. */
+        FOREARM
+    }
+
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
-    public static final ForgeConfigSpec.BooleanValue HOTBAR_ON_FOREARM;
+    public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -34,9 +44,10 @@ public final class VrClientConfig {
                 .define("showGuides", false);
         builder.pop();
         builder.push("visuals");
-        HOTBAR_ON_FOREARM = builder
-                .comment("With a gun in the off hand, move Vivecraft's hand or wrist HUD (hotbar) back along the forearm.")
-                .define("hotbarOnForearm", true);
+        HUD_PLACEMENT = builder
+                .comment("With a gun in the off hand, where Vivecraft's hand or wrist HUD (hotbar) goes:",
+                        "VIVECRAFT (unchanged), ELBOW (slid back towards the elbow), FOREARM (along the inner forearm).")
+                .defineEnum("hudPlacement", HudPlacement.ELBOW);
         builder.pop();
         SPEC = builder.build();
     }
@@ -57,13 +68,13 @@ public final class VrClientConfig {
         return SPEC.isLoaded() && SHOW_GUIDES.get();
     }
 
-    public static boolean hotbarOnForearm() {
-        return !SPEC.isLoaded() || HOTBAR_ON_FOREARM.get();
+    public static HudPlacement hudPlacement() {
+        return SPEC.isLoaded() ? HUD_PLACEMENT.get() : HudPlacement.ELBOW;
     }
 
-    public static void setHotbarOnForearm(boolean on) {
-        HOTBAR_ON_FOREARM.set(on);
-        HOTBAR_ON_FOREARM.save();
+    public static void setHudPlacement(HudPlacement placement) {
+        HUD_PLACEMENT.set(placement);
+        HUD_PLACEMENT.save();
     }
 
     public static void setGrabZone(GrabZone zone) {

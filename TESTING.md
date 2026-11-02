@@ -207,10 +207,12 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] Con un arma en cada mano: no hay cajas, se recarga con el botón.
 
 ## F9.14 (hotbar en el antebrazo)
-- [x] (auto) Compila sin avisos; aplican 25 mezclas (nueva: `GuiHandlerVRMixin`); la config tiene `visuals.hotbarOnForearm = true`.
+- [x] (auto) Compila sin avisos; aplican 25 mezclas (nueva: `GuiHandlerVRMixin`); la config tiene `visuals.hudPlacement = "ELBOW"` (la opción vieja sí/no se migra sola).
+- [x] Usuario: "hacia el codo" está bien.
 - [ ] Vivecraft con la HUD en la mano o en la muñeca (opciones de HUD de Vivecraft). Sin arma en la secundaria: la hotbar está donde siempre.
 - [ ] Con un arma en la secundaria (sola o con otra en la principal): la hotbar se corre hacia el codo, sin quedar tapada ni metida en el arma.
 - [ ] Tocar la hotbar con la otra mano sigue eligiendo el slot que tocás (en su nueva posición).
 - [ ] Probar pistola y rifle; y zurdo (manos invertidas en Vivecraft).
-- [ ] Config → "Hotbar en el antebrazo" en No: vuelve a la posición de Vivecraft.
+- [ ] Config → "Hotbar con arma en la secundaria" = "Sobre el antebrazo": la hotbar queda a lo largo del lado interior del antebrazo (zona del marco rojo de la foto), se lee girando la muñeca, y tocarla con la otra mano elige el slot tocado.
+- [ ] "Como en Vivecraft": vuelve a la posición de Vivecraft.
 - [ ] HUD fija en la cabeza: nada cambia.

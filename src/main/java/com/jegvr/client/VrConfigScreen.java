@@ -49,17 +49,24 @@ public final class VrConfigScreen extends Screen {
                 .withTooltip(show -> Tooltip.create(Component.translatable("jeg_vr_compat.config.showGuides.tooltip")))
                 .create(x, y + ROW, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.showGuides"),
                         (button, show) -> VrClientConfig.setShowGuides(show)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.hotbarOnForearm())
-                .withTooltip(on -> Tooltip.create(Component.translatable("jeg_vr_compat.config.hotbarOnForearm.tooltip")))
+        addRenderableWidget(CycleButton.<VrClientConfig.HudPlacement>builder(
+                        placement -> Component.translatable(placementKey(placement)))
+                .withValues(VrClientConfig.HudPlacement.values())
+                .withInitialValue(VrClientConfig.hudPlacement())
+                .withTooltip(placement -> Tooltip.create(Component.translatable(placementKey(placement) + ".tooltip")))
                 .create(x, y + ROW * 2, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.hotbarOnForearm"),
-                        (button, on) -> VrClientConfig.setHotbarOnForearm(on)));
+                        Component.translatable("jeg_vr_compat.config.hudPlacement"),
+                        (button, placement) -> VrClientConfig.setHudPlacement(placement)));
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .bounds(x, y + ROW * 4, BUTTON_WIDTH, BUTTON_HEIGHT).build());
     }
 
     private static Component zoneName(VrClientConfig.GrabZone zone) {
         return Component.translatable(zoneKey(zone));
+    }
+
+    private static String placementKey(VrClientConfig.HudPlacement placement) {
+        return "jeg_vr_compat.config.hudPlacement." + placement.name().toLowerCase(Locale.ROOT);
     }
 
     private static String zoneKey(VrClientConfig.GrabZone zone) {
