@@ -164,3 +164,9 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [x] (auto) Compila; aplican las 22 mezclas.
 - [ ] Cámara de Vivecraft y jugador flat: el rifle (y la minigun) se ven en la mano del jugador VR, no solo la pistola.
 - [ ] Supervivencia, dos armas distintas: disparar al otro jugador con cada mano. Los dos disparos le bajan vida (corazones de su barra y sonido de golpe).
+
+## F8.6 (arma de la mano secundaria vista desde afuera)
+- [x] (auto) Compila; aplican 23 mezclas (nueva: `ItemInHandLayerVRMixin`).
+- [ ] VR con un arma en cada mano: el jugador flat (con addon + Vivecraft) ve las dos armas, cada una en su mano. Probar pistola + rifle.
+- [ ] Cámara de Vivecraft del jugador VR: se ven las dos armas.
+- [ ] Jugador flat con un arma en la principal y otra en la secundaria: como en JEG (la secundaria no se dibuja).
