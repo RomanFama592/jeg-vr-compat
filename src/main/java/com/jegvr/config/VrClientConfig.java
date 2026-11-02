@@ -28,8 +28,9 @@ public final class VrClientConfig {
                         "Ignored in Vivecraft's seated mode (no tracked hands): grab-to-reload is off there.")
                 .defineEnum("grabZone", GrabZone.HIP);
         SHOW_GUIDES = builder
-                .comment("Show the coloured boxes of grab-to-reload (/jegvr zones toggles it).")
-                .define("showGuides", true);
+                .comment("Show the coloured helper boxes (hip pouch, magazine well, foregrip). Off by default;",
+                        "/jegvr zones toggles it.")
+                .define("showGuides", false);
         builder.pop();
         SPEC = builder.build();
     }
@@ -47,7 +48,7 @@ public final class VrClientConfig {
     }
 
     public static boolean showGuides() {
-        return !SPEC.isLoaded() || SHOW_GUIDES.get();
+        return SPEC.isLoaded() && SHOW_GUIDES.get();
     }
 
     public static void setGrabZone(GrabZone zone) {

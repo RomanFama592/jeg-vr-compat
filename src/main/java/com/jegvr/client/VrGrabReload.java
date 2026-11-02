@@ -32,7 +32,7 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * normal reload (works on servers with only JEG). Guns loaded round by round ({@code MANUAL}, shotguns) take one round
  * per grab. JEG's reload key keeps working.
  * <p>
- * Guides (on by default, {@code /jegvr zones} toggles them): the hip box is red when there is no ammo, blue when a
+ * Guides (off by default; {@code showGuides} in the client config, {@code /jegvr zones} toggles them): the hip box is red when there is no ammo, blue when a
  * magazine can be taken and green with the hand in it; while holding, the magazine box is yellow and the
  * magazine-well box turns green on contact.
  * <p>

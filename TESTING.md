@@ -100,7 +100,7 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 
 ## Fase 7 (recarga con la mano)
 - [x] (auto) Compila; al arrancar aplican los 17 mixins.
-- Guías visibles por defecto; `/jegvr zones` las oculta o las vuelve a mostrar.
+- Guías (cajas) apagadas por defecto: `/jegvr zones` o `showGuides = true` en `config/jeg_vr_compat-client.toml` las prende.
 - [ ] VR, arma en la principal sin llenar, mano libre vacía, con munición: aparece una caja **azul** en la cadera del lado de la mano libre. Al meter la mano se pone **verde** y vibra suave.
 - [ ] Sin munición para esa arma: la caja de la cadera es **roja** y el grip no agarra. Arma llena: no hay caja.
 - [ ] Mano en la caja verde + grip (se puede soltar): vibra y suena; una caja **amarilla** sigue la mano y aparece una caja **blanca** debajo del arma.
@@ -117,11 +117,11 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [ ] Secundaria sin balas: volver a apretar su gatillo la recarga (como JEG con la principal).
 
 ## F7.4 (modo sentado y config)
-- [x] (auto) Compila; aplican los 17 mixins; se crea `config/jeg_vr_compat-client.toml` con `grabZone = "HIP"` y `showGuides = true`.
+- [x] (auto) Compila; aplican los 17 mixins; se crea `config/jeg_vr_compat-client.toml` con `grabZone = "HIP"` y `showGuides = false` (cajas apagadas por defecto).
 - [ ] Sentado con controles, `/jegvr grabzone front`: la caja aparece delante de la panza del lado de la mano libre; agarrar y meter el cargador funciona igual que de pie.
 - [ ] `/jegvr grabzone off`: no hay cajas y el grip siempre cambia de slot; la tecla de recarga y el botón secundario siguen recargando.
 - [ ] `/jegvr grabzone hip`: vuelve a la cadera.
-- [ ] `/jegvr zones` oculta las cajas; al cerrar y abrir el juego siguen ocultas (se guarda).
+- [ ] Config nueva: sin cajas. `/jegvr zones` las muestra; al cerrar y abrir el juego siguen visibles (se guarda). Otra vez `/jegvr zones` las oculta.
 - [ ] Modo sentado de Vivecraft (manos sin tracking): no hay cajas; recargar con la tecla funciona.
 
 ## S.7 (modo precisión con las dos manos)
