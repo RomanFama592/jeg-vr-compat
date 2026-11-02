@@ -54,7 +54,7 @@ public final class VrOffhandShooting {
         LocalPlayer player = mc.player;
         triggerTakenOver = player != null && VrOffhand.canDualWield(player.getOffhandItem())
                 && !VR.isBow(player.getMainHandItem()) && VR.active() && VrAim.serverHasAddon();
-        boolean down = triggerTakenOver && mc.screen == null && (VrKeys.FIRE_OFFHAND.isDown() || teleportPressed());
+        boolean down = triggerTakenOver && mc.screen == null && (VrKeys.FIRE_OFFHAND.isDown() || VrTriggers.offTriggerDown());
         if (down && player.getOffhandItem().getItem() instanceof GunItem gunItem) {
             ItemStack stack = player.getOffhandItem();
             Gun gun = gunItem.getModifiedGun(stack);
@@ -64,15 +64,6 @@ public final class VrOffhandShooting {
             }
         }
         wasDown = down;
-    }
-
-    private static boolean teleportPressed() {
-        for (KeyMapping key : VR.teleportKeys()) {
-            if (((KeyMappingAccessor) key).jegvr$isDownRaw()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static void fire(LocalPlayer player, ItemStack stack, Gun gun) {

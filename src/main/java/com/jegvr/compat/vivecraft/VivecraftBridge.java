@@ -1,5 +1,6 @@
 package com.jegvr.compat.vivecraft;
 
+import com.jegvr.mixin.input.MCOpenVRAccessor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +15,8 @@ import org.vivecraft.client_vr.gameplay.VRPlayer;
 import org.vivecraft.client_vr.gameplay.trackers.BowTracker;
 import org.vivecraft.client_vr.provider.ControllerType;
 import org.vivecraft.client_vr.provider.MCVR;
+import org.vivecraft.client_vr.provider.openvr_lwjgl.MCOpenVR;
+import org.vivecraft.client_vr.provider.openvr_lwjgl.VRInputAction;
 import org.vivecraft.client_vr.render.RenderPass;
 import org.vivecraft.client_vr.settings.VRSettings;
 
@@ -116,6 +119,33 @@ public final class VivecraftBridge {
     public static KeyMapping mainHandGripKey() {
         VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
         return isLeftHanded() ? mod.keyHotbarPrev : mod.keyHotbarNext;
+    }
+
+    /**
+     * Whether {@code key} is bound, in the current SteamVR binding, to the main-hand controller (true), the off-hand one
+     * (false), or neither or both (null).
+     */
+    public static Boolean boundToMainHand(KeyMapping key) {
+        MCVR vr = MCVR.get();
+        if (!(vr instanceof MCOpenVR openVr)) {
+            return null;
+        }
+        VRInputAction action = vr.getInputAction(key);
+        if (action == null) {
+            return null;
+        }
+        boolean left = false;
+        boolean right = false;
+        for (long origin : openVr.getOrigins(action)) {
+            ControllerType type = ((MCOpenVRAccessor) openVr).jegvr$originController(origin);
+            left |= type == ControllerType.LEFT;
+            right |= type == ControllerType.RIGHT;
+        }
+        if (left == right) {
+            return null;
+        }
+        // The main hand is the right controller unless hands are reversed.
+        return right != isLeftHanded();
     }
 
     /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */

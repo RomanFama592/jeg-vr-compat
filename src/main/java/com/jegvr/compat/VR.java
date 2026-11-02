@@ -3,6 +3,7 @@ package com.jegvr.compat;
 import com.jegvr.JegVrCompat;
 import com.jegvr.compat.vivecraft.VivecraftBridge;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -17,6 +18,8 @@ public final class VR {
     private static Boolean loaded;
     private static boolean broken;
     private static KeyMapping[] teleportKeys;
+    private static long attackSideCheckedAt;
+    private static boolean attackOnOffHand;
 
     private VR() {
     }
@@ -175,6 +178,28 @@ public final class VR {
             disable(t);
             return true;
         }
+    }
+
+    /**
+     * True when SteamVR binds the attack key (JEG's shoot) to the off-hand controller: hands reversed in Vivecraft
+     * while SteamVR kept the right-handed binding, or the other way round. Checked once a second.
+     */
+    public static boolean attackOnOffHand() {
+        if (!active()) {
+            return false;
+        }
+        long now = System.currentTimeMillis();
+        if (now - attackSideCheckedAt > 1000L) {
+            attackSideCheckedAt = now;
+            try {
+                Boolean main = VivecraftBridge.boundToMainHand(Minecraft.getInstance().options.keyAttack);
+                attackOnOffHand = main != null && !main;
+            } catch (Throwable t) {
+                disable(t);
+                attackOnOffHand = false;
+            }
+        }
+        return attackOnOffHand;
     }
 
     /** True when Vivecraft's HUD is locked to the off-hand controller (hand or wrist). */

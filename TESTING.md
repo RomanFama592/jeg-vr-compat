@@ -216,3 +216,10 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Config → "Hotbar con arma en la secundaria" = "Sobre el antebrazo": la hotbar queda a lo largo del lado interior del antebrazo (zona del marco rojo de la foto), se lee girando la muñeca, y tocarla con la otra mano elige el slot tocado.
 - [ ] "Como en Vivecraft": vuelve a la posición de Vivecraft.
 - [ ] HUD fija en la cabeza: nada cambia.
+
+## F9.16 (gatillos con la mano dominante invertida)
+- [x] (auto) Compila; aplican 27 mezclas (nuevas: `MCOpenVRAccessor`, `ShootingHandlerVRMixin`).
+- [ ] Manos normales: cada arma dispara con el gatillo de su mano, como antes.
+- [ ] Manos invertidas en Vivecraft (sin cambiar nada en SteamVR): pistola en la derecha (secundaria) → dispara con el gatillo **derecho**; arma en la izquierda (principal) → gatillo **izquierdo**. Con un arma en cada mano, cada gatillo dispara la suya.
+- [ ] Manos invertidas: el gatillo de la mano del arma principal no teletransporta; sin arma, todo como Vivecraft.
+- [ ] Manos invertidas con el binding "reversed" de Vivecraft cargado en SteamVR: también cada gatillo dispara su arma.
