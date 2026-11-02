@@ -13,7 +13,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
  */
 public final class VrNetwork {
     /** Bump when a packet changes; a mismatch (not an absence) is rejected on join. */
-    private static final String VERSION = "2";
+    private static final String VERSION = "3";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(JegVrCompat.MOD_ID, "main"), () -> VERSION,
@@ -37,6 +37,11 @@ public final class VrNetwork {
                 .encoder(C2SVrReloadOffhand::encode)
                 .decoder(C2SVrReloadOffhand::decode)
                 .consumerMainThread(C2SVrReloadOffhand::handle)
+                .add();
+        CHANNEL.messageBuilder(C2SVrInsertRound.class, 3, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrInsertRound::encode)
+                .decoder(C2SVrInsertRound::decode)
+                .consumerMainThread(C2SVrInsertRound::handle)
                 .add();
     }
 

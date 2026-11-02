@@ -12,6 +12,7 @@ import com.jegvr.client.VrOffhandShooting;
 import com.jegvr.client.VrPrecision;
 import com.jegvr.client.VrRecoil;
 import com.jegvr.network.VrNetwork;
+import com.jegvr.server.VrInsertRound;
 import com.jegvr.server.VrOffhand;
 import com.jegvr.server.VrServerAim;
 import net.minecraftforge.common.MinecraftForge;
@@ -42,6 +43,7 @@ public class JegVrCompat {
         MinecraftForge.EVENT_BUS.register(VrServerAim.class);
         if (ModList.get().isLoaded("jeg")) {
             MinecraftForge.EVENT_BUS.register(VrOffhand.class);
+            MinecraftForge.EVENT_BUS.register(VrInsertRound.class);
         }
     }
 

@@ -2,6 +2,8 @@ package com.jegvr.client;
 
 import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
+import com.jegvr.network.C2SVrInsertRound;
+import com.jegvr.network.VrNetwork;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
@@ -13,6 +15,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -30,7 +33,8 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * Reload by hand (phase 7): with the off hand free, put it in the hip box and press the off-hand grip to take a
  * magazine; the magazine box then follows the hand until it touches the gun's magazine-well box. That starts JEG's
  * normal reload (works on servers with only JEG). Guns loaded round by round ({@code MANUAL}, shotguns) take one round
- * per grab. JEG's reload key keeps working.
+ * per grab: with this addon on the server the round goes in at once ({@code C2SVrInsertRound}), otherwise JEG's reload
+ * is started and stopped after one round. JEG's reload key keeps working.
  * <p>
  * Guides (off by default; {@code showGuides} in the client config, {@code /jegvr zones} toggles them): the hip box is red when there is no ammo, blue when a
  * magazine can be taken and green with the hand in it; while holding, the magazine box is yellow and the
@@ -51,6 +55,8 @@ public final class VrGrabReload {
     private static final Vec3 MAGWELL_HALF = new Vec3(0.1, 0.1, 0.1);
     private static final Vec3 MAGAZINE_HALF = new Vec3(0.04, 0.07, 0.04);
     private static final int TIMEOUT_TICKS = 200;
+    /** Muzzle-up kick of the gun model when a round goes in by hand. */
+    private static final float ROUND_JOLT_DEGREES = 6.0F;
 
     private enum Pouch { HIDDEN, NO_AMMO, READY }
 
@@ -140,12 +146,19 @@ public final class VrGrabReload {
         holding = false;
         ItemStack stack = player.getMainHandItem();
         GunItem gunItem = (GunItem) stack.getItem();
+        VR.haptic(true, 0.08F, 0.8F);
+        VR.haptic(false, 0.08F, 0.8F);
         if (ReloadType.MANUAL.equals(gunItem.getModifiedGun(stack).getReloads().getReloadType())) {
+            if (VrAim.serverHasAddon()) {
+                // F7.8: the server loads this round at once (no JEG reload, no wait); the gun gives a short jolt.
+                VrNetwork.CHANNEL.sendToServer(new C2SVrInsertRound(InteractionHand.MAIN_HAND));
+                VrRecoil.jolt(ROUND_JOLT_DEGREES);
+                return;
+            }
+            // JEG-only server: start JEG's reload and stop it after one round (slower).
             singleRoundFrom = ammo(stack);
         }
         VrDualReload.reloadMainHand(player);
-        VR.haptic(true, 0.08F, 0.8F);
-        VR.haptic(false, 0.08F, 0.8F);
     }
 
     /** JEG keeps loading rounds while reloading; a grab inserts one, so stop the reload after it. */

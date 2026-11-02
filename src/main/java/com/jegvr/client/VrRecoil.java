@@ -86,6 +86,11 @@ public final class VrRecoil {
         return aimDrift;
     }
 
+    /** A short muzzle-up kick of the held gun model, without any aim deviation (e.g. a round pushed in by hand). */
+    public static void jolt(float degrees) {
+        kick = Math.min(MAX_KICK, kick + degrees);
+    }
+
     /** Muzzle-up rotation of the held gun, in degrees. */
     public static float kickDegrees(float partialTick) {
         return Mth.lerp(partialTick, prevKick, kick);

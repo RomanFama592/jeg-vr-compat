@@ -177,3 +177,13 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 - [x] Al revés (sónica en la secundaria, pistola en la principal): la secundaria lanza la onda sónica y la principal dispara balas.
 - [x] Con un arma que se desgasta en la secundaria: pierde durabilidad la secundaria, no la principal.
 - [x] Flat y una sola arma: igual que antes.
+
+## F7.8 (cartuchos uno a uno, rápido)
+- [x] (auto) Compila; aplican 24 mezclas; canal en versión 3.
+- [ ] LAN o `runServer` (addon en el servidor), escopeta sin llenar y cartuchos en el inventario: agarrar en la cadera y tocar el pozo: entra un cartucho al instante (sin animación de recarga de JEG), suena la carga, el arma da una sacudida corta y vibran las dos manos.
+- [ ] Repetir rápido: cada agarre suma uno; si vas muy rápido algunos no entran (límite contra spam).
+- [ ] Escopeta vacía: el primer cartucho suena también como el cierre del arma.
+- [ ] Se gasta un cartucho del inventario por cada uno que entra; en creativo no se gasta.
+- [ ] El otro jugador escucha el sonido de carga.
+- [ ] La tecla de recarga y el botón secundario siguen cargando todo con la animación de JEG.
+- [ ] Servidor sin el addon: queda como antes (más lento, con la recarga de JEG cortada tras un cartucho).
