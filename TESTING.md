@@ -2,6 +2,15 @@
 
 Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usuario manualmente.
 
+## Pendientes con servidor (el usuario las deja para más adelante)
+Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arman con `MULTIJUGADOR.md`.
+- [ ] Matriz de servidores F8.3 / S.6: solo JEG | JEG + Vivecraft | JEG + Vivecraft + addon, con cliente VR y flat.
+- [ ] Servidor dedicado solo con JEG: balas desde el controlador (F6.3), cliente VR entra sin errores (Fase S), gatillo de la mano libre teletransporta (S.5/S.5b), recarga con la mano y modo precisión funcionan (Fase 7, S.7), cartuchos con la recarga de JEG cortada (F7.8).
+- [ ] `runServer -PnoVivecraft`: el addon funciona sin Vivecraft en el servidor (Fase S).
+- [ ] Servidor con addon + cliente flat sin addon: entra y juega normal (Fase S).
+- [ ] Dos jugadores en supervivencia: el disparo de la mano libre le baja vida al otro (F8.5).
+- [ ] Dos jugadores: el otro escucha el sonido de cada cartucho metido a mano (F7.8).
+
 ## Fase 1
 - [ ] Flat, sin Vivecraft: arranca, se puede disparar y recargar.
 - [ ] Flat, con Vivecraft en modo NONVR: arranca sin errores de mixin.
@@ -180,10 +189,10 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 
 ## F7.8 (cartuchos uno a uno, rápido)
 - [x] (auto) Compila; aplican 24 mezclas; canal en versión 3.
-- [ ] LAN o `runServer` (addon en el servidor), escopeta sin llenar y cartuchos en el inventario: agarrar en la cadera y tocar el pozo: entra un cartucho al instante (sin animación de recarga de JEG), suena la carga, el arma da una sacudida corta y vibran las dos manos.
-- [ ] Repetir rápido: cada agarre suma uno; si vas muy rápido algunos no entran (límite contra spam).
-- [ ] Escopeta vacía: el primer cartucho suena también como el cierre del arma.
-- [ ] Se gasta un cartucho del inventario por cada uno que entra; en creativo no se gasta.
+- [x] Un jugador (LAN/servidor pendientes), escopeta sin llenar y cartuchos en el inventario: agarrar en la cadera y tocar el pozo: entra un cartucho al instante (sin animación de recarga de JEG), suena la carga, el arma da una sacudida corta y vibran las dos manos.
+- [x] Repetir rápido: cada agarre suma uno; si vas muy rápido algunos no entran (límite contra spam).
+- [x] Escopeta vacía: el primer cartucho suena también como el cierre del arma.
+- [x] Se gasta un cartucho del inventario por cada uno que entra; en creativo no se gasta.
 - [ ] El otro jugador escucha el sonido de carga.
-- [ ] La tecla de recarga y el botón secundario siguen cargando todo con la animación de JEG.
+- [x] La tecla de recarga y el botón secundario siguen cargando todo con la animación de JEG.
 - [ ] Servidor sin el addon: queda como antes (más lento, con la recarga de JEG cortada tras un cartucho).
