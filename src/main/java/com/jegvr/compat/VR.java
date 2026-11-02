@@ -20,6 +20,7 @@ public final class VR {
     private static KeyMapping[] teleportKeys;
     private static long attackSideCheckedAt;
     private static boolean attackOnOffHand;
+    private static boolean attackSideLogged;
 
     private VR() {
     }
@@ -193,7 +194,14 @@ public final class VR {
             attackSideCheckedAt = now;
             try {
                 Boolean main = VivecraftBridge.boundToMainHand(Minecraft.getInstance().options.keyAttack);
-                attackOnOffHand = main != null && !main;
+                boolean crossed = main != null && !main;
+                if (crossed != attackOnOffHand || attackSideCheckedAt == now && !attackSideLogged) {
+                    attackSideLogged = true;
+                    LOGGER.info("SteamVR attack trigger: {} (left-handed: {}) -> gun triggers {}",
+                            main == null ? "unknown" : main ? "main hand" : "off hand", VivecraftBridge.isLeftHanded(),
+                            crossed ? "swapped" : "as bound");
+                }
+                attackOnOffHand = crossed;
             } catch (Throwable t) {
                 disable(t);
                 attackOnOffHand = false;

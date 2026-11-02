@@ -16,6 +16,14 @@ import ttv.migami.jeg.item.GunItem;
  * shoot) and the attack key is the off-hand one ({@link VrOffhandShooting}).
  */
 public final class VrTriggers {
+    /**
+     * Crossed: JEG's view of its shoot key. JEG fires semi-automatic guns once per press by releasing the shoot key
+     * ({@code KeyMapping.setDown(false)}) after the shot; the teleport key it now reads is not the one it releases, so
+     * a press is latched here and {@link #releaseMainTrigger} drops it, exactly like the real key.
+     */
+    private static boolean mainLatch;
+    private static boolean mainWasDown;
+
     private VrTriggers() {
     }
 
@@ -26,7 +34,24 @@ public final class VrTriggers {
 
     /** JEG's shoot key as JEG should see it: the trigger of the main-hand controller. */
     public static boolean mainTriggerDown(boolean shootKeyDown) {
-        return crossed() ? teleportDown() : shootKeyDown;
+        if (!crossed()) {
+            mainLatch = false;
+            mainWasDown = false;
+            return shootKeyDown;
+        }
+        boolean down = teleportDown();
+        if (down && !mainWasDown) {
+            mainLatch = true;
+        } else if (!down) {
+            mainLatch = false;
+        }
+        mainWasDown = down;
+        return mainLatch;
+    }
+
+    /** JEG released its shoot key (after a semi-automatic shot, or overheating). */
+    public static void releaseMainTrigger() {
+        mainLatch = false;
     }
 
     /** The trigger of the off-hand controller, read raw (hidden keys still count). */

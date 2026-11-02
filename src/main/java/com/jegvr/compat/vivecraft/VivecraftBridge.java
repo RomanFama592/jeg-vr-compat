@@ -96,8 +96,9 @@ public final class VivecraftBridge {
         if (vr == null) {
             return;
         }
-        boolean right = mainHand != isLeftHanded();
-        vr.triggerHapticPulse(right ? ControllerType.RIGHT : ControllerType.LEFT, seconds, 160.0F, amplitude);
+        // Vivecraft's ControllerType is logical (RIGHT = main hand, LEFT = off hand); it maps it to the physical
+        // controller itself when hands are reversed.
+        vr.triggerHapticPulse(mainHand ? ControllerType.RIGHT : ControllerType.LEFT, seconds, 160.0F, amplitude);
     }
 
     /** Vivecraft's teleport keys (teleport mode and free-move fallback), bound to the off-hand trigger by default. */
@@ -144,8 +145,8 @@ public final class VivecraftBridge {
         if (left == right) {
             return null;
         }
-        // The main hand is the right controller unless hands are reversed.
-        return right != isLeftHanded();
+        // Logical types: with reversed hands Vivecraft swaps its device slots, so RIGHT is always the main hand.
+        return right;
     }
 
     /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */

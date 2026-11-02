@@ -18,4 +18,14 @@ public abstract class ShootingHandlerVRMixin {
         boolean down = original.call(key);
         return key == KeyBinds.getShootMapping() ? VrTriggers.mainTriggerDown(down) : down;
     }
+
+    /** JEG fires semi-automatic guns once per press by releasing the shoot key; release ours too. */
+    @WrapOperation(method = "onPostClientTick", at = @At(value = "INVOKE", remap = true,
+            target = "Lnet/minecraft/client/KeyMapping;setDown(Z)V"))
+    private void jegvr$releaseTrigger(KeyMapping key, boolean down, Operation<Void> original) {
+        original.call(key, down);
+        if (!down && key == KeyBinds.getShootMapping()) {
+            VrTriggers.releaseMainTrigger();
+        }
+    }
 }
