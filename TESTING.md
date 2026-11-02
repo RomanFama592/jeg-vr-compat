@@ -167,13 +167,13 @@ Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usua
 
 ## F8.6 (arma de la mano secundaria vista desde afuera)
 - [x] (auto) Compila; aplican 23 mezclas (nueva: `ItemInHandLayerVRMixin`).
-- [ ] VR con un arma en cada mano: el jugador flat (con addon + Vivecraft) ve las dos armas, cada una en su mano. Probar pistola + rifle.
-- [ ] Cámara de Vivecraft del jugador VR: se ven las dos armas.
-- [ ] Jugador flat con un arma en la principal y otra en la secundaria: como en JEG (la secundaria no se dibuja).
+- [x] VR con un arma en cada mano: el jugador flat (con addon + Vivecraft) ve las dos armas, cada una en su mano. Probar pistola + rifle.
+- [x] Cámara de Vivecraft del jugador VR: se ven las dos armas.
+- [x] Jugador flat con un arma en la principal y otra en la secundaria: como en JEG (la secundaria no se dibuja).
 
 ## F8.7 (armas sónicas con dos armas)
 - [x] (auto) Compila; aplican 24 mezclas (nueva: `GunEventBusVRMixin`).
-- [ ] Hypersonic Cannon (o Supersonic Shotgun) en la principal y pistola en la secundaria: la pistola dispara balas normales, sin onda sónica. El cañón sigue lanzando su onda.
-- [ ] Al revés (sónica en la secundaria, pistola en la principal): la secundaria lanza la onda sónica y la principal dispara balas.
-- [ ] Con un arma que se desgasta en la secundaria: pierde durabilidad la secundaria, no la principal.
-- [ ] Flat y una sola arma: igual que antes.
+- [x] Hypersonic Cannon (o Supersonic Shotgun) en la principal y pistola en la secundaria: la pistola dispara balas normales, sin onda sónica. El cañón sigue lanzando su onda.
+- [x] Al revés (sónica en la secundaria, pistola en la principal): la secundaria lanza la onda sónica y la principal dispara balas.
+- [x] Con un arma que se desgasta en la secundaria: pierde durabilidad la secundaria, no la principal.
+- [x] Flat y una sola arma: igual que antes.
