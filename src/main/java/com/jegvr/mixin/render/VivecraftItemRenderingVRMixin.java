@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.vivecraft.client_vr.render.VivecraftItemRendering;
-import ttv.migami.jeg.item.GunItem;
 
 /**
  * Vivecraft rotates every held item by a per-type transform designed for sprites, tools and swords. JEG guns are
@@ -28,7 +27,7 @@ public class VivecraftItemRenderingVRMixin {
                                                      boolean rightHand, AbstractClientPlayer player,
                                                      float equipProgress, float swingProgress, ItemStack stack,
                                                      InteractionHand hand, CallbackInfo ci) {
-        if (stack.getItem() instanceof GunItem) {
+        if (VrGunPose.heldLikeGun(stack)) {
             VrDiag.once("vivecraftTransform", "Vivecraft first-person item transform replaced for JEG guns (type={})", type);
             VrHands.setRenderingHand(hand);
             VrGunPose.apply(poseStack, stack,

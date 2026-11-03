@@ -1,6 +1,7 @@
 package com.jegvr.mixin.render;
 
 import com.jegvr.client.VrDiag;
+import com.jegvr.client.VrGunPose;
 import com.jegvr.compat.VR;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -12,7 +13,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import ttv.migami.jeg.item.GunItem;
 
 /**
  * JEG gun models carry a {@code firstperson_*} display offset that places the gun on a flat screen (every gun shifts
@@ -26,7 +26,7 @@ public class ItemRendererVRMixin {
     private BakedModel jegvr$noFlatDisplayOffset(PoseStack poseStack, BakedModel model, ItemDisplayContext context,
                                                  boolean leftHand, Operation<BakedModel> original,
                                                  @Local(argsOnly = true) ItemStack stack) {
-        if (context.firstPerson() && stack.getItem() instanceof GunItem && VR.active()) {
+        if (context.firstPerson() && VrGunPose.heldLikeGun(stack) && VR.active()) {
             VrDiag.once("displayOffset", "Skipping flat first-person display transform for JEG guns (context={}, leftHand={})",
                     context, leftHand);
             return original.call(poseStack, model, ItemDisplayContext.NONE, leftHand);

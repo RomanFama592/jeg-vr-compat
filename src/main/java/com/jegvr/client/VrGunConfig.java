@@ -72,6 +72,16 @@ public final class VrGunConfig {
         return pose;
     }
 
+    /** Built-in per-item entries, used while guns.json has no entry of its own for that item. */
+    private static final Map<String, Pose> BUILT_IN = new LinkedHashMap<>();
+
+    static {
+        // F9.11: the trumpet's baked model is small next to the guns (6 px long); JEG draws it 1.5x in flat too.
+        Pose trumpet = new Pose();
+        trumpet.scale = 1.5F;
+        BUILT_IN.put("jeg:trumpet", trumpet);
+    }
+
     private static Data data = new Data();
     private static long lastModified = -1L;
     private static long lastCheck;
@@ -87,7 +97,7 @@ public final class VrGunConfig {
     public static Pose poseFor(String gunId) {
         reloadIfChanged();
         Pose base = data.defaults;
-        Pose gun = data.guns.get(gunId);
+        Pose gun = data.guns.getOrDefault(gunId, BUILT_IN.get(gunId));
         Pose result = base.copy();
         if (gun != null) {
             result.pitch += gun.pitch;
@@ -112,7 +122,7 @@ public final class VrGunConfig {
             return;
         }
         Pose base = data.defaults;
-        Pose entry = data.guns.computeIfAbsent(gunId, k -> new Pose());
+        Pose entry = data.guns.computeIfAbsent(gunId, VrGunConfig::newEntry);
         entry.pitch = effective.pitch - base.pitch;
         entry.yaw = effective.yaw - base.yaw;
         entry.roll = effective.roll - base.roll;
@@ -125,7 +135,13 @@ public final class VrGunConfig {
     /** The raw entry being edited: the per-gun one, or the global default when {@code gunId} is null. */
     public static Pose editable(String gunId) {
         reloadIfChanged();
-        return gunId == null ? data.defaults : data.guns.computeIfAbsent(gunId, k -> new Pose());
+        return gunId == null ? data.defaults : data.guns.computeIfAbsent(gunId, VrGunConfig::newEntry);
+    }
+
+    /** A new per-gun entry, starting from the built-in one when there is one. */
+    private static Pose newEntry(String gunId) {
+        Pose builtIn = BUILT_IN.get(gunId);
+        return builtIn == null ? new Pose() : builtIn.copy();
     }
 
     public static void save() {

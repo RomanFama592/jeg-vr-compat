@@ -9,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Quaternionf;
+import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.item.TrumpetItem;
 
 /** Orientation/position correction applied to a JEG gun held in a VR controller. */
 public final class VrGunPose {
@@ -17,6 +19,14 @@ public final class VrGunPose {
     private static final float GRIP_DOWN = 0.08F;
 
     private VrGunPose() {
+    }
+
+    /**
+     * Items held like a gun in VR: JEG guns, and the trumpet (F9.11), a 3D model with its bell along -Z that is not a
+     * {@link GunItem}. Vivecraft's per-type transforms are meant for flat sprites and tools and turn it sideways.
+     */
+    public static boolean heldLikeGun(ItemStack stack) {
+        return stack.getItem() instanceof GunItem || stack.getItem() instanceof TrumpetItem;
     }
 
     public static String gunId(ItemStack stack) {

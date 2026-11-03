@@ -12,7 +12,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import ttv.migami.jeg.item.GunItem;
 
 import java.util.Locale;
 
@@ -116,7 +115,7 @@ public final class VrDebugCommands {
             return null;
         }
         ItemStack stack = player.getMainHandItem();
-        return stack.getItem() instanceof GunItem ? VrGunPose.gunId(stack) : null;
+        return VrGunPose.heldLikeGun(stack) ? VrGunPose.gunId(stack) : null;
     }
 
     private static int reply(CommandContext<CommandSourceStack> c, String message) {
