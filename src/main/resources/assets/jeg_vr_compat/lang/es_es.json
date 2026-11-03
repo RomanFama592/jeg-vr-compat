@@ -18,5 +18,7 @@
   "jeg_vr_compat.config.hudPlacement.elbow": "Hacia el codo",
   "jeg_vr_compat.config.hudPlacement.elbow.tooltip": "Corre la HUD hacia el codo para que el arma no la tape.",
   "jeg_vr_compat.config.hudPlacement.forearm": "Sobre el antebrazo",
-  "jeg_vr_compat.config.hudPlacement.forearm.tooltip": "Apoya la hotbar a lo largo del lado interior del antebrazo; se ve girando la muñeca."
+  "jeg_vr_compat.config.hudPlacement.forearm.tooltip": "Apoya la hotbar a lo largo del lado interior del antebrazo; se ve girando la muñeca.",
+  "jeg_vr_compat.config.mirrorLeftHand": "Espejar armas en la izquierda",
+  "jeg_vr_compat.config.mirrorLeftHand.tooltip": "Las armas en el control izquierdo se ven hechas para esa mano (cerrojo y eyector del otro lado), con su animación."
 }

@@ -18,5 +18,7 @@
   "jeg_vr_compat.config.hudPlacement.elbow": "Towards the elbow",
   "jeg_vr_compat.config.hudPlacement.elbow.tooltip": "Slides the HUD towards the elbow so the gun does not cover it.",
   "jeg_vr_compat.config.hudPlacement.forearm": "On the forearm",
-  "jeg_vr_compat.config.hudPlacement.forearm.tooltip": "Lays the hotbar along the inner side of the forearm; turn the wrist to see it."
+  "jeg_vr_compat.config.hudPlacement.forearm.tooltip": "Lays the hotbar along the inner side of the forearm; turn the wrist to see it.",
+  "jeg_vr_compat.config.mirrorLeftHand": "Mirror left-hand guns",
+  "jeg_vr_compat.config.mirrorLeftHand.tooltip": "Guns in the left controller look made for the left hand (bolt and ejection port on the other side), animation included."
 }

@@ -30,6 +30,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
+    public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -48,6 +49,10 @@ public final class VrClientConfig {
                 .comment("With a gun in the off hand, where Vivecraft's hand or wrist HUD (hotbar) goes:",
                         "VIVECRAFT (unchanged), ELBOW (slid back towards the elbow), FOREARM (along the inner forearm).")
                 .defineEnum("hudPlacement", HudPlacement.ELBOW);
+        MIRROR_LEFT_HAND = builder
+                .comment("Draw guns held in the left controller mirrored, as if made for the left hand (JEG models are",
+                        "made for the right hand). Their animation is mirrored too.")
+                .define("mirrorLeftHand", true);
         builder.pop();
         SPEC = builder.build();
     }
@@ -70,6 +75,15 @@ public final class VrClientConfig {
 
     public static HudPlacement hudPlacement() {
         return SPEC.isLoaded() ? HUD_PLACEMENT.get() : HudPlacement.ELBOW;
+    }
+
+    public static boolean mirrorLeftHand() {
+        return !SPEC.isLoaded() || MIRROR_LEFT_HAND.get();
+    }
+
+    public static void setMirrorLeftHand(boolean mirror) {
+        MIRROR_LEFT_HAND.set(mirror);
+        MIRROR_LEFT_HAND.save();
     }
 
     public static void setHudPlacement(HudPlacement placement) {

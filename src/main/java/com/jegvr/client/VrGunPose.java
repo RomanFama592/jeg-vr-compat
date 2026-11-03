@@ -26,13 +26,18 @@ public final class VrGunPose {
 
     public static void apply(PoseStack poseStack, ItemStack stack, ItemDisplayContext context, boolean mainHand) {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(gunId(stack));
-        // The left hand mirrors yaw/roll and the lateral offset.
-        float side = context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
+        boolean mirrored = VrGunMirror.mirrors(mainHand);
+        // The left hand mirrors yaw/roll and the lateral offset; a mirrored frame already does.
+        float side = !mirrored && context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
         // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the gun hand to the free hand.
         Vec3 twoHand = VrPrecision.localAimDir(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
         if (twoHand != null) {
             poseStack.mulPose(new Quaternionf().rotationTo(0.0F, 0.0F, -1.0F,
                     (float) twoHand.x, (float) twoHand.y, (float) twoHand.z));
+        }
+        // Physical left hand: the right-hand pose in a mirrored frame lands where the left-hand pose did.
+        if (mirrored) {
+            VrGunMirror.mirror(poseStack);
         }
         poseStack.translate(pose.tx * side, pose.ty - GRIP_DOWN, pose.tz - GRIP_FORWARD);
         // JEG only fires the main-hand gun, so only that one kicks.

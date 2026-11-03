@@ -209,13 +209,13 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 ## F9.14 (hotbar en el antebrazo)
 - [x] (auto) Compila sin avisos; aplican 25 mezclas (nueva: `GuiHandlerVRMixin`); la config tiene `visuals.hudPlacement = "ELBOW"` (la opción vieja sí/no se migra sola).
 - [x] Usuario: "hacia el codo" está bien.
-- [ ] Vivecraft con la HUD en la mano o en la muñeca (opciones de HUD de Vivecraft). Sin arma en la secundaria: la hotbar está donde siempre.
-- [ ] Con un arma en la secundaria (sola o con otra en la principal): la hotbar se corre hacia el codo, sin quedar tapada ni metida en el arma.
-- [ ] Tocar la hotbar con la otra mano sigue eligiendo el slot que tocás (en su nueva posición).
-- [ ] Probar pistola y rifle; y zurdo (manos invertidas en Vivecraft).
-- [ ] Config → "Hotbar con arma en la secundaria" = "Sobre el antebrazo": la hotbar queda a lo largo del lado interior del antebrazo (zona del marco rojo de la foto), se lee girando la muñeca, y tocarla con la otra mano elige el slot tocado.
-- [ ] "Como en Vivecraft": vuelve a la posición de Vivecraft.
-- [ ] HUD fija en la cabeza: nada cambia.
+- [x] Vivecraft con la HUD en la mano o en la muñeca (opciones de HUD de Vivecraft). Sin arma en la secundaria: la hotbar está donde siempre.
+- [x] Con un arma en la secundaria (sola o con otra en la principal): la hotbar se corre hacia el codo, sin quedar tapada ni metida en el arma.
+- [x] Tocar la hotbar con la otra mano sigue eligiendo el slot que tocás (en su nueva posición).
+- [x] Probar pistola y rifle; y zurdo (manos invertidas en Vivecraft).
+- [x] Config → "Hotbar con arma en la secundaria" = "Sobre el antebrazo": la hotbar queda a lo largo del lado interior del antebrazo (zona del marco rojo de la foto), se lee girando la muñeca, y tocarla con la otra mano elige el slot tocado.
+- [x] "Como en Vivecraft": vuelve a la posición de Vivecraft.
+- [x] HUD fija en la cabeza: nada cambia.
 
 ## F9.16 (gatillos con la mano dominante invertida)
 - [x] (auto) Compila; aplican 27 mezclas (nuevas: `MCOpenVRAccessor`, `ShootingHandlerVRMixin`).
@@ -226,3 +226,14 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] Manos invertidas en Vivecraft (sin cambiar nada en SteamVR): pistola en la derecha (secundaria) → dispara con el gatillo **derecho**; arma en la izquierda (principal) → gatillo **izquierdo**. Con un arma en cada mano, cada gatillo dispara la suya.
 - [x] Manos invertidas: el gatillo de la mano del arma principal no teletransporta; sin arma, todo como Vivecraft.
 - [x] Manos invertidas con el binding "reversed" de Vivecraft cargado en SteamVR: también cada gatillo dispara su arma.
+
+## F9.17 (armas espejadas en la mano izquierda)
+- [x] (auto) Compila sin avisos; aplican 28 mezclas (nueva: `render.ItemInHandRendererVRMixin`); la config tiene `visuals.mirrorLeftHand = true`.
+- [ ] Manos normales, pistola en la secundaria (izquierda): se ve espejada (cerrojo/eyector del lado izquierdo del arma), en la misma posición y ángulo que antes; las caras se ven por fuera (no "transparente" ni por dentro) y la iluminación es normal.
+- [ ] Disparar y recargar con esa arma: la animación (corredera, cargador) se mueve espejada y sigue pegada al arma; el destello sale de la boca del cañón y la bala sale por donde apuntás.
+- [ ] Probar un arma GeckoLib grande (rifle) y una clásica si hay alguna; también una con mira o accesorios: se ven completos.
+- [ ] Rifle en la izquierda + modo precisión (S.7b): sigue apuntando por la línea de las dos manos.
+- [ ] Manos invertidas en Vivecraft: el arma de la **principal** (ahora en la izquierda) se ve espejada y la de la secundaria (derecha) normal.
+- [ ] La mano derecha no cambia nada.
+- [ ] Config → "Espejar armas en la izquierda" = No: vuelve a verse como antes (sin espejar).
+- [ ] Tercera persona / otros jugadores: hoy no se espeja (solo tu vista). Decime si querés que también.
