@@ -77,8 +77,10 @@ public final class VrGunConfig {
 
     static {
         // F9.11: the trumpet's baked model is small next to the guns (6 px long); JEG draws it 1.5x in flat too.
+        // Its valves sit higher than a gun's grip, so it goes up a few centimetres into the hand.
         Pose trumpet = new Pose();
         trumpet.scale = 1.5F;
+        trumpet.ty = 0.04F;
         BUILT_IN.put("jeg:trumpet", trumpet);
     }
 
@@ -130,6 +132,16 @@ public final class VrGunConfig {
         entry.ty = effective.ty - base.ty;
         entry.tz = effective.tz - base.tz;
         entry.scale = base.scale == 0.0F ? 1.0F : effective.scale / base.scale;
+    }
+
+    /** Back to the factory pose: the global default, or a gun's built-in entry (none for most guns). */
+    public static void reset(String gunId) {
+        reloadIfChanged();
+        if (gunId == null) {
+            data.defaults = factoryDefaults();
+        } else {
+            data.guns.remove(gunId);
+        }
     }
 
     /** The raw entry being edited: the per-gun one, or the global default when {@code gunId} is null. */

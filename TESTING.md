@@ -242,6 +242,11 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] (auto) Compila sin avisos; aplican 28 mezclas.
 - [x] Trompeta (`jeg:trumpet`) en la mano principal: apunta hacia adelante como un arma (campana adelante, boquilla hacia vos), pegada al control, no de costado ni separada.
 - [x] En la secundaria (izquierda): igual, espejada.
-- [x] Tamaño (foto del usuario: bien, sin calibrar): si se ve muy chica o muy grande, o corrida, calibrala con `/jegvr pose` teniéndola en la principal (`/jegvr save`) y pasame los números para dejarlos por defecto.
+- [ ] Agarre: el usuario lo vio unos cm por debajo de la mano; subido 4 cm (`ty 0.04`). Que las válvulas queden en la mano. Tamaño (foto del usuario: bien): si se ve muy chica o muy grande, o corrida, calibrala con `/jegvr pose` teniéndola en la principal (`/jegvr save`) y pasame los números para dejarlos por defecto.
 - [x] Usarla (gatillo de usar): suena y lanza las notas como antes.
 - [x] Flat: se ve como siempre.
+
+## Comandos (`COMANDOS.md`)
+- [ ] `/jegvr help` muestra el resumen en el chat.
+- [ ] `/jegvr move 0 0.02 0` con un arma en la mano: sube 2 cm; `/jegvr show` muestra el valor.
+- [ ] `/jegvr reset` con la trompeta en la mano: vuelve a la pose de fábrica de la trompeta (no a la de las armas).

@@ -20,6 +20,17 @@ import java.util.Locale;
  * (global default included); without a gun in hand they edit the global default.
  */
 public final class VrDebugCommands {
+    /** Shown by /jegvr help (same text as COMANDOS.md). */
+    private static final String[] HELP = {
+            "§e/jegvr: calibrar el arma que tenés en la mano principal (sin arma: la pose general)",
+            "§7Ejes del control: X = derecha, Y = arriba, Z = hacia atrás (negativo = hacia adelante). 0.01 = 1 cm",
+            "§f/jegvr move <dx> <dy> <dz>§7: correr; 0 en los ejes que no cambian. Ej: /jegvr move 0 0.02 0 = 2 cm arriba",
+            "§f/jegvr rot <dpitch> <dyaw> <droll>§7: girar en grados; 0 en los que no cambian. Ej: /jegvr rot 0 0 10",
+            "§f/jegvr scale <factor>§7: tamaño final (0.6 = el de todas las armas)",
+            "§f/jegvr pose <pitch> <yaw> <roll> [tx ty tz]§7: poner valores absolutos (los que muestra el chat)",
+            "§f/jegvr show§7: ver los valores · §f/jegvr save§7: guardar · §f/jegvr reset§7: volver a lo de fábrica",
+    };
+
     private VrDebugCommands() {
     }
 
@@ -86,13 +97,19 @@ public final class VrDebugCommands {
             }));
         }
         root.then(grabZone);
+        root.then(Commands.literal("help").executes(c -> {
+            for (String line : HELP) {
+                reply(c, line);
+            }
+            return 1;
+        }));
         root.then(Commands.literal("save").executes(c -> {
             VrGunConfig.save();
             return reply(c, "Guardado en config/jeg_vr_compat/guns.json");
         }));
         root.then(Commands.literal("reset").executes(c -> {
             String id = heldGunId();
-            VrGunConfig.setEffective(id, VrGunConfig.factoryDefaults());
+            VrGunConfig.reset(id);
             return reply(c, "Pose restablecida para " + (id == null ? "default" : id));
         }));
         d.register(root);

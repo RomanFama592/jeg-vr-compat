@@ -48,7 +48,7 @@ src/main/java/com/jegvr/
   client/VrGunConfig.java          # carga config/jeg_vr_compat/guns.json
   client/VrRecoil.java
   client/VrGrabReload.java
-  client/VrDebugCommands.java      # /jegvr pose ..., /jegvr zones, /jegvr grabzone
+  client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, zones, grabzone (ver COMANDOS.md)
   config/VrClientConfig.java       # config/jeg_vr_compat-client.toml (ForgeConfigSpec CLIENT)
 src/main/resources/
   META-INF/mods.toml
