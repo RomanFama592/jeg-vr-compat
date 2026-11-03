@@ -223,6 +223,123 @@ public final class VR {
         }
     }
 
+    /** Vivecraft's bow mode is "on" (every bow-like item); false without Vivecraft. */
+    public static boolean bowModeOn() {
+        if (!loaded()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isBowModeOn();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    /** Vivecraft's roomscale bow handles what the local player holds now. */
+    public static boolean bowActive() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isBowActive();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    /** An arrow sits on the string of Vivecraft's roomscale bow (or it is being drawn). */
+    public static boolean bowNotched() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isBowNotched();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    public static boolean bowDrawing() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isBowDrawing();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    /** How far the bow string is pulled, 0 to 1 (0 when not drawing). */
+    public static float bowDrawPercent() {
+        if (!active()) {
+            return 0.0F;
+        }
+        try {
+            return VivecraftBridge.bowDrawPercent();
+        } catch (Throwable t) {
+            disable(t);
+            return 0.0F;
+        }
+    }
+
+    /** True when the bow sits in the main-hand controller (Vivecraft's reversed bow); normally it is the off hand. */
+    public static boolean bowInMainController() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isBowInMainController();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    /** Bow controller position and the arrow's direction (arrow hand towards bow hand), or null. */
+    public static Aim bowAim() {
+        if (!active()) {
+            return null;
+        }
+        try {
+            VivecraftBridge.Pose pose = VivecraftBridge.bowAim();
+            return pose == null ? null : new Aim(pose.pos(), pose.dir());
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
+    /** A remote VR player in seated mode; false when unknown or not in VR. */
+    public static boolean remoteSeated(Player player) {
+        if (player == null || !loaded()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isRemoteSeated(player);
+        } catch (Throwable t) {
+            disable(t);
+            return false;
+        }
+    }
+
+    /** Distance between a remote VR player's hands in room-scale metres, or -1 when unknown. */
+    public static double remoteHandGap(Player player) {
+        if (player == null || !loaded()) {
+            return -1.0;
+        }
+        try {
+            return VivecraftBridge.remoteHandGap(player);
+        } catch (Throwable t) {
+            disable(t);
+            return -1.0;
+        }
+    }
+
     /** True in Vivecraft's seated mode (hands not tracked). */
     public static boolean seated() {
         if (!active()) {

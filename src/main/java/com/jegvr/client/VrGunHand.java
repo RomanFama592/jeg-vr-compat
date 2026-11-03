@@ -20,6 +20,10 @@ public final class VrGunHand {
 
     /** The hand with the gun when the other hand is empty, or null. */
     public static InteractionHand of(LocalPlayer player) {
+        // A JEG bow in Vivecraft's roomscale bow uses both hands for the bow itself.
+        if (VrBows.active()) {
+            return null;
+        }
         if (player.getMainHandItem().getItem() instanceof GunItem && player.getOffhandItem().isEmpty()) {
             return InteractionHand.MAIN_HAND;
         }

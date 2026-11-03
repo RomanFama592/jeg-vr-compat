@@ -32,6 +32,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
+    public static final ForgeConfigSpec.BooleanValue VR_BOW;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -44,6 +45,13 @@ public final class VrClientConfig {
                 .comment("Show the coloured helper boxes (hip pouch, magazine well, foregrip). Off by default;",
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
+        builder.pop();
+        builder.push("bows");
+        VR_BOW = builder
+                .comment("JEG's bows work like Vivecraft's roomscale bow: the bow in the off hand, the arrow in the main hand,",
+                        "touch the string, hold the grip and pull. Needs Vivecraft's bow mode \"on\" and the off hand empty.",
+                        "Off: the bow is fired with the trigger like any JEG gun.")
+                .define("vrBow", true);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -84,6 +92,15 @@ public final class VrClientConfig {
 
     public static boolean mirrorLeftHand() {
         return !SPEC.isLoaded() || MIRROR_LEFT_HAND.get();
+    }
+
+    public static boolean vrBow() {
+        return !SPEC.isLoaded() || VR_BOW.get();
+    }
+
+    public static void setVrBow(boolean bow) {
+        VR_BOW.set(bow);
+        VR_BOW.save();
     }
 
     public static boolean bowLaser() {

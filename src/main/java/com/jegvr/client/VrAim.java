@@ -40,8 +40,12 @@ public final class VrAim {
      * building the shoot message: it may send the muzzle position first.
      */
     public static float[] shotRotation(Player player) {
-        // In precision mode the gun points along the line between both hands.
-        VR.Aim aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
+        // A drawn JEG bow shoots from the bow along the arrow; in precision mode the gun points along the line between
+        // both hands.
+        VR.Aim aim = VrBows.aim();
+        if (aim == null) {
+            aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
+        }
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return null;
         }

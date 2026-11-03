@@ -67,8 +67,13 @@ public final class VrConfigScreen extends Screen {
                 .create(x, y + ROW * 4, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.bowLaser"),
                         (button, laser) -> VrClientConfig.setBowLaser(laser)));
+        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.vrBow())
+                .withTooltip(bow -> Tooltip.create(Component.translatable("jeg_vr_compat.config.vrBow.tooltip")))
+                .create(x, y + ROW * 5, BUTTON_WIDTH, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.vrBow"),
+                        (button, bow) -> VrClientConfig.setVrBow(bow)));
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
-                .bounds(x, y + ROW * 6, BUTTON_WIDTH, BUTTON_HEIGHT).build());
+                .bounds(x, y + ROW * 7, BUTTON_WIDTH, BUTTON_HEIGHT).build());
     }
 
     private static Component zoneName(VrClientConfig.GrabZone zone) {

@@ -36,7 +36,11 @@ public final class VrGunPose {
         // The left hand mirrors yaw/roll and the lateral offset; a mirrored frame already does.
         float side = !mirrored && context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
         // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the gun hand to the free hand.
-        Vec3 twoHand = VrPrecision.localAimDir(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        // A notched JEG bow (F9.7) points where the arrow flies, the same way.
+        Vec3 twoHand = VrBows.localAimDir(mainHand);
+        if (twoHand == null) {
+            twoHand = VrPrecision.localAimDir(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        }
         if (twoHand != null) {
             poseStack.mulPose(new Quaternionf().rotationTo(0.0F, 0.0F, -1.0F,
                     (float) twoHand.x, (float) twoHand.y, (float) twoHand.z));

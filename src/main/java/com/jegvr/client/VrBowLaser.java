@@ -41,7 +41,7 @@ public final class VrBowLaser {
     private static final String BOW_ID = "jeg:compound_bow";
     /** JEG's base projectile gravity, in blocks per tick squared ({@code ProjectileEntity} constructor). */
     private static final double JEG_GRAVITY = -0.04;
-    private static final double LENGTH = 16.0;
+    private static final double LENGTH = 32.0;
     private static final double FADE = 5.0;
     /** The beam is drawn in pieces this long so the fade and the arc look smooth. */
     private static final double PIECE = 0.25;
@@ -73,7 +73,10 @@ public final class VrBowLaser {
                 || ChargeTracker.getChargeTime(player.getUUID()) <= 0) {
             return;
         }
-        VR.Aim aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
+        VR.Aim aim = VrBows.aim();
+        if (aim == null) {
+            aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
+        }
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return;
         }
