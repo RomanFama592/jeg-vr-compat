@@ -73,10 +73,7 @@ public final class VrBowLaser {
                 || ChargeTracker.getChargeTime(player.getUUID()) <= 0) {
             return;
         }
-        VR.Aim aim = VrBows.aim();
-        if (aim == null) {
-            aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
-        }
+        VR.Aim aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return;
         }

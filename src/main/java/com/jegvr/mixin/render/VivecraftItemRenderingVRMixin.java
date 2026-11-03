@@ -1,6 +1,5 @@
 package com.jegvr.mixin.render;
 
-import com.jegvr.client.VrBows;
 import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrGunPose;
 import com.jegvr.client.VrHands;
@@ -30,8 +29,7 @@ public class VivecraftItemRenderingVRMixin {
                                                      InteractionHand hand, CallbackInfo ci) {
         if (VrGunPose.heldLikeGun(stack)) {
             VrDiag.once("vivecraftTransform", "Vivecraft first-person item transform replaced for JEG guns (type={})", type);
-            // A JEG bow in the roomscale bow is drawn by the bow-hand controller but is still the main-hand gun.
-            VrHands.setRenderingHand(VrBows.isRoomscaleBow(stack) ? InteractionHand.MAIN_HAND : hand);
+            VrHands.setRenderingHand(hand);
             VrGunPose.apply(poseStack, stack,
                     rightHand ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
                     hand == InteractionHand.MAIN_HAND);

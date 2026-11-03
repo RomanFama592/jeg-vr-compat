@@ -35,17 +35,11 @@ public final class VrGunPose {
         boolean mirrored = VrGunMirror.mirrors(mainHand);
         // The left hand mirrors yaw/roll and the lateral offset; a mirrored frame already does.
         float side = !mirrored && context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
-        // A JEG bow in Vivecraft's roomscale bow (F9.7) is held upright like Vivecraft's own bow, not like a gun.
-        Quaternionf bow = VrBows.localOrientation(mainHand);
-        if (bow != null) {
-            poseStack.mulPose(bow);
-        } else {
-            // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the gun hand to the free hand.
-            Vec3 twoHand = VrPrecision.localAimDir(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
-            if (twoHand != null) {
-                poseStack.mulPose(new Quaternionf().rotationTo(0.0F, 0.0F, -1.0F,
-                        (float) twoHand.x, (float) twoHand.y, (float) twoHand.z));
-            }
+        // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the gun hand to the free hand.
+        Vec3 twoHand = VrPrecision.localAimDir(mainHand ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+        if (twoHand != null) {
+            poseStack.mulPose(new Quaternionf().rotationTo(0.0F, 0.0F, -1.0F,
+                    (float) twoHand.x, (float) twoHand.y, (float) twoHand.z));
         }
         // Physical left hand: the right-hand pose in a mirrored frame lands where the left-hand pose did.
         if (mirrored) {

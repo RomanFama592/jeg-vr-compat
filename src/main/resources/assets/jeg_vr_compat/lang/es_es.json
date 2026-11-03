@@ -22,7 +22,5 @@
   "jeg_vr_compat.config.mirrorLeftHand": "Espejar armas en la izquierda",
   "jeg_vr_compat.config.mirrorLeftHand.tooltip": "Las armas en el control izquierdo se ven hechas para esa mano (cerrojo y eyector del otro lado), con su animación.",
   "jeg_vr_compat.config.bowLaser": "Láser del arco compuesto",
-  "jeg_vr_compat.config.bowLaser.tooltip": "Al tensar el arco compuesto, un láser sigue el vuelo predicho de la flecha (16 bloques, se desvanece en los últimos 5).",
-  "jeg_vr_compat.config.vrBow": "Arcos de JEG como el de Vivecraft",
-  "jeg_vr_compat.config.vrBow.tooltip": "Arco en la mano secundaria y flecha en la principal: tocá la cuerda, mantené el grip y tirá. Necesita el modo arco de Vivecraft activado y la mano secundaria vacía."
+  "jeg_vr_compat.config.bowLaser.tooltip": "Al tensar el arco compuesto, un láser sigue el vuelo predicho de la flecha (16 bloques, se desvanece en los últimos 5)."
 }

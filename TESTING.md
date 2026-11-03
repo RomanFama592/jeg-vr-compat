@@ -11,7 +11,6 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] (sin servidor, pero también pendiente) `.jar` (`-all`) en un Minecraft normal: poses del addon, `guns.json` del usuario y `/jegvr reset` (ver sección "Poses internas").
 - [ ] Dos jugadores en supervivencia: el disparo de la mano libre le baja vida al otro (F8.5).
 - [ ] Dos jugadores: el otro escucha el sonido de cada cartucho metido a mano (F7.8).
-- [ ] Dos jugadores (F9.7): el otro (flat y VR) ve el arco JEG en tu mano secundaria y la flecha en la principal; al encocharla la flecha desaparece de la mano y ve la animación de tensado.
 
 ## Fase 1
 - [ ] Flat, sin Vivecraft: arranca, se puede disparar y recargar.
@@ -271,20 +270,3 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Al soltar (disparo) o cambiar de arma, el láser desaparece. El arco primitivo no tiene láser.
 - [ ] Config → "Láser del arco compuesto" = No: no aparece.
 - [ ] Flat: no hay láser (decisión del usuario: solo VR).
-
-## F9.7 (arcos de JEG como el arco de Vivecraft)
-- [x] (auto) Compila; refmap con `getProjectile` → `m_6298_`; `BowTrackerVRMixin` aplica al arrancar (29 mezclas); `VRArmHelperVRMixin` y `ChargeTrackerVRMixin` se aplican al cargar sus clases (en VR / al tensar).
-- Requisitos: Vivecraft → opciones de VR → modo arco ("Bow mode") en **ON** (no "Vanilla"); de pie (no sentado); mano secundaria vacía; flechas en el inventario (o creativo).
-- [ ] Arco compuesto en la principal: en VR se ve el **arco en la mano secundaria** y una **flecha en la principal** (como el arco vanilla).
-- [ ] Llevar la flecha a la cuerda (arriba del arco): vibran los dos controles, la flecha queda en el arco. Mantener el **grip** de la mano de la flecha y alejarla: tensa, vibra más a medida que tirás, el arco apunta hacia donde va la flecha (y el láser también).
-- [ ] Soltar el grip: dispara la flecha de JEG hacia donde apuntaba el arco. Poco tensado = poco daño; tensado completo = daño completo.
-- [ ] Soltar enseguida (menos de ~¼ s de tensado) no dispara (JEG necesita un mínimo).
-- [ ] El gatillo no dispara el arco; mientras está encochado el grip no cambia de slot de la hotbar.
-- [ ] Sin flechas en supervivencia: no aparece la flecha en la mano y no se puede encochar.
-- [ ] Arco primitivo: lo mismo.
-- [ ] Con algo en la mano secundaria, o con la opción "Arcos de JEG como el de Vivecraft" en No, o el modo arco de Vivecraft en "Vanilla"/"Off": el arco vuelve a ser un arma JEG normal (gatillo para cargar y soltar).
-- [ ] Manos invertidas: el arco queda en la mano secundaria (derecha) y la flecha en la principal (izquierda).
-- [ ] Cámara de Vivecraft / tercera persona: arco en el brazo secundario, flecha en el principal.
-- [ ] Otro jugador (ver "Pendientes con servidor").
-- [ ] Orientación (corrección: antes se veía acostado y enorme): con el control vertical como un arco, el arco queda **parado**, palas a lo largo del control (la de arriba hacia donde apunta el control) y la flecha del modelo hacia adelante. Al encochar, el arco gira un poco para apuntar donde va la flecha, sin saltos grandes.
-- [ ] Agarre y tamaño: la empuñadura del arco cae en la mano (compuesto ~0.8 m, primitivo ~0.75 m). Si no, calibrar con `/jegvr move` / `/jegvr scale` (en el arco: X derecha, Y a lo largo de las palas, Z hacia atrás, hacia la cuerda) y `/jegvr save`.

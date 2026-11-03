@@ -22,7 +22,5 @@
   "jeg_vr_compat.config.mirrorLeftHand": "Mirror left-hand guns",
   "jeg_vr_compat.config.mirrorLeftHand.tooltip": "Guns in the left controller look made for the left hand (bolt and ejection port on the other side), animation included.",
   "jeg_vr_compat.config.bowLaser": "Compound bow laser",
-  "jeg_vr_compat.config.bowLaser.tooltip": "While drawing the compound bow, a laser follows the arrow's predicted flight (16 blocks, fading over the last 5).",
-  "jeg_vr_compat.config.vrBow": "JEG bows like Vivecraft's bow",
-  "jeg_vr_compat.config.vrBow.tooltip": "Bow in the off hand, arrow in the main hand: touch the string, hold the grip and pull. Needs Vivecraft's bow mode on and the off hand empty."
+  "jeg_vr_compat.config.bowLaser.tooltip": "While drawing the compound bow, a laser follows the arrow's predicted flight (16 blocks, fading over the last 5)."
 }

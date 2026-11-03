@@ -5,11 +5,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.client.Minecraft;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.vivecraft.client.ClientVRPlayers;
-import org.vivecraft.client.network.ClientNetworking;
 import org.vivecraft.api_beta.VivecraftAPI;
 import org.vivecraft.client.VivecraftVRMod;
 import org.vivecraft.api_beta.client.VivecraftClientAPI;
@@ -156,81 +152,6 @@ public final class VivecraftBridge {
     /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */
     public static boolean isBow(ItemStack stack) {
         return BowTracker.isBow(stack);
-    }
-
-    /** Vivecraft's bow mode is "on" (every bow-like item, not only the vanilla bow). */
-    public static boolean isBowModeOn() {
-        return ClientDataHolderVR.getInstance().vrSettings.bowMode == VRSettings.BowMode.ON;
-    }
-
-    /** Vivecraft's roomscale bow handles the item held now (a bow in either hand, standing, alive). */
-    public static boolean isBowActive() {
-        Minecraft mc = Minecraft.getInstance();
-        return mc.player != null && ClientDataHolderVR.getInstance().bowTracker.isActive(mc.player);
-    }
-
-    /** An arrow sits on the string (the arrow hand is at the string, or the bow is being drawn). */
-    public static boolean isBowNotched() {
-        return ClientDataHolderVR.getInstance().bowTracker.isNotched();
-    }
-
-    public static boolean isBowDrawing() {
-        return ClientDataHolderVR.getInstance().bowTracker.isDrawing;
-    }
-
-    /** How far the string is pulled, 0 to 1. */
-    public static float bowDrawPercent() {
-        BowTracker bow = ClientDataHolderVR.getInstance().bowTracker;
-        return bow.isDrawing ? Math.max(0.0F, Math.min(1.0F, bow.getDrawPercent())) : 0.0F;
-    }
-
-    /** True when the bow is held by the main-hand controller (Vivecraft's "reverse shooting eye" with server support). */
-    public static boolean isBowInMainController() {
-        return ClientDataHolderVR.getInstance().vrSettings.reverseShootingEye && ClientNetworking.supportsReversedBow();
-    }
-
-    /**
-     * Where the arrow leaves: the bow controller, and the direction from the arrow hand to the bow hand (Vivecraft's
-     * aim vector points the other way, see {@code VRPlayer.getAimVector}). Null without an aim yet.
-     */
-    public static Pose bowAim() {
-        VRData d = data();
-        Vector3fc aim = ClientDataHolderVR.getInstance().bowTracker.getAimVector();
-        if (d == null || aim == null || aim.lengthSquared() < 1.0E-6F) {
-            return null;
-        }
-        VRData.VRDevicePose bow = isBowInMainController() ? d.c0 : d.c1;
-        return new Pose(bow.getPosition(), new Vec3(-aim.x(), -aim.y(), -aim.z()).normalize());
-    }
-
-    /**
-     * The bow hand's grip pose ({@code VRData.getHand}, not the aim pose), the one Vivecraft's bow is laid out by: its
-     * up and back axes in world space. Holding a bow, "up" points at the target and "back" runs along the controller.
-     */
-    public static Vec3[] bowHandAxes() {
-        VRData d = data();
-        if (d == null) {
-            return null;
-        }
-        VRData.VRDevicePose hand = d.getHand(isBowInMainController() ? 0 : 1);
-        Vector3f up = hand.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
-        Vector3f back = hand.getCustomVector(new Vector3f(0.0F, 0.0F, 1.0F));
-        return new Vec3[]{new Vec3(up.x, up.y, up.z), new Vec3(back.x, back.y, back.z)};
-    }
-
-    /** A remote VR player in Vivecraft's seated mode (no tracked hands). */
-    public static boolean isRemoteSeated(Player player) {
-        return ClientVRPlayers.getInstance().isVRAndSeated(player.getUUID());
-    }
-
-    /** Distance between a remote VR player's hands, in their room-scale metres, or -1 if unknown. */
-    public static double remoteHandGap(Player player) {
-        ClientVRPlayers.RotInfo info = ClientVRPlayers.getInstance().getRotationsForPlayer(player.getUUID());
-        if (info == null || info.mainHandPos == null || info.offHandPos == null) {
-            return -1.0;
-        }
-        double gap = info.mainHandPos.distance(info.offHandPos);
-        return info.worldScale > 0.0F ? gap / info.worldScale : gap;
     }
 
     /** True when Vivecraft's HUD (with the hotbar) is locked to the off-hand controller, not to the head. */
