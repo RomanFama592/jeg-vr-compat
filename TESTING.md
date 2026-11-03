@@ -270,3 +270,11 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Al soltar (disparo) o cambiar de arma, el láser desaparece. El arco primitivo no tiene láser.
 - [ ] Config → "Láser del arco compuesto" = No: no aparece.
 - [ ] Flat: no hay láser (decisión del usuario: solo VR).
+
+## F9.5 (Finger Gun en la hotbar en VR)
+- [x] (auto) Compila; `AnimatedGunRendererVRMixin` aplica (28 mezclas).
+- [ ] VR, Finger Gun en la hotbar: se ve el ícono (la mano con el dedo, como en flat), en la mano y en el inventario.
+- [ ] VR, Finger Gun en la mano: sigue sin dibujarse el brazo de JEG (solo la mano de Vivecraft), igual que antes.
+- [ ] VR, Finger Gun tirado en el suelo o en un marco: se ve.
+- [ ] VR, otra arma en la mano: no aparecen brazos estáticos de JEG (sin cambios).
+- [ ] Flat: el Finger Gun se ve igual que siempre.

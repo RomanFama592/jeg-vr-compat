@@ -16,6 +16,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import ttv.migami.jeg.client.handler.ShootingHandler;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -60,14 +61,18 @@ public class AnimatedGunRendererVRMixin {
         return !VR.active();
     }
 
+    @Shadow
+    private ItemDisplayContext renderType;
+
     // JEG draws static player arms (arm + sleeve, both hands) on the gun's arm bones; Vivecraft already draws the
-    // tracked hands. Only drops the draw call: the bone transforms still apply to child bones.
+    // tracked hands. Only drops the draw call: the bone transforms still apply to child bones. Only in first person:
+    // the Finger Gun is drawn as those arms in the hotbar, inventory, item frames and on the ground (F9.5).
     @WrapWithCondition(method = "renderRecursively(Lcom/mojang/blaze3d/vertex/PoseStack;Lttv/migami/jeg/item/AnimatedGunItem;Lsoftware/bernie/geckolib/cache/object/GeoBone;Lnet/minecraft/client/renderer/RenderType;Lnet/minecraft/client/renderer/MultiBufferSource;Lcom/mojang/blaze3d/vertex/VertexConsumer;ZFIIFFFF)V",
             at = @At(value = "INVOKE", remap = true,
                     target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
     private boolean jegvr$noStaticArms(ModelPart part, PoseStack stack, VertexConsumer consumer, int light, int overlay,
                                        float r, float g, float b, float a) {
-        return !VR.active();
+        return !VR.active() || renderType == null || !renderType.firstPerson();
     }
 
     @Inject(method = "renderByItem", at = @At("HEAD"))
