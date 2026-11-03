@@ -314,6 +314,19 @@ public final class VR {
         }
     }
 
+    /** The bow hand's grip-pose up and back axes in world space, or null outside VR. */
+    public static Vec3[] bowHandAxes() {
+        if (!active()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.bowHandAxes();
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
     /** A remote VR player in seated mode; false when unknown or not in VR. */
     public static boolean remoteSeated(Player player) {
         if (player == null || !loaded()) {

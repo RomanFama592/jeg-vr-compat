@@ -286,3 +286,5 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Manos invertidas: el arco queda en la mano secundaria (derecha) y la flecha en la principal (izquierda).
 - [ ] Cámara de Vivecraft / tercera persona: arco en el brazo secundario, flecha en el principal.
 - [ ] Otro jugador (ver "Pendientes con servidor").
+- [ ] Orientación (corrección: antes se veía acostado y enorme): con el control vertical como un arco, el arco queda **parado**, palas a lo largo del control (la de arriba hacia donde apunta el control) y la flecha del modelo hacia adelante. Al encochar, el arco gira un poco para apuntar donde va la flecha, sin saltos grandes.
+- [ ] Agarre y tamaño: la empuñadura del arco cae en la mano (compuesto ~0.8 m, primitivo ~0.75 m). Si no, calibrar con `/jegvr move` / `/jegvr scale` (en el arco: X derecha, Y a lo largo de las palas, Z hacia atrás, hacia la cuerda) y `/jegvr save`.

@@ -11,6 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.joml.Matrix3f;
+import org.joml.Quaternionf;
 import ttv.migami.jeg.common.FireMode;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.item.AnimatedBowItem;
@@ -72,15 +74,42 @@ public final class VrBows {
     }
 
     /**
-     * The arrow's direction in the axes of the controller being drawn, when that controller holds the notched bow:
-     * the bow is turned to point where the arrow flies. Null otherwise.
+     * How the bow sits in the controller being drawn, when that controller holds the roomscale bow; null otherwise.
+     * The bow is held like Vivecraft's: its limbs (model +Y) run along the controller, its top where the controller
+     * points, and its arrow (model -Z) points out of the fist. With an arrow on the string it points where the arrow
+     * flies instead, with the limbs kept as close to the controller as that allows.
      */
-    public static Vec3 localAimDir(boolean mainController) {
-        VR.Aim aim = aim();
-        if (aim == null || mainController != VR.bowInMainController()) {
+    public static Quaternionf localOrientation(boolean mainController) {
+        if (!active() || mainController != VR.bowInMainController()) {
             return null;
         }
-        return VR.toHandLocal(mainController, aim.dir());
+        Vec3[] hand = VR.bowHandAxes();
+        if (hand == null) {
+            return null;
+        }
+        VR.Aim aim = aim();
+        Vec3 forward = VR.toHandLocal(mainController, aim != null ? aim.dir() : hand[0]);
+        Vec3 limbs = VR.toHandLocal(mainController, hand[1]);
+        if (forward == null || limbs == null) {
+            return null;
+        }
+        // The controller's own forward axis is -Z: the bow's top goes that way.
+        if (limbs.z > 0.0) {
+            limbs = limbs.scale(-1.0);
+        }
+        Vec3 f = forward.normalize();
+        Vec3 up = limbs.subtract(f.scale(limbs.dot(f)));
+        if (f.lengthSqr() < 1.0E-6 || up.lengthSqr() < 1.0E-6) {
+            return null;
+        }
+        up = up.normalize();
+        Vec3 back = f.scale(-1.0);
+        Vec3 right = up.cross(back);
+        Matrix3f basis = new Matrix3f(
+                (float) right.x, (float) right.y, (float) right.z,
+                (float) up.x, (float) up.y, (float) up.z,
+                (float) back.x, (float) back.y, (float) back.z);
+        return new Quaternionf().setFromNormalized(basis);
     }
 
     /**

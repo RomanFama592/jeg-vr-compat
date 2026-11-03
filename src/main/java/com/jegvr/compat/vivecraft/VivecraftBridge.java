@@ -203,6 +203,21 @@ public final class VivecraftBridge {
         return new Pose(bow.getPosition(), new Vec3(-aim.x(), -aim.y(), -aim.z()).normalize());
     }
 
+    /**
+     * The bow hand's grip pose ({@code VRData.getHand}, not the aim pose), the one Vivecraft's bow is laid out by: its
+     * up and back axes in world space. Holding a bow, "up" points at the target and "back" runs along the controller.
+     */
+    public static Vec3[] bowHandAxes() {
+        VRData d = data();
+        if (d == null) {
+            return null;
+        }
+        VRData.VRDevicePose hand = d.getHand(isBowInMainController() ? 0 : 1);
+        Vector3f up = hand.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
+        Vector3f back = hand.getCustomVector(new Vector3f(0.0F, 0.0F, 1.0F));
+        return new Vec3[]{new Vec3(up.x, up.y, up.z), new Vec3(back.x, back.y, back.z)};
+    }
+
     /** A remote VR player in Vivecraft's seated mode (no tracked hands). */
     public static boolean isRemoteSeated(Player player) {
         return ClientVRPlayers.getInstance().isVRAndSeated(player.getUUID());
