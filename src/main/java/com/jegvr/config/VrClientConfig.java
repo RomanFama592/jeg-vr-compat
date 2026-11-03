@@ -31,6 +31,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
+    public static final ForgeConfigSpec.BooleanValue BOW_LASER;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -53,6 +54,10 @@ public final class VrClientConfig {
                 .comment("Draw guns held in the left controller mirrored, as if made for the left hand (JEG models are",
                         "made for the right hand). Their animation is mirrored too.")
                 .define("mirrorLeftHand", true);
+        BOW_LASER = builder
+                .comment("Laser sight on JEG's compound bow while it is drawn: follows the arrow's predicted flight",
+                        "for 16 blocks, fading out over the last 5.")
+                .define("bowLaser", true);
         builder.pop();
         SPEC = builder.build();
     }
@@ -79,6 +84,15 @@ public final class VrClientConfig {
 
     public static boolean mirrorLeftHand() {
         return !SPEC.isLoaded() || MIRROR_LEFT_HAND.get();
+    }
+
+    public static boolean bowLaser() {
+        return !SPEC.isLoaded() || BOW_LASER.get();
+    }
+
+    public static void setBowLaser(boolean laser) {
+        BOW_LASER.set(laser);
+        BOW_LASER.save();
     }
 
     public static void setMirrorLeftHand(boolean mirror) {

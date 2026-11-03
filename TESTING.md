@@ -8,6 +8,7 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Servidor dedicado solo con JEG: balas desde el controlador (F6.3), cliente VR entra sin errores (Fase S), gatillo de la mano libre teletransporta (S.5/S.5b), recarga con la mano y modo precisión funcionan (Fase 7, S.7), cartuchos con la recarga de JEG cortada (F7.8).
 - [ ] `runServer -PnoVivecraft`: el addon funciona sin Vivecraft en el servidor (Fase S).
 - [ ] Servidor con addon + cliente flat sin addon: entra y juega normal (Fase S).
+- [ ] (sin servidor, pero también pendiente) `.jar` (`-all`) en un Minecraft normal: poses del addon, `guns.json` del usuario y `/jegvr reset` (ver sección "Poses internas").
 - [ ] Dos jugadores en supervivencia: el disparo de la mano libre le baja vida al otro (F8.5).
 - [ ] Dos jugadores: el otro escucha el sonido de cada cartucho metido a mano (F7.8).
 
@@ -254,6 +255,17 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 ## Poses internas (`gun_poses.json`) y del usuario (`guns.json`)
 - [x] (auto) Compila; el `.jar` trae `assets/jeg_vr_compat/gun_poses.json`. En `runClient` el log dice que lee y edita el archivo de `src/main/resources` ("calibration commands edit the built-in file (development)").
 - [x] Poses pasadas al archivo interno: trompeta y Holy Shotgun (calibradas por el usuario) y la general (que incluye el corrimiento del agarre que antes estaba en el código, `ty -0.08`, `tz -0.06`). El chat ahora muestra la `t` final (p. ej. trompeta `ty = 0.11` en vez de `0.19`): es la misma posición.
-- [ ] `runClient`: trompeta y Holy Shotgun se ven como las dejaste; las demás armas igual que antes.
+- [x] `runClient`: trompeta y Holy Shotgun se ven como las dejaste; las demás armas igual que antes.
 - [ ] `runClient`: `/jegvr move 0 0.01 0` + `/jegvr save` cambia `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (mirar el archivo en el proyecto).
 - [ ] Con el `.jar` en un Minecraft normal (sin el proyecto): las poses del addon se ven igual; `/jegvr save` crea `config/jeg_vr_compat/guns.json` con solo tus cambios; `/jegvr reset` vuelve a la del addon. (Sin verificar todavía fuera del entorno de desarrollo.)
+
+## F9.15 (mira láser del arco compuesto)
+- [x] (auto) Compila; aplican 28 mezclas; config `visuals.bowLaser = true` y botón en la pantalla de config.
+- [ ] VR, arco compuesto (`jeg:compound_bow`) en la principal: sin tensar no hay láser. Al tensar (mantener el gatillo) sale un haz rojo desde la punta del arco hacia donde apunta.
+- [ ] El haz mide unos 16 bloques: se ve entero hasta ~11 y se desvanece hasta desaparecer a los 16.
+- [ ] Apuntando a un bloque o a un mob a menos de 16 bloques: el haz se corta ahí y aparece un punto rojo; la flecha cae en ese punto.
+- [ ] Apuntando hacia arriba o abajo: el haz sigue la curva de la flecha (con la velocidad del arco es casi recto en 16 bloques; la curva se nota poco).
+- [ ] Modo precisión (dos manos): el haz sigue la línea de las dos manos.
+- [ ] Al soltar (disparo) o cambiar de arma, el láser desaparece. El arco primitivo no tiene láser.
+- [ ] Config → "Láser del arco compuesto" = No: no aparece.
+- [ ] Flat: no hay láser (decidir si se quiere).
