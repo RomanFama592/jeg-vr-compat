@@ -233,15 +233,15 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] Disparar y recargar con esa arma: la animación (corredera, cargador) se mueve espejada y sigue pegada al arma; el destello sale de la boca del cañón y la bala sale por donde apuntás.
 - [x] Probar un arma GeckoLib grande (rifle) y una clásica si hay alguna; también una con mira o accesorios: se ven completos.
 - [x] Rifle en la izquierda + modo precisión (S.7b): sigue apuntando por la línea de las dos manos.
-- [ ] (pendiente, el usuario lo prueba después) Manos invertidas en Vivecraft: el arma de la **principal** (ahora en la izquierda) se ve espejada y la de la secundaria (derecha) normal.
+- [x] Manos invertidas en Vivecraft: el arma de la **principal** (ahora en la izquierda) se ve espejada y la de la secundaria (derecha) normal.
 - [x] La mano derecha no cambia nada.
-- [ ] (pendiente, el usuario lo prueba después) Config → "Espejar armas en la izquierda" = No: vuelve a verse como antes (sin espejar).
+- [x] Config → "Espejar armas en la izquierda" = No: vuelve a verse como antes (sin espejar).
 - [ ] Tercera persona / otros jugadores: hoy no se espeja (solo tu vista). Decime si querés que también.
 
 ## F9.11 (trompeta en la mano)
 - [x] (auto) Compila sin avisos; aplican 28 mezclas.
-- [ ] Trompeta (`jeg:trumpet`) en la mano principal: apunta hacia adelante como un arma (campana adelante, boquilla hacia vos), pegada al control, no de costado ni separada.
-- [ ] En la secundaria (izquierda): igual, espejada.
-- [ ] Tamaño: si se ve muy chica o muy grande, o corrida, calibrala con `/jegvr pose` teniéndola en la principal (`/jegvr save`) y pasame los números para dejarlos por defecto.
-- [ ] Usarla (gatillo de usar): suena y lanza las notas como antes.
-- [ ] Flat: se ve como siempre.
+- [x] Trompeta (`jeg:trumpet`) en la mano principal: apunta hacia adelante como un arma (campana adelante, boquilla hacia vos), pegada al control, no de costado ni separada.
+- [x] En la secundaria (izquierda): igual, espejada.
+- [x] Tamaño (foto del usuario: bien, sin calibrar): si se ve muy chica o muy grande, o corrida, calibrala con `/jegvr pose` teniéndola en la principal (`/jegvr save`) y pasame los números para dejarlos por defecto.
+- [x] Usarla (gatillo de usar): suena y lanza las notas como antes.
+- [x] Flat: se ve como siempre.
