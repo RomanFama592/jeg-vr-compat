@@ -250,3 +250,10 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] `/jegvr help` muestra el resumen en el chat.
 - [ ] `/jegvr move 0 0.02 0` con un arma en la mano: sube 2 cm; `/jegvr show` muestra el valor.
 - [ ] `/jegvr reset` con la trompeta en la mano: vuelve a la pose de fábrica de la trompeta (no a la de las armas).
+
+## Poses internas (`gun_poses.json`) y del usuario (`guns.json`)
+- [x] (auto) Compila; el `.jar` trae `assets/jeg_vr_compat/gun_poses.json`. En `runClient` el log dice que lee y edita el archivo de `src/main/resources` ("calibration commands edit the built-in file (development)").
+- [x] Poses pasadas al archivo interno: trompeta y Holy Shotgun (calibradas por el usuario) y la general (que incluye el corrimiento del agarre que antes estaba en el código, `ty -0.08`, `tz -0.06`). El chat ahora muestra la `t` final (p. ej. trompeta `ty = 0.11` en vez de `0.19`): es la misma posición.
+- [ ] `runClient`: trompeta y Holy Shotgun se ven como las dejaste; las demás armas igual que antes.
+- [ ] `runClient`: `/jegvr move 0 0.01 0` + `/jegvr save` cambia `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (mirar el archivo en el proyecto).
+- [ ] Con el `.jar` en un Minecraft normal (sin el proyecto): las poses del addon se ven igual; `/jegvr save` crea `config/jeg_vr_compat/guns.json` con solo tus cambios; `/jegvr reset` vuelve a la del addon. (Sin verificar todavía fuera del entorno de desarrollo.)

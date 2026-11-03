@@ -12,12 +12,8 @@ import org.joml.Quaternionf;
 import ttv.migami.jeg.item.GunItem;
 import ttv.migami.jeg.item.TrumpetItem;
 
-/** Orientation/position correction applied to a JEG gun held in a VR controller. */
+/** Orientation/position correction applied to a JEG gun held in a VR controller (values: {@link VrGunConfig}). */
 public final class VrGunPose {
-    /** Moves the model so its grip sits in Vivecraft's hand: forward (-Z) and down, in blocks of the controller frame. */
-    private static final float GRIP_FORWARD = 0.06F;
-    private static final float GRIP_DOWN = 0.08F;
-
     private VrGunPose() {
     }
 
@@ -49,7 +45,7 @@ public final class VrGunPose {
         if (mirrored) {
             VrGunMirror.mirror(poseStack);
         }
-        poseStack.translate(pose.tx * side, pose.ty - GRIP_DOWN, pose.tz - GRIP_FORWARD);
+        poseStack.translate(pose.tx * side, pose.ty, pose.tz);
         // JEG only fires the main-hand gun, so only that one kicks.
         if (mainHand) {
             float partialTick = Minecraft.getInstance().getFrameTime();

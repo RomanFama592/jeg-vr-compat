@@ -45,7 +45,7 @@ src/main/java/com/jegvr/
   mixin/net/C2SMessageShootVRMixin.java
   mixin/model/PlayerModelVRMixin.java
   client/VrGunPose.java            # corrección de orientación por arma
-  client/VrGunConfig.java          # carga config/jeg_vr_compat/guns.json
+  client/VrGunConfig.java          # poses: assets/jeg_vr_compat/gun_poses.json (jar) + config/jeg_vr_compat/guns.json (usuario)
   client/VrRecoil.java
   client/VrGrabReload.java
   client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, zones, grabzone (ver COMANDOS.md)
@@ -98,3 +98,6 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 - Vivecraft dibuja la mano con `VRArmHelper.renderVRHand_Main/Offhand` -> `ItemInHandRenderer.renderArmWithItem` (su mixin `vrRenderArmWithItem` lo sustituye): **no se dispara `RenderHandEvent`** en VR (verificado), así que `GunRenderingHandler.onRenderOverlay` no corre en VR; las armas pasan por `renderByItem`/`renderWeapon`.
 - Marco de la mano: `RenderHelper.setupRenderingAtController` = translate(posición controlador - cámara) · matriz del controlador · scale(worldScale). Luego `VivecraftItemRendering.applyFirstPersonItemTransforms` añade una rotación por tipo; para `GunItem` la cancelamos en `VivecraftItemRenderingVRMixin`.
 
+## Poses de armas (no van en el código)
+- Toda pose/rotación/escala de armas va en `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (capa interna, va en el jar), nunca como constante en Java. `config/jeg_vr_compat/guns.json` es la capa del usuario (una entrada del usuario reemplaza la interna de esa arma).
+- En desarrollo (`FMLLoader.isProduction()` falso y el archivo fuente existe al lado de `run/`), `/jegvr ...` y `/jegvr save` editan el archivo fuente y se ignora `guns.json`. Comandos documentados en `COMANDOS.md`.

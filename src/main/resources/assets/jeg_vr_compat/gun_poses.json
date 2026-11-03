@@ -1,0 +1,31 @@
+{
+  "defaults": {
+    "pitch": 0.0,
+    "yaw": 0.0,
+    "roll": 0.0,
+    "tx": 0.0,
+    "ty": -0.08,
+    "tz": -0.06,
+    "scale": 0.6
+  },
+  "guns": {
+    "jeg:trumpet": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.19,
+      "tz": 0.0,
+      "scale": 1.5
+    },
+    "jeg:holy_shotgun": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.16,
+      "ty": -0.02,
+      "tz": -0.12,
+      "scale": 1.0
+    }
+  }
+}

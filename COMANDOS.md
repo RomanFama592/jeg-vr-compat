@@ -3,6 +3,22 @@
 Son comandos de cliente: funcionan en un mundo propio y en cualquier servidor, y no hace falta ser operador.
 `/jegvr help` muestra un resumen en el chat.
 
+## Dónde se guardan las poses
+
+Ninguna pose está escrita en el código. Hay dos archivos:
+
+| Archivo | Quién lo usa | Qué guarda |
+|---|---|---|
+| `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (dentro del `.jar`) | todos | las poses por defecto del addon: la general y las de cada arma calibrada |
+| `config/jeg_vr_compat/guns.json` | cada jugador | sus propios ajustes, encima de los del addon |
+
+- **Al jugar desde el proyecto** (`runClient`): los comandos cambian el archivo interno del proyecto y `/jegvr save`
+  lo guarda ahí. Va dentro del próximo `.jar`, así que lo calibrado así lo tienen todos. `guns.json` no se usa.
+- **Con el `.jar` instalado**: el archivo interno no se puede cambiar. Los comandos cambian `guns.json`, que se crea
+  vacío la primera vez. Un arma con ajuste propio usa el del jugador en lugar del del addon; las demás siguen las
+  poses del addon, también cuando se actualiza a una versión nueva.
+- **Editar a mano**: los dos archivos se pueden editar con el juego abierto; se recargan solos en un segundo.
+
 ## Calibrar cómo se ve un arma en la mano
 
 Los cambios se aplican al arma que tenés en la **mano principal** y se ven al instante. Si no tenés un arma en la
@@ -30,11 +46,11 @@ Los ejes son los del control, no los del mundo:
 |---|---|
 | `/jegvr move <dx> <dy> <dz>` | Corre el arma esa cantidad desde donde está. En los ejes que no querés tocar poné `0`. |
 | `/jegvr rot <dpitch> <dyaw> <droll>` | La gira esos grados desde donde está. En los que no querés tocar poné `0`. |
-| `/jegvr scale <factor>` | Tamaño final. `0.6` es el de todas las armas; `0.9` es un 50 % más grande. |
+| `/jegvr scale <factor>` | Tamaño final, el mismo número que muestra el chat (más grande = arma más grande). |
 | `/jegvr pose <pitch> <yaw> <roll> [tx ty tz]` | Pone valores absolutos, los mismos que muestra el chat. Sirve para copiar una pose. |
 | `/jegvr show` | Muestra los valores actuales del arma en la mano. |
-| `/jegvr save` | Guarda en `config/jeg_vr_compat/guns.json`. Sin guardar, se pierde al cerrar el juego. |
-| `/jegvr reset` | Vuelve el arma en la mano a la pose de fábrica. |
+| `/jegvr save` | Guarda (ver "Dónde se guardan las poses"). Sin guardar, se pierde al cerrar el juego. |
+| `/jegvr reset` | Con el `.jar`: borra tu ajuste de esa arma y vuelve a la pose del addon. Desde el proyecto: le quita su ajuste propio en el archivo interno (sin arma: vuelve la pose general a lo último guardado). |
 
 **Ejemplos:**
 - `/jegvr move 0 0.02 0`: 2 cm más arriba.
@@ -43,7 +59,7 @@ Los ejes son los del control, no los del mundo:
 
 Cada comando responde con los valores finales, por ejemplo
 `jeg:holy_shotgun: pitch=0.0 yaw=0.0 roll=15.0 | t=(0.000, 0.020, 0.000) | scale=0.60`.
-Esa línea es la que hay que pasar para dejar la pose como valor por defecto del addon.
+Con el `.jar`, esa línea sirve para compartir una pose y que se agregue a las poses del addon.
 
 ## Otros
 

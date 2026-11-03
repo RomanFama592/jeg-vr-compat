@@ -4,6 +4,7 @@ import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
 import com.jegvr.client.VrConfigScreen;
 import com.jegvr.client.VrDebugCommands;
+import com.jegvr.client.VrGunConfig;
 import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrDualReload;
 import com.jegvr.client.VrGrabReload;
@@ -51,6 +52,8 @@ public class JegVrCompat {
         // Client-only classes: register here, never in the constructor (dedicated servers also load this mod).
         MinecraftForge.EVENT_BUS.register(VrDiag.class);
         MinecraftForge.EVENT_BUS.register(VrDebugCommands.class);
+        // Read the gun poses now (built-in file, then the user's), so a broken file shows up in the log at startup.
+        VrGunConfig.load();
         if (ModList.get().isLoaded("jeg")) {
             // VrRecoil listens to a JEG event type: only register it when JEG is present.
             MinecraftForge.EVENT_BUS.register(VrRecoil.class);

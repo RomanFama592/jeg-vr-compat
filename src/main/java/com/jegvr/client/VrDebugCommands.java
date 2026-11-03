@@ -26,9 +26,9 @@ public final class VrDebugCommands {
             "§7Ejes del control: X = derecha, Y = arriba, Z = hacia atrás (negativo = hacia adelante). 0.01 = 1 cm",
             "§f/jegvr move <dx> <dy> <dz>§7: correr; 0 en los ejes que no cambian. Ej: /jegvr move 0 0.02 0 = 2 cm arriba",
             "§f/jegvr rot <dpitch> <dyaw> <droll>§7: girar en grados; 0 en los que no cambian. Ej: /jegvr rot 0 0 10",
-            "§f/jegvr scale <factor>§7: tamaño final (0.6 = el de todas las armas)",
+            "§f/jegvr scale <factor>§7: tamaño final (el que muestra el chat; más grande = mayor)",
             "§f/jegvr pose <pitch> <yaw> <roll> [tx ty tz]§7: poner valores absolutos (los que muestra el chat)",
-            "§f/jegvr show§7: ver los valores · §f/jegvr save§7: guardar · §f/jegvr reset§7: volver a lo de fábrica",
+            "§f/jegvr show§7: ver los valores · §f/jegvr save§7: guardar · §f/jegvr reset§7: volver a la pose del addon",
     };
 
     private VrDebugCommands() {
@@ -104,13 +104,20 @@ public final class VrDebugCommands {
             return 1;
         }));
         root.then(Commands.literal("save").executes(c -> {
-            VrGunConfig.save();
-            return reply(c, "Guardado en config/jeg_vr_compat/guns.json");
+            java.nio.file.Path path = VrGunConfig.save();
+            if (path == null) {
+                return reply(c, "§cNo se pudo guardar (ver el log)");
+            }
+            return reply(c, (VrGunConfig.editsBuiltIn() ? "Guardado en las poses internas del addon (van en el próximo .jar): "
+                    : "Guardado en tus poses: ") + path);
         }));
         root.then(Commands.literal("reset").executes(c -> {
             String id = heldGunId();
             VrGunConfig.reset(id);
-            return reply(c, "Pose restablecida para " + (id == null ? "default" : id));
+            String what = id == null ? "la pose general" : id;
+            return reply(c, VrGunConfig.editsBuiltIn()
+                    ? "Restablecido " + what + (id == null ? " a lo guardado en el archivo interno" : ": sin ajuste propio (solo la pose general)")
+                    : "Restablecido " + what + " a la pose del addon");
         }));
         d.register(root);
     }
