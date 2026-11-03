@@ -268,4 +268,4 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Modo precisión (dos manos): el haz sigue la línea de las dos manos.
 - [ ] Al soltar (disparo) o cambiar de arma, el láser desaparece. El arco primitivo no tiene láser.
 - [ ] Config → "Láser del arco compuesto" = No: no aparece.
-- [ ] Flat: no hay láser (decidir si se quiere).
+- [ ] Flat: no hay láser (decisión del usuario: solo VR).
