@@ -220,9 +220,9 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 ## F9.16 (gatillos con la mano dominante invertida)
 - [x] (auto) Compila; aplican 27 mezclas (nuevas: `MCOpenVRAccessor`, `ShootingHandlerVRMixin`).
 - [x] Primera prueba del usuario: seguía cruzado y mantener el gatillo contrario disparaba en ráfaga. Corregido (ver PLAN F9.16).
-- [ ] Mantener apretado el gatillo con una pistola o escopeta: dispara una sola vez por pulsación (no ráfaga), en las dos manos y con manos normales e invertidas.
-- [ ] Manos invertidas: las vibraciones salen en la mano correcta (la del arma que dispara).
-- [ ] Manos normales: cada arma dispara con el gatillo de su mano, como antes.
-- [ ] Manos invertidas en Vivecraft (sin cambiar nada en SteamVR): pistola en la derecha (secundaria) → dispara con el gatillo **derecho**; arma en la izquierda (principal) → gatillo **izquierdo**. Con un arma en cada mano, cada gatillo dispara la suya.
-- [ ] Manos invertidas: el gatillo de la mano del arma principal no teletransporta; sin arma, todo como Vivecraft.
-- [ ] Manos invertidas con el binding "reversed" de Vivecraft cargado en SteamVR: también cada gatillo dispara su arma.
+- [x] Mantener apretado el gatillo con una pistola o escopeta: dispara una sola vez por pulsación (no ráfaga), en las dos manos y con manos normales e invertidas.
+- [x] Manos invertidas: las vibraciones salen en la mano correcta (la del arma que dispara).
+- [x] Manos normales: cada arma dispara con el gatillo de su mano, como antes.
+- [x] Manos invertidas en Vivecraft (sin cambiar nada en SteamVR): pistola en la derecha (secundaria) → dispara con el gatillo **derecho**; arma en la izquierda (principal) → gatillo **izquierdo**. Con un arma en cada mano, cada gatillo dispara la suya.
+- [x] Manos invertidas: el gatillo de la mano del arma principal no teletransporta; sin arma, todo como Vivecraft.
+- [x] Manos invertidas con el binding "reversed" de Vivecraft cargado en SteamVR: también cada gatillo dispara su arma.
