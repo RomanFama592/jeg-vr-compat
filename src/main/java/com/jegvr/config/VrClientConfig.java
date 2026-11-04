@@ -60,7 +60,7 @@ public final class VrClientConfig {
                         "for 32 blocks, fading out over the last 5.")
                 .define("bowLaser", true);
         GUN_HUD = builder
-                .comment("Each gun's name and ammo float beside the hand that holds it, instead of JEG's ammo overlay",
+                .comment("Each gun's name, ammo and meters float beside the hand that holds it, instead of JEG's overlay",
                         "on the HUD (which only shows the main-hand gun).")
                 .define("gunHud", true);
         builder.pop();

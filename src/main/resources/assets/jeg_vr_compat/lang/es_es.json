@@ -24,6 +24,6 @@
   "jeg_vr_compat.config.bowLaser": "Láser del arco compuesto",
   "jeg_vr_compat.config.bowLaser.tooltip": "Al tensar el arco compuesto, un láser sigue el vuelo predicho de la flecha (32 bloques, se desvanece en los últimos 5).",
   "jeg_vr_compat.config.gunHud": "Munición junto a cada mano",
-  "jeg_vr_compat.config.gunHud.tooltip": "El nombre y la munición de cada arma flotan junto a su mano, en lugar del contador de JEG en la HUD.",
+  "jeg_vr_compat.config.gunHud.tooltip": "El nombre, la munición y los medidores de cada arma flotan junto a su mano, en lugar de lo que JEG muestra en la HUD.",
   "jeg_vr_compat.hud.reloading": "Recargando"
 }

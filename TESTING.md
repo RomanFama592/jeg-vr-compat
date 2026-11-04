@@ -286,6 +286,8 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Un arma en cada mano: cada mano muestra lo suyo; al disparar baja solo el número de esa arma.
 - [ ] Arma solo en la secundaria (con el addon en el servidor): el panel aparece en esa mano.
 - [ ] Recargar: el arma que recarga muestra "Recargando" (sin reserva) y la otra sigue normal.
+- [ ] Medidores (corrección pedida por el usuario): con el lanzacohetes en la principal, debajo del texto de esa mano sale el medidor de JEG; se llena al mantener el gatillo y ya no aparece en la HUD. Lo mismo con un arma de sobrecalentamiento (minigun, ametralladora ligera) y con los arcos (carga).
+- [ ] Arma con medidor en la secundaria: sin medidor (esa mano dispara al instante, sin carga ni sobrecalentamiento).
 - [ ] Reserva: cambia al sumar o sacar munición del inventario; en creativo dice 9999.
 - [ ] Manos invertidas: cada panel sigue del lado del cuerpo.
 - [ ] Sin panel: Finger Gun, trompeta, sin arma, con un menú abierto o con F1.
