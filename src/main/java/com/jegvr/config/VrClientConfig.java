@@ -4,6 +4,8 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 
+import java.util.List;
+
 /** Client options, in {@code config/jeg_vr_compat-client.toml}. */
 public final class VrClientConfig {
     /** Where the off hand takes a magazine for grab-to-reload. */
@@ -33,6 +35,8 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
     public static final ForgeConfigSpec.BooleanValue GUN_HUD;
+    public static final ForgeConfigSpec.BooleanValue HUD_EXCLUSION;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HUD_EXCLUDED_GUNS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -63,6 +67,14 @@ public final class VrClientConfig {
                 .comment("Each gun's name, ammo and meters float beside the hand that holds it, instead of JEG's overlay",
                         "on the HUD (which only shows the main-hand gun).")
                 .define("gunHud", true);
+        HUD_EXCLUSION = builder
+                .comment("With a gun from hudExcludedGuns in the off hand, Vivecraft's hand or wrist HUD (hotbar) stays",
+                        "where Vivecraft puts it, on the back of the hand, whatever hudPlacement says.")
+                .define("hudExclusion", true);
+        HUD_EXCLUDED_GUNS = builder
+                .comment("The guns of hudExclusion, by item id (for example jeg:minigun).")
+                .defineListAllowEmpty(List.of("hudExcludedGuns"), () -> List.of("jeg:minigun"),
+                        id -> id instanceof String);
         builder.pop();
         SPEC = builder.build();
     }
@@ -97,6 +109,29 @@ public final class VrClientConfig {
 
     public static boolean gunHud() {
         return !SPEC.isLoaded() || GUN_HUD.get();
+    }
+
+    public static boolean hudExclusion() {
+        return !SPEC.isLoaded() || HUD_EXCLUSION.get();
+    }
+
+    public static void setHudExclusion(boolean exclusion) {
+        HUD_EXCLUSION.set(exclusion);
+        HUD_EXCLUSION.save();
+    }
+
+    public static List<? extends String> hudExcludedGuns() {
+        return SPEC.isLoaded() ? HUD_EXCLUDED_GUNS.get() : List.of("jeg:minigun");
+    }
+
+    public static void setHudExcludedGuns(List<String> guns) {
+        HUD_EXCLUDED_GUNS.set(guns);
+        HUD_EXCLUDED_GUNS.save();
+    }
+
+    /** The exclusion is on and this gun is listed: the HUD stays where Vivecraft puts it. */
+    public static boolean hudExcluded(String gunId) {
+        return hudExclusion() && hudExcludedGuns().contains(gunId);
     }
 
     public static void setGunHud(boolean hud) {

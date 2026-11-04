@@ -25,5 +25,9 @@
   "jeg_vr_compat.config.bowLaser.tooltip": "While drawing the compound bow, a laser follows the arrow's predicted flight (32 blocks, fading over the last 5).",
   "jeg_vr_compat.config.gunHud": "Ammo beside each hand",
   "jeg_vr_compat.config.gunHud.tooltip": "Each gun's name, ammo and meters float beside its hand, instead of JEG's overlay on the HUD.",
+  "jeg_vr_compat.config.hudExclusion": "Hotbar on the hand with listed guns",
+  "jeg_vr_compat.config.hudExclusion.tooltip": "With one of the listed guns in the off hand, the hotbar stays on the back of the hand, wherever the option above puts it for other guns.",
+  "jeg_vr_compat.config.hudExcludedGuns": "Listed guns:",
+  "jeg_vr_compat.config.hudExcludedGuns.tooltip": "Item ids separated by commas, for example jeg:minigun, jeg:flamethrower",
   "jeg_vr_compat.hud.reloading": "Reloading"
 }

@@ -25,5 +25,9 @@
   "jeg_vr_compat.config.bowLaser.tooltip": "Al tensar el arco compuesto, un láser sigue el vuelo predicho de la flecha (32 bloques, se desvanece en los últimos 5).",
   "jeg_vr_compat.config.gunHud": "Munición junto a cada mano",
   "jeg_vr_compat.config.gunHud.tooltip": "El nombre, la munición y los medidores de cada arma flotan junto a su mano, en lugar de lo que JEG muestra en la HUD.",
+  "jeg_vr_compat.config.hudExclusion": "Hotbar en la mano con armas de la lista",
+  "jeg_vr_compat.config.hudExclusion.tooltip": "Con un arma de la lista en la mano secundaria, la hotbar queda en el dorso de la mano, sin importar dónde la ponga la otra opción para las demás armas.",
+  "jeg_vr_compat.config.hudExcludedGuns": "Armas de la lista:",
+  "jeg_vr_compat.config.hudExcludedGuns.tooltip": "Ids de ítem separados por comas, por ejemplo jeg:minigun, jeg:flamethrower",
   "jeg_vr_compat.hud.reloading": "Recargando"
 }

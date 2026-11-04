@@ -289,6 +289,7 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Recargar: el arma que recarga muestra "Recargando" (sin reserva) y la otra sigue normal.
 - [ ] Medidores (corrección pedida por el usuario): con el lanzacohetes en la principal, debajo del texto de esa mano sale el medidor de JEG; se llena al mantener el gatillo y ya no aparece en la HUD. Lo mismo con un arma de sobrecalentamiento (minigun, ametralladora ligera) y con los arcos (carga).
 - [ ] Arma con medidor en la secundaria: sin medidor (esa mano dispara al instante, sin carga ni sobrecalentamiento).
+- [ ] Por encima del arma (pedido del usuario): ninguna arma tapa el panel, ni siquiera acercándolo a la cara o con armas grandes (minigun, lanzacohetes). El texto se lee limpio, con su sombra detrás, y la barra llena se ve sobre la vacía. Los bloques tampoco lo tapan.
 - [ ] Reserva: cambia al sumar o sacar munición del inventario; en creativo dice 9999.
 - [ ] Manos invertidas: cada panel sigue del lado del cuerpo.
 - [ ] Sin panel: Finger Gun, trompeta, sin arma, con un menú abierto o con F1.
@@ -314,3 +315,12 @@ Se prueba en un mundo de un jugador (ya tiene el addon en el servidor).
   - Cambiar de mano: sobrecalentá la minigun y cambiala de mano. Sigue caliente y bloqueada, y se enfría desde donde estaba. Lo mismo con la cadencia del lanzacohetes: disparar y cambiar de mano no deja volver a disparar antes de tiempo, para los dos lados.
   - Typhoonee en la secundaria: el rayo va hacia donde apunta esa mano, no la principal, y le pega a lo que apunta. También en la principal con modo precisión.
 - [ ] Mano principal y flat: sin cambios.
+
+## Exclusión de la hotbar (F9.19)
+Con la HUD de Vivecraft en la mano o la muñeca, y "Hotbar con arma en la secundaria" en "Hacia el codo" o "Sobre el antebrazo".
+- [x] (auto) Compila; 31 mezclas; `config/jeg_vr_compat-client.toml` trae `hudExclusion = true` y `hudExcludedGuns = ["jeg:minigun"]`.
+- [ ] Minigun en la secundaria: la hotbar queda en el dorso de la mano, donde la pone Vivecraft; tocarla con la otra mano cambia de slot.
+- [ ] Otra arma en la secundaria: la hotbar va al codo o al antebrazo, como siempre.
+- [ ] Config → "Hotbar en la mano con armas de la lista" = No: la minigun se comporta como las demás.
+- [ ] Config → agregar otra arma al campo de texto (por ejemplo `jeg:minigun, jeg:flamethrower`) y salir con Listo: el lanzallamas también deja la hotbar en la mano, y la lista sigue igual al reabrir la pantalla. Lo mismo editando el `.toml`.
+- [ ] La pantalla de config entra entera con todas las opciones (botón Listo visible), también con la escala de GUI más grande.

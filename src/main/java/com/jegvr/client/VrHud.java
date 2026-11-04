@@ -18,7 +18,8 @@ import ttv.migami.jeg.item.GunItem;
  * <li>FOREARM: turned so the hotbar lies along the inner side of the forearm, like a strip on the sleeve, read by
  * turning the wrist.</li>
  * </ul>
- * Without a gun, with the HUD locked to the head, or with a menu open, Vivecraft's position is kept.
+ * Without a gun, with the HUD locked to the head, or with a menu open, Vivecraft's position is kept. So it is with the
+ * guns listed in the config (by default the minigun, whose body runs along the forearm): {@link VrClientConfig#hudExcluded}.
  */
 public final class VrHud {
     /** ELBOW: room-scale metres (multiplied by Vivecraft's world scale) towards the elbow, and up off the sleeve. */
@@ -43,7 +44,8 @@ public final class VrHud {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (placement == VrClientConfig.HudPlacement.VIVECRAFT || player == null || mc.screen != null || !VR.hudOnHand()
-                || !(player.getOffhandItem().getItem() instanceof GunItem)) {
+                || !(player.getOffhandItem().getItem() instanceof GunItem)
+                || VrClientConfig.hudExcluded(VrGunPose.gunId(player.getOffhandItem()))) {
             return guiPos;
         }
         VR.Aim hand = VR.offHandAim();

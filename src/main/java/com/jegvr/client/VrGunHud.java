@@ -17,11 +17,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.lwjgl.opengl.GL11;
 import ttv.migami.jeg.Config;
 import ttv.migami.jeg.client.handler.ShootingHandler;
 import ttv.migami.jeg.common.Gun;
@@ -65,6 +64,8 @@ public final class VrGunHud {
     private static final float METER_STEP = 7.0F;
     /** The full bar sits this far in front of the empty one, as the font lifts text over its shadow. */
     private static final float METER_LIFT = 0.03F;
+    /** Enough depth steps left to tell the panel's layers apart, and in front of anything within arm's reach. */
+    private static final double FRONT_DEPTH_RANGE = 0.05;
 
     private VrGunHud() {
     }
@@ -74,12 +75,28 @@ public final class VrGunHud {
         return VR.active() && VrClientConfig.gunHud() && !VR.seated();
     }
 
-    @SubscribeEvent
-    public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !active() || !VR.isEyePass()) {
+    /**
+     * Called right after Vivecraft draws the hands, with its pose stack (world axes, relative to the eye). The panels go
+     * over the guns: their depth is squeezed to the very front of the depth range, so they win against everything
+     * already drawn while keeping their own layers (text over shadow, full bar over empty bar) in order.
+     */
+    public static void render(PoseStack pose) {
+        if (!active() || !VR.isEyePass()) {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
+        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
+        buffers.endBatch();
+        GL11.glDepthRange(0.0, FRONT_DEPTH_RANGE);
+        try {
+            drawPanels(mc, pose, buffers);
+            buffers.endBatch();
+        } finally {
+            GL11.glDepthRange(0.0, 1.0);
+        }
+    }
+
+    private static void drawPanels(Minecraft mc, PoseStack pose, MultiBufferSource buffers) {
         LocalPlayer player = mc.player;
         if (player == null || mc.screen != null || mc.options.hideGui) {
             return;
@@ -91,9 +108,7 @@ public final class VrGunHud {
         }
         boolean showAmmo = Config.CLIENT.display.showAmmoGUI.get();
         boolean showMeters = Config.CLIENT.display.showTimersGUI.get();
-        MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
-        PoseStack pose = event.getPoseStack();
-        Vec3 cam = event.getCamera().getPosition();
+        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack stack = player.getItemInHand(hand);
             boolean ammo = showAmmo && showsAmmo(stack);
@@ -118,7 +133,6 @@ public final class VrGunHud {
                 }
             }
         }
-        buffers.endBatch();
     }
 
     /** The guns JEG's overlay shows: not the Finger Gun, and only once the gun has its ammo tag. */
