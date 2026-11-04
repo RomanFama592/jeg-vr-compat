@@ -26,6 +26,24 @@
       "ty": -0.02,
       "tz": -0.12,
       "scale": 1.0
+    },
+    "jeg:atlantean_spear": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.16,
+      "ty": 0.0,
+      "tz": -0.05,
+      "scale": 1.0
+    },
+    "jeg:typhoonee": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.16,
+      "ty": 0.0,
+      "tz": -0.05,
+      "scale": 1.0
     }
   }
 }
