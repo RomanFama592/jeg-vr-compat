@@ -1,6 +1,9 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.mixin.input.ItemCooldownInstanceAccessor;
+import com.jegvr.mixin.input.ItemCooldownsAccessor;
+import com.jegvr.mixin.input.ShootingHandlerAccessor;
 import com.jegvr.network.C2SVrPreFireOffhand;
 import com.jegvr.network.C2SVrShootOffhand;
 import com.jegvr.network.VrNetwork;
@@ -13,9 +16,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.client.handler.GunRenderingHandler;
+import ttv.migami.jeg.client.handler.ShootingHandler;
 import ttv.migami.jeg.common.FireMode;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ReloadType;
@@ -42,6 +47,7 @@ public final class VrOffhandShooting {
     private static final int OVERHEAT_COOLDOWN = 80;
     private static final int PRE_FIRE_SOUND_TICK = 2;
     private static final int MIN_HOLD_TO_FIRE = 5;
+    private static final int SWAP_SETTLE_TICKS = 2;
 
     private static boolean triggerTakenOver;
     /** The trigger as JEG sees its shoot key: pressed, until released or until JEG would release it after a shot. */
@@ -56,6 +62,9 @@ public final class VrOffhandShooting {
     private static boolean previouslyPressed;
     private static boolean overheated;
     private static int burstCount;
+    private static Item knownMain;
+    private static Item knownOff;
+    private static int settlingTicks;
 
     private VrOffhandShooting() {
     }
@@ -93,6 +102,9 @@ public final class VrOffhandShooting {
         LocalPlayer player = mc.player;
         triggerTakenOver = player != null && VrOffhand.canDualWield(player.getOffhandItem())
                 && !VR.isBow(player.getMainHandItem()) && VR.active() && VrAim.serverHasAddon();
+        if (player != null) {
+            trackHandSwap(player);
+        }
         if (player == null || mc.screen != null || mc.getOverlay() != null) {
             trigger = false;
             rawWasDown = false;
@@ -129,6 +141,54 @@ public final class VrOffhandShooting {
         } else {
             previouslyPressed = false;
         }
+    }
+
+    /**
+     * Each hand keeps its own heat and cooldown, so a gun that changes hands takes them along; otherwise swapping hands
+     * would cool it at once. The two hands' slots may arrive from the server a tick apart, so a change that is not yet a
+     * swap is given a moment to become one.
+     */
+    private static void trackHandSwap(LocalPlayer player) {
+        Item main = player.getMainHandItem().getItem();
+        Item off = player.getOffhandItem().getItem();
+        if (main == knownMain && off == knownOff) {
+            settlingTicks = 0;
+            return;
+        }
+        boolean swapped = main == knownOff && off == knownMain;
+        if (swapped || ++settlingTicks > SWAP_SETTLE_TICKS || !VR.active() || !VrAim.serverHasAddon()) {
+            if (swapped && VR.active() && VrAim.serverHasAddon()) {
+                swapStates(player, main, off);
+            }
+            knownMain = main;
+            knownOff = off;
+            settlingTicks = 0;
+        }
+    }
+
+    private static void swapStates(LocalPlayer player, Item nowMain, Item nowOff) {
+        ShootingHandlerAccessor mainHand = (ShootingHandlerAccessor) ShootingHandler.get();
+        int mainHeat = mainHand.jegvr$getOverheatTimer();
+        boolean mainOverheated = mainHand.jegvr$isOverheated();
+        mainHand.jegvr$setOverheatTimer(overheatTimer);
+        mainHand.jegvr$setOverheated(overheated);
+        overheatTimer = mainHeat;
+        overheated = mainOverheated;
+
+        int offLeft = onCooldown(nowMain) ? cooldown : 0;
+        int mainLeft = mainCooldownLeft(player, nowOff);
+        player.getCooldowns().removeCooldown(nowOff);
+        if (offLeft > 0) {
+            player.getCooldowns().addCooldown(nowMain, offLeft);
+        }
+        startCooldown(nowOff, mainLeft);
+    }
+
+    private static int mainCooldownLeft(LocalPlayer player, Item item) {
+        ItemCooldownsAccessor cooldowns = (ItemCooldownsAccessor) player.getCooldowns();
+        Object instance = cooldowns.jegvr$getCooldowns().get(item);
+        return instance == null ? 0
+                : Math.max(0, ((ItemCooldownInstanceAccessor) instance).jegvr$getEndTime() - cooldowns.jegvr$getTickCount());
     }
 
     private static void readTrigger() {
@@ -263,8 +323,27 @@ public final class VrOffhandShooting {
             GunRenderingHandler.get().showMuzzleFlashForPlayer(player.getId());
         }
         VrHands.markShot(InteractionHand.OFF_HAND);
+        pushBack(player, general);
 
         float angle = general.getRecoilAngle() * (1.0F - GunModifierHelper.getRecoilModifier(stack));
         VR.haptic(false, 0.06F, Mth.clamp(angle / 10.0F, 0.2F, 1.0F));
+    }
+
+    /**
+     * The push JEG gives the shooter ({@code GunEventBus.postShoot} and {@code recoil}), halved when crouching on solid
+     * ground. It only counts on the client, in the event this hand does not post, and it follows this gun's barrel.
+     */
+    private static void pushBack(LocalPlayer player, Gun.General general) {
+        VR.Aim aim = VrPrecision.aim(InteractionHand.OFF_HAND, VR.offHandAim());
+        float force = general.getShooterPushback();
+        if (aim == null || force == 0.0F) {
+            return;
+        }
+        if (player.isCrouching() && player.level().getBlockState(player.getOnPos()).isSolid()) {
+            force /= 2.0F;
+        }
+        Vec3 push = aim.dir().normalize().scale(force);
+        player.push(push.x, push.y, push.z);
+        player.fallDistance = 0.0F;
     }
 }

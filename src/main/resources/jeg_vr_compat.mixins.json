@@ -6,7 +6,7 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "jeg_vr_compat.refmap.json",
   "mixins": ["server.GunEventBusVRMixin", "server.ProjectileEntityVRMixin", "server.ReloadTrackerVRMixin", "server.ServerPlayHandlerVRMixin"],
-  "client": ["input.AimingHandlerVRMixin", "input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
+  "client": ["input.AimingHandlerVRMixin", "input.ItemCooldownInstanceAccessor", "input.ItemCooldownsAccessor", "input.ShootingHandlerAccessor","input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
     "input.MCOpenVRAccessor", "input.ReloadHandlerVRMixin", "input.ShootingHandlerVRMixin", "model.ItemInHandLayerVRMixin", "model.OneHandedPoseVRMixin", "model.WeaponPoseVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunRendererVRMixin",
     "render.CrosshairHandlerVRMixin", "render.GuiHandlerVRMixin", "render.GuiRendererVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemInHandRendererVRMixin", "render.ItemRendererVRMixin",
     "render.VREffectsHelperVRMixin", "render.VivecraftItemRenderingVRMixin"],

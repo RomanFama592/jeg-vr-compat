@@ -309,4 +309,8 @@ Se prueba en un mundo de un jugador (ya tiene el addon en el servidor).
 - [ ] Un arma en cada mano: los medidores, el calor y la cadencia son independientes, incluso con la misma arma en las dos manos. Sobrecalentar una no frena a la otra.
 - [ ] Un arco en cada mano: la carga de cada uno es la suya (el daño de uno no depende del otro).
 - [ ] Sin munición en la secundaria: el gatillo recarga esa arma. Recarga con la mano y modo precisión con un arco solo en la secundaria (ahora se permite).
+- [ ] Correcciones tras la primera prueba:
+  - Retroceso: la minigun y el lanzacohetes en la secundaria empujan al personaje, en sentido contrario a donde apunta esa arma. Agachado, la mitad.
+  - Cambiar de mano: sobrecalentá la minigun y cambiala de mano. Sigue caliente y bloqueada, y se enfría desde donde estaba. Lo mismo con la cadencia del lanzacohetes: disparar y cambiar de mano no deja volver a disparar antes de tiempo, para los dos lados.
+  - Typhoonee en la secundaria: el rayo va hacia donde apunta esa mano, no la principal, y le pega a lo que apunta. También en la principal con modo precisión.
 - [ ] Mano principal y flat: sin cambios.

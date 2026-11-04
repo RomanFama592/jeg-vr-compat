@@ -1,11 +1,14 @@
 package com.jegvr.mixin.server;
 
 import com.jegvr.server.VrOffhand;
+import com.jegvr.server.VrServerAim;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.HitResult;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import ttv.migami.jeg.event.GunEventBus;
@@ -28,6 +31,30 @@ public abstract class GunEventBusVRMixin {
             target = "Lnet/minecraft/world/entity/LivingEntity;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack jegvr$firingGunEffects(LivingEntity entity, Operation<ItemStack> original) {
         return firingHand(entity, original.call(entity));
+    }
+
+    /**
+     * The Typhoonee's blast looks for its target with {@code pick(64, 0, false)}, which at partial tick 0 reads last
+     * tick's rotation, not the one the shoot message just set: in VR that is where the main hand pointed. For a VR shot,
+     * it reads the rotation of the shot. Flat players (no fresh record in {@link VrServerAim}) are untouched.
+     */
+    @WrapOperation(method = "typhooneeBlast", at = @At(value = "INVOKE", remap = true,
+            target = "Lnet/minecraft/world/entity/LivingEntity;pick(DFZ)Lnet/minecraft/world/phys/HitResult;"))
+    private static HitResult jegvr$pickAlongShot(LivingEntity shooter, double distance, float partialTick, boolean fluids,
+                                                 Operation<HitResult> original) {
+        if (!VrOffhand.firing() && VrServerAim.muzzleFor(shooter, InteractionHand.MAIN_HAND) == null) {
+            return original.call(shooter, distance, partialTick, fluids);
+        }
+        float xRotO = shooter.xRotO;
+        float yHeadRotO = shooter.yHeadRotO;
+        shooter.xRotO = shooter.getXRot();
+        shooter.yHeadRotO = shooter.getYRot();
+        try {
+            return original.call(shooter, distance, partialTick, fluids);
+        } finally {
+            shooter.xRotO = xRotO;
+            shooter.yHeadRotO = yHeadRotO;
+        }
     }
 
     private static ItemStack firingHand(LivingEntity entity, ItemStack mainHand) {
