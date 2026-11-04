@@ -16,12 +16,13 @@ import ttv.migami.jeg.common.ShootTracker;
 import ttv.migami.jeg.common.network.ServerPlayHandler;
 
 /**
- * {@code handleShoot} always fires {@code getItemInHand(MAIN_HAND)}. During a {@link VrOffhand} it reads the off
- * hand instead, with a separate fire-rate tracker. Normal shots are untouched.
+ * {@code handleShoot} always fires {@code getItemInHand(MAIN_HAND)}, and {@code handlePreFireSound} plays that gun's
+ * sound. During a {@link VrOffhand} they read the off hand instead, with a separate fire-rate tracker. Normal shots are
+ * untouched.
  */
 @Mixin(value = ServerPlayHandler.class, remap = false)
 public abstract class ServerPlayHandlerVRMixin {
-    @WrapOperation(method = "handleShoot", at = @At(value = "INVOKE",
+    @WrapOperation(method = {"handleShoot", "handlePreFireSound"}, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;getItemInHand(Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/item/ItemStack;",
             remap = true))
     private static ItemStack jegvr$offhandGun(ServerPlayer player, InteractionHand hand,

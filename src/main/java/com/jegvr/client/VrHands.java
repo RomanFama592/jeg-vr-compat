@@ -62,10 +62,10 @@ public final class VrHands {
 
     /**
      * JEG's per-player "trigger held" flag, as the gun animation sees it. It belongs to the main-hand trigger, so the
-     * off-hand gun (never charged from that hand) must not play its charge animation when the main gun fires.
+     * off-hand gun reads its own trigger: it plays its charge animation only while that one charges it.
      */
     public static boolean shootingFlag(Player player, boolean original) {
-        return original && !renderingOffhand(player);
+        return renderingOffhand(player) ? VrOffhandShooting.triggerHeld() : original;
     }
 
     public static void markReload(InteractionHand hand) {

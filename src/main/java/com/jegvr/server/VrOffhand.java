@@ -2,18 +2,19 @@ package com.jegvr.server;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import ttv.migami.jeg.common.FireMode;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ShootTracker;
 import ttv.migami.jeg.common.network.ServerPlayHandler;
 import ttv.migami.jeg.init.ModSyncedDataKeys;
 import ttv.migami.jeg.item.AnimatedGunItem;
 import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.network.message.C2SMessagePreFireSound;
 import ttv.migami.jeg.network.message.C2SMessageShoot;
 import ttv.migami.jeg.util.GunModifierHelper;
 
@@ -38,34 +39,52 @@ public final class VrOffhand {
     private static final Set<UUID> RELOADING = ConcurrentHashMap.newKeySet();
     /** Same length as JEG's main-hand shoot animation (AnimatedGunItem.inventoryTick). */
     private static final int SHOOT_ANIMATION_TICKS = 5;
+    private static final String CHARGE_KEY = "ChargeProgress";
 
     private static boolean firing;
 
     private VrOffhand() {
     }
 
-    /**
-     * Guns that can be used from the off hand. Charged guns (bows, {@code RELEASE_FIRE}) are left out: JEG keeps their
-     * charge per player (ChargeTracker, the SHOOTING flag), so it cannot charge one hand without the other.
-     */
+    /** Guns that can be used from the off hand. */
     public static boolean canDualWield(ItemStack stack) {
-        return stack.getItem() instanceof GunItem gunItem
-                && !FireMode.RELEASE_FIRE.equals(gunItem.getModifiedGun(stack).getGeneral().getFireMode());
+        return stack.getItem() instanceof GunItem;
     }
 
-    public static void fire(ServerPlayer player, float yaw, float pitch) {
+    /**
+     * JEG's projectile reads one charge per player (synced by {@code C2SMessageChargeSync} for the main hand). For this
+     * shot it reads the off-hand gun's; the main hand's goes back right after, even in the middle of charging.
+     */
+    public static void fire(ServerPlayer player, float yaw, float pitch, float charge) {
+        if (!canDualWield(player.getOffhandItem()) || firing) {
+            return;
+        }
+        firing = true;
+        CompoundTag data = player.getPersistentData();
+        float mainCharge = data.getFloat(CHARGE_KEY);
+        data.putFloat(CHARGE_KEY, Mth.clamp(charge, 0.0F, 1.0F));
+        try {
+            ServerPlayHandler.handleShoot(new C2SMessageShoot(yaw, pitch), player);
+        } finally {
+            data.putFloat(CHARGE_KEY, mainCharge);
+            firing = false;
+        }
+    }
+
+    /** The off-hand gun's wind-up sound, through JEG's handler. */
+    public static void preFireSound(ServerPlayer player) {
         if (!canDualWield(player.getOffhandItem()) || firing) {
             return;
         }
         firing = true;
         try {
-            ServerPlayHandler.handleShoot(new C2SMessageShoot(yaw, pitch), player);
+            ServerPlayHandler.handlePreFireSound(new C2SMessagePreFireSound(), player);
         } finally {
             firing = false;
         }
     }
 
-    /** True while an off-hand shot is being processed (server thread only). */
+    /** True while an off-hand shot or wind-up sound is being processed (server thread only). */
     public static boolean firing() {
         return firing;
     }

@@ -11,6 +11,7 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] (sin servidor, pero también pendiente) `.jar` (`-all`) en un Minecraft normal: poses del addon, `guns.json` del usuario y `/jegvr reset` (ver sección "Poses internas").
 - [ ] Dos jugadores en supervivencia: el disparo de la mano libre le baja vida al otro (F8.5).
 - [ ] Dos jugadores: el otro escucha el sonido de cada cartucho metido a mano (F7.8).
+- [ ] Servidor dedicado con este `.jar` nuevo (la versión del canal subió a 4: cliente y servidor tienen que tener la misma versión del addon): disparo y medidores de la mano secundaria; el otro jugador escucha la preparación del lanzacohetes en esa mano.
 
 ## Fase 1
 - [ ] Flat, sin Vivecraft: arranca, se puede disparar y recargar.
@@ -104,7 +105,7 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] (auto) Compila; al arrancar aplican los 17 mixins (nuevo: `input.AimingHandlerVRMixin`).
 - [ ] Arma a dos manos en la principal y la mano libre vacía: vibran los dos mandos. Con un arma u otro ítem en la mano libre: solo vibra el de la principal.
 - [ ] Arco (vanilla) en la principal y arma en la mano libre: el gatillo de la mano libre tensa el arco / teletransporta como siempre, y no dispara el arma.
-- [ ] Arco de JEG en la mano libre: el gatillo de esa mano no lo dispara (vuelve a teletransportar). Al disparar la mini gun con la principal, el arco de la mano libre no hace la animación de carga.
+- [ ] Al disparar la mini gun con la principal, un arco de JEG en la mano libre no hace la animación de carga (ahora ese arco dispara con su gatillo: ver "Reglas de disparo en la mano secundaria").
 - [ ] Botón de apuntar (zoom) con un arma: no hace zoom y recarga; con un arma en cada mano recarga la que tenga el cañón hacia arriba (la principal si las dos o ninguna).
 - [ ] Flat: apuntar con clic derecho sigue haciendo zoom.
 
@@ -294,3 +295,18 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Modo sentado de Vivecraft: sin paneles; vuelve el contador de JEG.
 - [ ] Config → "Munición junto a cada mano" = No: sin paneles; vuelve el contador de JEG.
 - [ ] Flat: el contador de JEG igual que siempre.
+
+## Reglas de disparo en la mano secundaria (F9.18)
+Se prueba en un mundo de un jugador (ya tiene el addon en el servidor).
+- [x] (auto) Compila; 29 mezclas al arrancar; el `@At` de `handlePreFireSound` verificado con `javap` (se aplica al cargar la clase, en la partida).
+- [ ] Lanzacohetes en la secundaria: al mantener el gatillo se llena el medidor en el panel de esa mano, suena la preparación y recién ahí dispara; soltar antes cancela. Un disparo por apretada y su cadencia lenta.
+- [ ] Minigun, ametralladora ligera o lanzallamas en la secundaria: el medidor de calor sube al disparar y baja al soltar. Al llenarse deja de disparar unos 4 s (80 ticks), salen humo y sonido, y no vuelve a disparar hasta enfriarse. Bajo el agua se enfría de golpe.
+- [ ] Lanzallamas en la secundaria: al sobrecalentarse prende fuego al jugador, como en la principal.
+- [ ] Soulhunter (ráfagas) en la secundaria: una apretada dispara la ráfaga completa aunque sueltes, con la pausa entre ráfagas.
+- [ ] Typhoonee o cañón hipersónico (pulso) en la secundaria: medidor de preparación y un disparo por apretada.
+- [ ] Arcos de JEG en la secundaria: mantener carga (medidor y animación de tensado), soltar dispara. Soltar enseguida no dispara. Poca carga hace menos daño. Con el compuesto sale el láser desde esa mano.
+- [ ] Armas semiautomáticas y automáticas comunes en la secundaria: igual que antes.
+- [ ] Un arma en cada mano: los medidores, el calor y la cadencia son independientes, incluso con la misma arma en las dos manos. Sobrecalentar una no frena a la otra.
+- [ ] Un arco en cada mano: la carga de cada uno es la suya (el daño de uno no depende del otro).
+- [ ] Sin munición en la secundaria: el gatillo recarga esa arma. Recarga con la mano y modo precisión con un arco solo en la secundaria (ahora se permite).
+- [ ] Mano principal y flat: sin cambios.

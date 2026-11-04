@@ -1,38 +1,61 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
-import com.jegvr.mixin.input.KeyMappingAccessor;
+import com.jegvr.network.C2SVrPreFireOffhand;
 import com.jegvr.network.C2SVrShootOffhand;
 import com.jegvr.network.VrNetwork;
 import com.jegvr.server.VrOffhand;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.client.handler.GunRenderingHandler;
 import ttv.migami.jeg.common.FireMode;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ReloadType;
+import ttv.migami.jeg.compat.PlayerReviveHelper;
 import ttv.migami.jeg.event.GunFireEvent;
+import ttv.migami.jeg.init.ModItems;
 import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.network.PacketHandler;
+import ttv.migami.jeg.network.message.C2SMessageBurnPlayer;
+import ttv.migami.jeg.network.message.C2SMessageOverheat;
 import ttv.migami.jeg.util.GunEnchantmentHelper;
 import ttv.migami.jeg.util.GunModifierHelper;
 
 /**
  * Client side of the off-hand gun (dual wield, S.5). With a gun in the off hand, in VR and on a server with this
- * addon, that hand's trigger (Vivecraft's teleport key, see {@code KeyMappingVRMixin}) or
- * {@link VrKeys#FIRE_OFFHAND} fires it at its own rate through {@link C2SVrShootOffhand}. Automatic guns fire while
- * held; every other fire mode fires once per press. Charged guns (bows) are not fired from the off hand, and the
+ * addon, that hand's trigger (Vivecraft's teleport key, see {@code KeyMappingVRMixin}) or {@link VrKeys#FIRE_OFFHAND}
+ * fires it through {@link C2SVrShootOffhand}, under the same rules as JEG's main-hand trigger. This follows
+ * {@code ShootingHandler.onPostClientTick} and {@code fire} step by step, with its own state: fire modes (bursts, one
+ * shot per press), the wind-up before firing, charging by holding (bows), overheating and the cooldown of the gun. The
  * trigger keeps its normal role while the main hand holds a Vivecraft bow (drawn with that trigger).
  */
 public final class VrOffhandShooting {
-    private static int cooldown;
-    private static boolean wasDown;
+    /** JEG's fixed values ({@code ShootingHandler}). */
+    private static final int OVERHEAT_COOLDOWN = 80;
+    private static final int PRE_FIRE_SOUND_TICK = 2;
+    private static final int MIN_HOLD_TO_FIRE = 5;
+
     private static boolean triggerTakenOver;
+    /** The trigger as JEG sees its shoot key: pressed, until released or until JEG would release it after a shot. */
+    private static boolean trigger;
+    private static boolean rawWasDown;
+    /** JEG keeps cooldowns per item on the player, shared with the main hand; this hand has its own. */
+    private static int cooldown;
+    private static Item cooldownItem;
+    private static int fireTimer;
+    private static int holdFire;
+    private static int overheatTimer;
+    private static boolean previouslyPressed;
+    private static boolean overheated;
+    private static int burstCount;
 
     private VrOffhandShooting() {
     }
@@ -40,6 +63,22 @@ public final class VrOffhandShooting {
     /** True while the off-hand trigger fires the off-hand gun instead of teleporting. */
     public static boolean triggerTakenOver() {
         return triggerTakenOver;
+    }
+
+    public static boolean triggerHeld() {
+        return trigger;
+    }
+
+    public static int fireTimer() {
+        return fireTimer;
+    }
+
+    public static int holdFire() {
+        return holdFire;
+    }
+
+    public static int overheatTimer() {
+        return overheatTimer;
     }
 
     @SubscribeEvent
@@ -54,36 +93,168 @@ public final class VrOffhandShooting {
         LocalPlayer player = mc.player;
         triggerTakenOver = player != null && VrOffhand.canDualWield(player.getOffhandItem())
                 && !VR.isBow(player.getMainHandItem()) && VR.active() && VrAim.serverHasAddon();
-        boolean down = triggerTakenOver && mc.screen == null && (VrKeys.FIRE_OFFHAND.isDown() || VrTriggers.offTriggerDown());
-        if (down && player.getOffhandItem().getItem() instanceof GunItem gunItem) {
-            ItemStack stack = player.getOffhandItem();
-            Gun gun = gunItem.getModifiedGun(stack);
-            boolean automatic = FireMode.AUTOMATIC.equals(gun.getGeneral().getFireMode());
-            if (cooldown == 0 && (automatic || !wasDown)) {
-                fire(player, stack, gun);
+        if (player == null || mc.screen != null || mc.getOverlay() != null) {
+            trigger = false;
+            rawWasDown = false;
+            return;
+        }
+        readTrigger();
+        if (PlayerReviveHelper.isBleeding(player)) {
+            return;
+        }
+        if (!trigger) {
+            fireTimer = 0;
+            if (!previouslyPressed) {
+                holdFire = 0;
+            } else if (holdFire > 0) {
+                holdFire--;
+            }
+            if (overheatTimer > 0) {
+                overheatTimer--;
             }
         }
-        wasDown = down;
+        if (overheated && overheatTimer <= 0) {
+            overheated = false;
+        }
+        if (player.isUnderWater()) {
+            overheatTimer = 0;
+            overheated = false;
+        }
+        if (overheated) {
+            trigger = false;
+        }
+        ItemStack stack = player.getOffhandItem();
+        if (triggerTakenOver && stack.getItem() instanceof GunItem gunItem) {
+            tickGun(player, stack, gunItem.getModifiedGun(stack));
+        } else {
+            previouslyPressed = false;
+        }
+    }
+
+    private static void readTrigger() {
+        boolean raw = triggerTakenOver && (VrKeys.FIRE_OFFHAND.isDown() || VrTriggers.offTriggerDown());
+        if (raw && !rawWasDown) {
+            trigger = true;
+        } else if (!raw) {
+            trigger = false;
+        }
+        rawWasDown = raw;
+    }
+
+    private static void tickGun(LocalPlayer player, ItemStack stack, Gun gun) {
+        Gun.General general = gun.getGeneral();
+        FireMode mode = general.getFireMode();
+        boolean creative = player.isCreative();
+        if (general.getOverheatTimer() == 0) {
+            overheated = false;
+        }
+        CompoundTag tag = stack.getTag();
+        // JEG reloads the main-hand gun when its trigger is pulled empty (ShootingHandler); same for this hand.
+        if (trigger && !Gun.hasAmmo(stack) && !creative && tag != null && tag.getInt("AmmoCount") <= 0
+                && !ReloadType.INVENTORY_FED.equals(gun.getReloads().getReloadType())) {
+            VrDualReload.reloadOffhand(player);
+        }
+        if (!trigger && mode == FireMode.RELEASE_FIRE && holdFire > MIN_HOLD_TO_FIRE && previouslyPressed) {
+            fire(player, stack, gun);
+        }
+        if ((trigger || (burstCount > 0 && mode == FireMode.BURST)) && mode != FireMode.RELEASE_FIRE
+                && mode != FireMode.SEMI_AUTO && mode != FireMode.PULSE) {
+            fire(player, stack, gun);
+            if (mode != FireMode.AUTOMATIC && mode != FireMode.BURST) {
+                trigger = false;
+            }
+        }
+        if (!Gun.hasAmmo(stack) && !creative) {
+            trigger = false;
+            burstCount = 0;
+        }
+        if (trigger) {
+            tickHeld(player, stack, gun);
+        }
+    }
+
+    /** The trigger is held: heat, charge and wind-up. */
+    private static void tickHeld(LocalPlayer player, ItemStack stack, Gun gun) {
+        Gun.General general = gun.getGeneral();
+        FireMode mode = general.getFireMode();
+        Item item = stack.getItem();
+        if (general.getOverheatTimer() != 0 && overheatTimer < general.getOverheatTimer()) {
+            overheatTimer++;
+            if (overheatTimer >= general.getOverheatTimer()) {
+                startCooldown(item, OVERHEAT_COOLDOWN);
+                if (stack.is(ModItems.FLAMETHROWER.get())) {
+                    PacketHandler.getPlayChannel().sendToServer(new C2SMessageBurnPlayer());
+                }
+                overheated = true;
+                trigger = false;
+                PacketHandler.getPlayChannel().sendToServer(new C2SMessageOverheat());
+            }
+        }
+        if (general.getMaxHoldFire() != 0 && holdFire < general.getMaxHoldFire() && !onCooldown(item)) {
+            previouslyPressed = true;
+            holdFire++;
+        }
+        if (general.getFireTimer() != 0) {
+            if (fireTimer < general.getFireTimer() && !onCooldown(item)) {
+                if (fireTimer == PRE_FIRE_SOUND_TICK) {
+                    VrNetwork.CHANNEL.sendToServer(new C2SVrPreFireOffhand());
+                }
+                fireTimer++;
+                if (player.isUnderWater()) {
+                    fireTimer++;
+                }
+            } else {
+                fire(player, stack, gun);
+                if (mode == FireMode.SEMI_AUTO || mode == FireMode.PULSE) {
+                    trigger = false;
+                    fireTimer = 0;
+                }
+            }
+        } else {
+            if (mode != FireMode.RELEASE_FIRE) {
+                fire(player, stack, gun);
+            }
+            if (mode == FireMode.SEMI_AUTO) {
+                trigger = false;
+            }
+        }
+    }
+
+    private static boolean onCooldown(Item item) {
+        return cooldown > 0 && item == cooldownItem;
+    }
+
+    private static void startCooldown(Item item, int ticks) {
+        cooldown = ticks;
+        cooldownItem = item;
     }
 
     private static void fire(LocalPlayer player, ItemStack stack, Gun gun) {
-        if (player.isSpectator()) {
+        if ((!Gun.hasAmmo(stack) && !player.isCreative()) || player.isSpectator()
+                || player.getUseItem().getItem() instanceof ShieldItem) {
             return;
         }
-        if (!Gun.hasAmmo(stack) && !player.isCreative()) {
-            // JEG reloads the main-hand gun when its trigger is pulled empty (ShootingHandler); same for this hand.
-            if (!ReloadType.INVENTORY_FED.equals(gun.getReloads().getReloadType())) {
-                VrDualReload.reloadOffhand(player);
-            }
+        Gun.General general = gun.getGeneral();
+        float charge = general.getMaxHoldFire() > 0 ? Math.min(1.0F, (float) holdFire / general.getMaxHoldFire()) : 0.0F;
+        holdFire = 0;
+        previouslyPressed = false;
+        Item item = stack.getItem();
+        if (onCooldown(item) || (stack.isDamageableItem() && stack.getDamageValue() >= stack.getMaxDamage() - 1)) {
             return;
         }
         float[] rotation = VrAim.offHandShotRotation();
         if (rotation == null) {
             return;
         }
-        VrNetwork.CHANNEL.sendToServer(new C2SVrShootOffhand(rotation[0], rotation[1]));
         // Same rate JEG uses for the main hand (ShootingHandler.fire / ShootTracker.putCooldown).
-        cooldown = Math.max(1, GunModifierHelper.getModifiedRate(stack, GunEnchantmentHelper.getRate(stack, gun)));
+        startCooldown(item, Math.max(1, GunModifierHelper.getModifiedRate(stack, GunEnchantmentHelper.getRate(stack, gun))));
+        if (general.getFireMode() == FireMode.BURST) {
+            if (burstCount == 1) {
+                startCooldown(item, general.getBurstDelay());
+            }
+            burstCount = burstCount <= 0 ? general.getBurstAmount() - 1 : burstCount - 1;
+        }
+        VrNetwork.CHANNEL.sendToServer(new C2SVrShootOffhand(rotation[0], rotation[1], charge));
 
         // What JEG's client does for a main-hand shot, without posting the event (our main-hand listeners would
         // treat it as a main-hand shot): the constructor starts the shoot animation of this stack, then the flash.
@@ -93,7 +264,7 @@ public final class VrOffhandShooting {
         }
         VrHands.markShot(InteractionHand.OFF_HAND);
 
-        float angle = gun.getGeneral().getRecoilAngle() * (1.0F - GunModifierHelper.getRecoilModifier(stack));
+        float angle = general.getRecoilAngle() * (1.0F - GunModifierHelper.getRecoilModifier(stack));
         VR.haptic(false, 0.06F, Mth.clamp(angle / 10.0F, 0.2F, 1.0F));
     }
 }

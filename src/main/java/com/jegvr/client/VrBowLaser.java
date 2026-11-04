@@ -68,12 +68,22 @@ public final class VrBowLaser {
         if (player == null || !VR.active()) {
             return;
         }
-        ItemStack bow = player.getMainHandItem();
-        if (!(bow.getItem() instanceof GunItem gunItem) || !BOW_ID.equals(VrGunPose.gunId(bow))
-                || ChargeTracker.getChargeTime(player.getUUID()) <= 0) {
+        if (ChargeTracker.getChargeTime(player.getUUID()) > 0) {
+            drawBeam(event, mc, player, InteractionHand.MAIN_HAND, VR.mainHandAim());
+        }
+        if (VrOffhandShooting.triggerTakenOver() && VrOffhandShooting.holdFire() > 0) {
+            drawBeam(event, mc, player, InteractionHand.OFF_HAND, VR.offHandAim());
+        }
+    }
+
+    /** The beam of the bow in {@code hand}, which is being drawn. */
+    private static void drawBeam(RenderLevelStageEvent event, Minecraft mc, LocalPlayer player, InteractionHand hand,
+                                 VR.Aim handAim) {
+        ItemStack bow = player.getItemInHand(hand);
+        if (!(bow.getItem() instanceof GunItem gunItem) || !BOW_ID.equals(VrGunPose.gunId(bow))) {
             return;
         }
-        VR.Aim aim = VrPrecision.aim(InteractionHand.MAIN_HAND, VR.mainHandAim());
+        VR.Aim aim = VrPrecision.aim(hand, handAim);
         if (aim == null || aim.dir().lengthSqr() < 1.0E-6) {
             return;
         }

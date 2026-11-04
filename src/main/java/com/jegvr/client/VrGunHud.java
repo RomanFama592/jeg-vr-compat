@@ -34,10 +34,10 @@ import ttv.migami.jeg.modifier.Modifier;
 import ttv.migami.jeg.modifier.ModifierHelper;
 
 /**
- * F9.9: each gun's name, loaded rounds and reserve float beside the hand that holds it, with the main-hand gun's meters
- * below them. It shows what JEG's overlay ({@code GuiRenderer}) shows for the main-hand gun, which this replaces while it
- * is on (see {@code GuiRendererVRMixin}). JEG's meters belong to its main-hand trigger ({@link ShootingHandler}): an
- * off-hand gun fires at once, with nothing to fill.
+ * F9.9: each gun's name, loaded rounds, reserve and meters float beside the hand that holds it. It shows what JEG's
+ * overlay ({@code GuiRenderer}) shows for the main-hand gun, which this replaces while it is on (see
+ * {@code GuiRendererVRMixin}). The meters read {@link ShootingHandler} for the main hand and {@link VrOffhandShooting}
+ * for the off hand.
  * <p>
  * The panel follows the controller, on the side towards the body so it does not cover the sights, and always faces the
  * headset, so both eyes see the same flat panel.
@@ -97,7 +97,8 @@ public final class VrGunHud {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack stack = player.getItemInHand(hand);
             boolean ammo = showAmmo && showsAmmo(stack);
-            boolean meters = showMeters && hand == InteractionHand.MAIN_HAND && hasMeters(stack);
+            boolean mainHand = hand == InteractionHand.MAIN_HAND;
+            boolean meters = showMeters && (mainHand || VrOffhandShooting.triggerTakenOver()) && hasMeters(stack);
             if (ammo || meters) {
                 Vec3 anchor = anchor(hand);
                 if (anchor != null) {
@@ -111,7 +112,7 @@ public final class VrGunHud {
                         drawAmmo(mc.font, player, stack, hand, pose, buffers);
                     }
                     if (meters) {
-                        drawMeters(stack, pose, buffers);
+                        drawMeters(stack, mainHand, pose, buffers);
                     }
                     pose.popPose();
                 }
@@ -189,20 +190,23 @@ public final class VrGunHud {
     }
 
     /** JEG's meters, in its order: overheating, charge while holding, wind-up before firing. */
-    private static void drawMeters(ItemStack stack, PoseStack pose, MultiBufferSource buffers) {
+    private static void drawMeters(ItemStack stack, boolean mainHand, PoseStack pose, MultiBufferSource buffers) {
         Gun.General general = ((GunItem) stack.getItem()).getModifiedGun(stack).getGeneral();
         ShootingHandler shooting = ShootingHandler.get();
         float y = METERS_Y;
         if (general.getOverheatTimer() != 0) {
-            meter(OVERHEAT, y, (float) shooting.getOverheatTimer() / general.getOverheatTimer(), pose, buffers);
+            int heat = mainHand ? shooting.getOverheatTimer() : VrOffhandShooting.overheatTimer();
+            meter(OVERHEAT, y, (float) heat / general.getOverheatTimer(), pose, buffers);
             y += METER_STEP;
         }
         if (general.getMaxHoldFire() != 0) {
-            meter(POWER, y, (float) shooting.getHoldFire() / general.getMaxHoldFire(), pose, buffers);
+            int hold = mainHand ? shooting.getHoldFire() : VrOffhandShooting.holdFire();
+            meter(POWER, y, (float) hold / general.getMaxHoldFire(), pose, buffers);
             y += METER_STEP;
         }
         if (general.getFireTimer() != 0) {
-            meter(HOLD, y, (float) shooting.getFireTimer() / general.getFireTimer(), pose, buffers);
+            int windUp = mainHand ? shooting.getFireTimer() : VrOffhandShooting.fireTimer();
+            meter(HOLD, y, (float) windUp / general.getFireTimer(), pose, buffers);
         }
     }
 
