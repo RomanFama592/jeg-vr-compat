@@ -72,6 +72,7 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 ## Comandos
 - `./gradlew build` — compila (debe pasar sin warnings de mixin).
 - `./gradlew runClient` — cliente de prueba (flat).
+- `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
 - Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `MULTIJUGADOR.md`.
 - Logs de mixin: añadir `-Dmixin.debug.export=true -Dmixin.debug.verbose=true` en el run config si un inject no aplica.
 - El usuario prueba VR manualmente; tras cada fase dejá un checklist de prueba en `TESTING.md`.
