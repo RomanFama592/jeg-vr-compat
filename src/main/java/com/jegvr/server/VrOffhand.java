@@ -3,6 +3,7 @@ package com.jegvr.server;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
@@ -11,9 +12,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ShootTracker;
 import ttv.migami.jeg.common.network.ServerPlayHandler;
+import ttv.migami.jeg.event.FlashlightEvent;
 import ttv.migami.jeg.init.ModSyncedDataKeys;
 import ttv.migami.jeg.item.AnimatedGunItem;
 import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.item.attachment.IAttachment;
 import ttv.migami.jeg.network.message.C2SMessagePreFireSound;
 import ttv.migami.jeg.network.message.C2SMessageShoot;
 import ttv.migami.jeg.util.GunModifierHelper;
@@ -42,6 +45,7 @@ public final class VrOffhand {
     private static final String CHARGE_KEY = "ChargeProgress";
 
     private static boolean firing;
+    private static boolean attachmentsPass;
 
     private VrOffhand() {
     }
@@ -145,11 +149,40 @@ public final class VrOffhand {
             RELOADING.remove(player.getUUID());
         }
         ItemStack offhand = player.getOffhandItem();
+        tickAttachments(event, player, offhand);
         tickShootAnimation(offhand);
         CompoundTag tag = offhand.getTag();
         if (!jegReloading && tag != null && tag.getBoolean("IsReloading") && offhand.getItem() instanceof GunItem) {
             tag.remove("IsReloading");
         }
+    }
+
+    /**
+     * JEG runs the flashlight and the laser pointer of the main-hand gun every tick. Run them for the off-hand gun too,
+     * while the client reports where that gun points: without that record the player is not in VR with this addon.
+     */
+    private static void tickAttachments(TickEvent.PlayerTickEvent event, Player player, ItemStack offhand) {
+        if (player.level().isClientSide || !(offhand.getItem() instanceof GunItem)
+                || !Gun.hasAttachmentEquipped(offhand, IAttachment.Type.SPECIAL)
+                || VrServerAim.muzzleFor(player, InteractionHand.OFF_HAND) == null
+                || VrServerAim.directionFor(player, InteractionHand.OFF_HAND) == null) {
+            return;
+        }
+        attachmentsPass = true;
+        try {
+            FlashlightEvent.laserPointer(event);
+            FlashlightEvent.flashlight(event);
+        } finally {
+            attachmentsPass = false;
+        }
+    }
+
+    /**
+     * True while JEG's flashlight and laser pointer run for the off-hand gun. Only set on the server thread; JEG stops
+     * before any of the calls that read it when the player is on the client side.
+     */
+    public static boolean attachmentsPass() {
+        return attachmentsPass;
     }
 
     /**

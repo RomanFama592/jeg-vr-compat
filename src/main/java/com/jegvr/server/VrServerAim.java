@@ -75,6 +75,16 @@ public final class VrServerAim {
         return aim.muzzle;
     }
 
+    /** Unit vector along the barrel of the gun in {@code hand} from a fresh record, or null without one. */
+    public static Vec3 directionFor(LivingEntity shooter, InteractionHand hand) {
+        Aim aim = map(hand).get(shooter.getUUID());
+        if (aim == null || shooter.level().getGameTime() - aim.gameTime > MAX_AGE_TICKS
+                || aim.direction.lengthSqr() < 1.0E-6) {
+            return null;
+        }
+        return aim.direction.normalize();
+    }
+
     private static Map<UUID, Aim> map(InteractionHand hand) {
         return hand == InteractionHand.OFF_HAND ? OFF_HAND : MAIN_HAND;
     }

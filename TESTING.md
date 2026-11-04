@@ -315,6 +315,9 @@ Se prueba en un mundo de un jugador (ya tiene el addon en el servidor).
   - Retroceso: la minigun y el lanzacohetes en la secundaria empujan al personaje, en sentido contrario a donde apunta esa arma. Agachado, la mitad.
   - Cambiar de mano: sobrecalentá la minigun y cambiala de mano. Sigue caliente y bloqueada, y se enfría desde donde estaba. Lo mismo con la cadencia del lanzacohetes: disparar y cambiar de mano no deja volver a disparar antes de tiempo, para los dos lados.
   - Typhoonee en la secundaria: el rayo va hacia donde apunta esa mano, no la principal, y le pega a lo que apunta. También en la principal con modo precisión.
+- [ ] Linterna acoplada a un arma en la secundaria (prendida con un golpe): ilumina hacia donde apunta esa arma, sigue a la mano y se apaga al golpear de nuevo. Corriendo se apaga, como en JEG.
+- [ ] Linterna en un arma en cada mano: cada una ilumina hacia su lado.
+- [ ] Puntero láser acoplado a un arma en la secundaria: el punto cae donde apunta esa arma.
 - [ ] Mano principal y flat: sin cambios.
 
 ## Exclusión de la hotbar (F9.19)

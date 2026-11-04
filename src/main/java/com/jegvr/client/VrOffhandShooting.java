@@ -28,6 +28,7 @@ import ttv.migami.jeg.compat.PlayerReviveHelper;
 import ttv.migami.jeg.event.GunFireEvent;
 import ttv.migami.jeg.init.ModItems;
 import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.item.attachment.IAttachment;
 import ttv.migami.jeg.network.PacketHandler;
 import ttv.migami.jeg.network.message.C2SMessageBurnPlayer;
 import ttv.migami.jeg.network.message.C2SMessageOverheat;
@@ -104,6 +105,10 @@ public final class VrOffhandShooting {
                 && !VR.isBow(player.getMainHandItem()) && VR.active() && VrAim.serverHasAddon();
         if (player != null) {
             trackHandSwap(player);
+            // The server needs to know where the gun points for its flashlight or laser pointer, not only when it fires.
+            if (triggerTakenOver && Gun.hasAttachmentEquipped(player.getOffhandItem(), IAttachment.Type.SPECIAL)) {
+                VrAim.offHandShotRotation();
+            }
         }
         if (player == null || mc.screen != null || mc.getOverlay() != null) {
             trigger = false;
