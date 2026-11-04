@@ -32,6 +32,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
+    public static final ForgeConfigSpec.BooleanValue GUN_HUD;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -56,8 +57,12 @@ public final class VrClientConfig {
                 .define("mirrorLeftHand", true);
         BOW_LASER = builder
                 .comment("Laser sight on JEG's compound bow while it is drawn: follows the arrow's predicted flight",
-                        "for 16 blocks, fading out over the last 5.")
+                        "for 32 blocks, fading out over the last 5.")
                 .define("bowLaser", true);
+        GUN_HUD = builder
+                .comment("Each gun's name and ammo float beside the hand that holds it, instead of JEG's ammo overlay",
+                        "on the HUD (which only shows the main-hand gun).")
+                .define("gunHud", true);
         builder.pop();
         SPEC = builder.build();
     }
@@ -88,6 +93,15 @@ public final class VrClientConfig {
 
     public static boolean bowLaser() {
         return !SPEC.isLoaded() || BOW_LASER.get();
+    }
+
+    public static boolean gunHud() {
+        return !SPEC.isLoaded() || GUN_HUD.get();
+    }
+
+    public static void setGunHud(boolean hud) {
+        GUN_HUD.set(hud);
+        GUN_HUD.save();
     }
 
     public static void setBowLaser(boolean laser) {

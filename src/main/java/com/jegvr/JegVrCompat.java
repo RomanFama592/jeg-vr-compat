@@ -9,6 +9,7 @@ import com.jegvr.client.VrDiag;
 import com.jegvr.client.VrDualReload;
 import com.jegvr.client.VrBowLaser;
 import com.jegvr.client.VrGrabReload;
+import com.jegvr.client.VrGunHud;
 import com.jegvr.client.VrKeys;
 import com.jegvr.client.VrOffhandShooting;
 import com.jegvr.client.VrPrecision;
@@ -63,6 +64,7 @@ public class JegVrCompat {
             MinecraftForge.EVENT_BUS.register(VrGrabReload.class);
             MinecraftForge.EVENT_BUS.register(VrPrecision.class);
             MinecraftForge.EVENT_BUS.register(VrBowLaser.class);
+            MinecraftForge.EVENT_BUS.register(VrGunHud.class);
         }
         VR.preload();
         LOGGER.info("Vivecraft present: {}, VR active at startup: {}", VR.loaded(), VR.active());

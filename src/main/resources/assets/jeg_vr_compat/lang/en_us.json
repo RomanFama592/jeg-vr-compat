@@ -22,5 +22,8 @@
   "jeg_vr_compat.config.mirrorLeftHand": "Mirror left-hand guns",
   "jeg_vr_compat.config.mirrorLeftHand.tooltip": "Guns in the left controller look made for the left hand (bolt and ejection port on the other side), animation included.",
   "jeg_vr_compat.config.bowLaser": "Compound bow laser",
-  "jeg_vr_compat.config.bowLaser.tooltip": "While drawing the compound bow, a laser follows the arrow's predicted flight (16 blocks, fading over the last 5)."
+  "jeg_vr_compat.config.bowLaser.tooltip": "While drawing the compound bow, a laser follows the arrow's predicted flight (32 blocks, fading over the last 5).",
+  "jeg_vr_compat.config.gunHud": "Ammo beside each hand",
+  "jeg_vr_compat.config.gunHud.tooltip": "Each gun's name and ammo float beside its hand, instead of JEG's ammo overlay on the HUD.",
+  "jeg_vr_compat.hud.reloading": "Reloading"
 }

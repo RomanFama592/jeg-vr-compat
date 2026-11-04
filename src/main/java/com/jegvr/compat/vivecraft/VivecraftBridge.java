@@ -56,6 +56,15 @@ public final class VivecraftBridge {
         return d == null ? null : pose(d.hmd);
     }
 
+    public static Vec3 hmdUp() {
+        VRData d = data();
+        if (d == null) {
+            return null;
+        }
+        Vector3f up = d.hmd.getCustomVector(new Vector3f(0.0F, 1.0F, 0.0F));
+        return new Vec3(up.x, up.y, up.z);
+    }
+
     /** {@code dir} (world space) in a controller's own axes, the frame the gun held in that hand is drawn in. */
     public static Vec3 toHandLocal(boolean mainHand, Vec3 dir) {
         VRData d = data();

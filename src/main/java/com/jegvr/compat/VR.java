@@ -128,6 +128,19 @@ public final class VR {
         }
     }
 
+    /** The headset's up axis in world space, or null outside VR. */
+    public static Vec3 hmdUp() {
+        if (!active()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.hmdUp();
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
     /** Vivecraft's world scale (1 = real size); distances measured in metres in the room scale with it. */
     public static float worldScale() {
         if (!active()) {

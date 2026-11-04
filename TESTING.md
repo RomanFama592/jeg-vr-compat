@@ -278,3 +278,17 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] VR, Finger Gun tirado en el suelo o en un marco: se ve.
 - [x] VR, otra arma en la mano: no aparecen brazos estáticos de JEG (sin cambios).
 - [x] Flat: el Finger Gun se ve igual que siempre.
+
+## F9.9 (nombre y munición junto a cada mano)
+- [x] (auto) Compila; `GuiRendererVRMixin` aplica al arrancar (29 mezclas).
+- [ ] VR, arma en la principal: junto a la mano, del lado del cuerpo, flota el nombre (con el color de JEG), la munición cargada en grande y la reserva en gris. Sigue a la mano y siempre mira hacia vos; no tapa la mira.
+- [ ] El contador de JEG ya no aparece en la HUD de Vivecraft (el nombre y la munición no están repetidos).
+- [ ] Un arma en cada mano: cada mano muestra lo suyo; al disparar baja solo el número de esa arma.
+- [ ] Arma solo en la secundaria (con el addon en el servidor): el panel aparece en esa mano.
+- [ ] Recargar: el arma que recarga muestra "Recargando" (sin reserva) y la otra sigue normal.
+- [ ] Reserva: cambia al sumar o sacar munición del inventario; en creativo dice 9999.
+- [ ] Manos invertidas: cada panel sigue del lado del cuerpo.
+- [ ] Sin panel: Finger Gun, trompeta, sin arma, con un menú abierto o con F1.
+- [ ] Modo sentado de Vivecraft: sin paneles; vuelve el contador de JEG.
+- [ ] Config → "Munición junto a cada mano" = No: sin paneles; vuelve el contador de JEG.
+- [ ] Flat: el contador de JEG igual que siempre.

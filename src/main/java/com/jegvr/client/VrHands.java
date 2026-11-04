@@ -72,6 +72,10 @@ public final class VrHands {
         reloadingHand = hand;
     }
 
+    public static InteractionHand reloadingHand() {
+        return reloadingHand;
+    }
+
     /**
      * JEG's per-player "reloading" flag, as the gun animation sees it. It does not say which gun reloads, so a reload of
      * one hand (even JEG's automatic one with no ammo for that gun) would animate the other hand's gun too: only the
