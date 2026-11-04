@@ -22,7 +22,7 @@
   "jeg_vr_compat.config.mirrorLeftHand": "Espejar armas en la izquierda",
   "jeg_vr_compat.config.mirrorLeftHand.tooltip": "Las armas en el control izquierdo se ven hechas para esa mano (cerrojo y eyector del otro lado), con su animación.",
   "jeg_vr_compat.config.bowLaser": "Láser del arco compuesto",
-  "jeg_vr_compat.config.bowLaser.tooltip": "Al tensar el arco compuesto, un láser sigue el vuelo predicho de la flecha (32 bloques, se desvanece en los últimos 5).",
+  "jeg_vr_compat.config.bowLaser.tooltip": "Al tensar el arco compuesto, un láser sigue el vuelo predicho de la flecha (32 bloques, transparente hacia la punta).",
   "jeg_vr_compat.config.gunHud": "Munición junto a cada mano",
   "jeg_vr_compat.config.gunHud.tooltip": "El nombre, la munición y los medidores de cada arma flotan junto a su mano, en lugar de lo que JEG muestra en la HUD.",
   "jeg_vr_compat.config.hudExclusion": "Hotbar en la mano con armas de la lista",

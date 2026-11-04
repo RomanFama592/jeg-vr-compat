@@ -30,13 +30,16 @@ import ttv.migami.jeg.particles.LaserData;
 import ttv.migami.jeg.util.GunEnchantmentHelper;
 import ttv.migami.jeg.util.GunModifierHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * F9.15: laser sight on JEG's compound bow. While the bow is drawn, a beam leaves the muzzle and follows the arrow's
- * predicted flight for up to {@link #LENGTH} blocks, fading out over the last {@link #FADE} blocks, and stops at the
- * first block or entity the arrow would hit.
+ * predicted flight for up to {@link #LENGTH} blocks, stopping at the first block or entity the arrow would hit.
  * <p>
- * It looks like JEG's laser pointer attachment: a thin solid bar, as thick as the attachment's in a VR hand, almost white
- * at the muzzle and then translucent red (the colours of {@code laser_pointer.png}), and on a block JEG's own red dot.
+ * It looks like JEG's laser pointer attachment: a thin solid bar, as thick as the attachment's in a VR hand, whose colour
+ * and transparency along its length are those of {@code laser_pointer.png}, stretched over the beam: almost white and
+ * solid at the muzzle, translucent red along it and transparent at the tip. On a block it ends in JEG's own red dot.
  * <p>
  * The prediction copies JEG's {@code ProjectileEntity}: the arrow starts with the bow's projectile speed (with its
  * enchantment and attachment modifiers) and every tick it moves by its velocity, then gravity (-0.04 blocks/tick,
@@ -47,25 +50,23 @@ public final class VrBowLaser {
     /** JEG's base projectile gravity, in blocks per tick squared ({@code ProjectileEntity} constructor). */
     private static final double JEG_GRAVITY = -0.04;
     private static final double LENGTH = 32.0;
-    private static final double FADE = 5.0;
-    /** The beam is drawn in pieces this long so the fade and the arc look smooth. */
+    /** The beam is drawn in pieces this long so the gradient and the arc look smooth. */
     private static final double PIECE = 0.25;
     /** Simulated ticks at most (a slow arrow pointing down could otherwise loop for long). */
     private static final int MAX_TICKS = 200;
     private static final double DOT = 0.03;
+    private static final float DOT_ALPHA = 0.9F;
     /** Same muzzle offset {@link VrAim} reports to the server. */
     private static final double MUZZLE_FORWARD = 0.3;
     /** Half the bar's side in room-scale metres: the attachment's 0.16 pixels at the default gun scale. */
     private static final double HALF_WIDTH = 0.003;
     /** Half the bar's side per block from the eye, so it stays about a pixel wide in the distance instead of breaking up. */
     private static final double HALF_WIDTH_PER_BLOCK = 0.0006;
-    /** How far from the muzzle the beam goes from almost white to its red. */
-    private static final double HOT_LENGTH = 0.4;
     private static final float RED = 1.0F;
-    private static final float TINT_HOT = 0.78F;
-    private static final float TINT = 0.27F;
-    private static final float ALPHA_NEAR = 0.65F;
-    private static final float ALPHA_FAR = 0.45F;
+    /** Sampled along the beam in {@code laser_pointer.png}: place from muzzle (0) to tip (1), green and blue, alpha. */
+    private static final float[] PLACES = {0.0F, 0.03F, 0.06F, 0.1F, 0.13F, 0.23F, 0.35F, 0.55F, 0.68F, 0.74F, 0.84F, 0.9F, 1.0F};
+    private static final float[] TINTS = {0.78F, 0.55F, 0.43F, 0.32F, 0.29F, 0.27F, 0.26F, 0.23F, 0.19F, 0.19F, 0.09F, 0.0F, 0.0F};
+    private static final float[] ALPHAS = {1.0F, 1.0F, 1.0F, 0.76F, 0.64F, 0.58F, 0.51F, 0.42F, 0.33F, 0.22F, 0.09F, 0.05F, 0.0F};
     /** How far off the block's face JEG puts its dot ({@code ClientPlayHandler.handleLaser}). */
     private static final double DOT_LIFT = 0.005;
 
@@ -112,13 +113,16 @@ public final class VrBowLaser {
         double worldScale = VR.worldScale();
         Vec3 start = aim.pos().add(dir.scale(MUZZLE_FORWARD * worldScale));
 
+        List<Vec3> flight = new ArrayList<>();
+        flight.add(start);
+        HitResult hit = trace(player, start, dir.scale(speed), gravity, flight);
+
         PoseStack pose = event.getPoseStack();
         Vec3 cam = event.getCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
-        VertexConsumer quads = buffers.getBuffer(RenderType.debugQuads());
-        HitResult hit = trace(player, start, dir.scale(speed), gravity, cam, worldScale, pose.last().pose(), quads);
+        drawFlight(pose.last().pose(), buffers.getBuffer(RenderType.debugQuads()), flight, cam, worldScale);
         buffers.endBatch(RenderType.debugQuads());
         if (hit instanceof BlockHitResult block) {
             jegDot(mc, hand, block);
@@ -127,7 +131,7 @@ public final class VrBowLaser {
             double half = DOT * worldScale;
             LevelRenderer.addChainedFilledBoxVertices(pose, buffers.getBuffer(RenderType.debugFilledBox()),
                     at.x - half, at.y - half, at.z - half, at.x + half, at.y + half, at.z + half,
-                    RED, TINT, TINT, alphaAt(start.distanceTo(at)));
+                    RED, TINTS[5], TINTS[5], DOT_ALPHA);
             buffers.endBatch(RenderType.debugFilledBox());
         }
         pose.popPose();
@@ -145,9 +149,8 @@ public final class VrBowLaser {
         mc.level.addParticle(new LaserData(face, block.getBlockPos()), false, at.x, at.y, at.z, 0.0, 0.0, 0.0);
     }
 
-    /** Draws the flight tick by tick; returns what it hits within the beam's length, or null. */
-    private static HitResult trace(LocalPlayer player, Vec3 start, Vec3 velocity, double gravity, Vec3 cam, double worldScale,
-                                   Matrix4f matrix, VertexConsumer quads) {
+    /** Follows the flight tick by tick, adding each point to {@code flight}; returns what it hits within the beam's length. */
+    private static HitResult trace(LocalPlayer player, Vec3 start, Vec3 velocity, double gravity, List<Vec3> flight) {
         Vec3 pos = start;
         Vec3 vel = velocity;
         double travelled = 0.0;
@@ -159,10 +162,11 @@ public final class VrBowLaser {
             // The part of this tick's segment still inside the beam.
             Vec3 end = pos.add(vel.scale(Math.min(1.0, (LENGTH - travelled) / step)));
             HitResult hit = firstHit(player, pos, end);
-            drawSegment(matrix, quads, pos, hit != null ? hit.getLocation() : end, travelled, cam, worldScale);
             if (hit != null) {
+                flight.add(hit.getLocation());
                 return hit;
             }
+            flight.add(end);
             travelled += pos.distanceTo(end);
             pos = end;
             vel = vel.add(0.0, gravity, 0.0);
@@ -188,9 +192,27 @@ public final class VrBowLaser {
         return !entity.isSpectator() && entity.isPickable();
     }
 
-    /** One straight piece of the flight, split so each piece gets the look of its distance along the beam. */
-    private static void drawSegment(Matrix4f matrix, VertexConsumer quads, Vec3 from, Vec3 to, double travelled, Vec3 cam,
-                                    double worldScale) {
+    /** The whole beam; the gradient runs from its start to wherever it ends, as the texture does on JEG's. */
+    private static void drawFlight(Matrix4f matrix, VertexConsumer quads, List<Vec3> flight, Vec3 cam, double worldScale) {
+        double total = 0.0;
+        for (int i = 1; i < flight.size(); i++) {
+            total += flight.get(i - 1).distanceTo(flight.get(i));
+        }
+        if (total < 1.0E-6) {
+            return;
+        }
+        double travelled = 0.0;
+        for (int i = 1; i < flight.size(); i++) {
+            Vec3 from = flight.get(i - 1);
+            Vec3 to = flight.get(i);
+            drawSegment(matrix, quads, from, to, travelled, total, cam, worldScale);
+            travelled += from.distanceTo(to);
+        }
+    }
+
+    /** One straight piece of the flight, split so the gradient and the width change smoothly along it. */
+    private static void drawSegment(Matrix4f matrix, VertexConsumer quads, Vec3 from, Vec3 to, double travelled, double total,
+                                    Vec3 cam, double worldScale) {
         double length = from.distanceTo(to);
         if (length < 1.0E-6) {
             return;
@@ -202,41 +224,38 @@ public final class VrBowLaser {
         for (int i = 0; i < pieces; i++) {
             Vec3 a = from.lerp(to, (double) i / pieces);
             Vec3 b = from.lerp(to, (double) (i + 1) / pieces);
-            double distance = travelled + length * i / pieces;
+            float placeA = (float) ((travelled + length * i / pieces) / total);
+            float placeB = (float) ((travelled + length * (i + 1) / pieces) / total);
             double half = HALF_WIDTH * worldScale + HALF_WIDTH_PER_BLOCK * a.distanceTo(cam);
             Vec3 s = side.scale(half);
             Vec3 u = up.scale(half);
-            float tint = tintAt(distance);
-            float alpha = alphaAt(distance);
-            face(matrix, quads, a, b, s, u, tint, alpha);
-            face(matrix, quads, a, b, u, s.scale(-1.0), tint, alpha);
-            face(matrix, quads, a, b, s.scale(-1.0), u.scale(-1.0), tint, alpha);
-            face(matrix, quads, a, b, u.scale(-1.0), s, tint, alpha);
+            face(matrix, quads, a, b, s, u, placeA, placeB);
+            face(matrix, quads, a, b, u, s.scale(-1.0), placeA, placeB);
+            face(matrix, quads, a, b, s.scale(-1.0), u.scale(-1.0), placeA, placeB);
+            face(matrix, quads, a, b, u.scale(-1.0), s, placeA, placeB);
         }
     }
 
     /** One long side of the bar: from {@code offset} + {@code width} to {@code offset} - {@code width} around the axis. */
-    private static void face(Matrix4f matrix, VertexConsumer quads, Vec3 a, Vec3 b, Vec3 offset, Vec3 width, float tint, float alpha) {
-        vertex(matrix, quads, a.add(offset).add(width), tint, alpha);
-        vertex(matrix, quads, b.add(offset).add(width), tint, alpha);
-        vertex(matrix, quads, b.add(offset).subtract(width), tint, alpha);
-        vertex(matrix, quads, a.add(offset).subtract(width), tint, alpha);
+    private static void face(Matrix4f matrix, VertexConsumer quads, Vec3 a, Vec3 b, Vec3 offset, Vec3 width, float placeA, float placeB) {
+        vertex(matrix, quads, a.add(offset).add(width), placeA);
+        vertex(matrix, quads, b.add(offset).add(width), placeB);
+        vertex(matrix, quads, b.add(offset).subtract(width), placeB);
+        vertex(matrix, quads, a.add(offset).subtract(width), placeA);
     }
 
-    private static void vertex(Matrix4f matrix, VertexConsumer quads, Vec3 p, float tint, float alpha) {
-        quads.vertex(matrix, (float) p.x, (float) p.y, (float) p.z).color(RED, tint, tint, alpha).endVertex();
+    private static void vertex(Matrix4f matrix, VertexConsumer quads, Vec3 p, float place) {
+        float tint = sample(TINTS, place);
+        quads.vertex(matrix, (float) p.x, (float) p.y, (float) p.z).color(RED, tint, tint, sample(ALPHAS, place)).endVertex();
     }
 
-    /** Green and blue of the colour: nearly white at the muzzle, then red. */
-    private static float tintAt(double distance) {
-        return distance >= HOT_LENGTH ? TINT : (float) (TINT_HOT + (TINT - TINT_HOT) * distance / HOT_LENGTH);
-    }
-
-    /** Solid at the muzzle, translucent along the beam, and fading to nothing from LENGTH - FADE to LENGTH. */
-    private static float alphaAt(double distance) {
-        float alpha = distance >= HOT_LENGTH ? ALPHA_NEAR + (ALPHA_FAR - ALPHA_NEAR) * (float) (distance / LENGTH)
-                : 1.0F + (ALPHA_NEAR - 1.0F) * (float) (distance / HOT_LENGTH);
-        double fadeStart = LENGTH - FADE;
-        return distance <= fadeStart ? alpha : (float) Math.max(0.0, alpha * (1.0 - (distance - fadeStart) / FADE));
+    private static float sample(float[] values, float place) {
+        for (int i = 1; i < PLACES.length; i++) {
+            if (place <= PLACES[i]) {
+                float t = (place - PLACES[i - 1]) / (PLACES[i] - PLACES[i - 1]);
+                return values[i - 1] + (values[i] - values[i - 1]) * t;
+            }
+        }
+        return values[values.length - 1];
     }
 }

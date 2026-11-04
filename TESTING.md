@@ -265,10 +265,10 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [x] (auto) Compila; aplican 28 mezclas; config `visuals.bowLaser = true` y botón en la pantalla de config.
 - [x] Usuario: el haz se ve bien; pidió 32 bloques (hecho: se desvanece en los últimos 5, del 27 al 32).
 - [ ] VR, arco compuesto (`jeg:compound_bow`) en la principal: sin tensar no hay láser. Al tensar (mantener el gatillo) sale un haz rojo desde la punta del arco hacia donde apunta.
-- [ ] El haz mide unos 32 bloques: se ve entero hasta ~27 y se desvanece hasta desaparecer a los 32.
+- [ ] El haz mide unos 32 bloques en el aire y se vuelve transparente de a poco hasta desaparecer en la punta.
 - [ ] Apuntando a un bloque o a un mob a menos de 32 bloques: el haz se corta ahí y aparece un punto rojo; la flecha cae en ese punto.
 - [ ] Apuntando hacia arriba o abajo: el haz sigue la curva de la flecha (con la velocidad del arco es casi recto en 16 bloques; la curva se nota poco).
-- [ ] Aspecto (pedido del usuario): el haz se parece al del puntero láser de JEG: barra fina continua, casi blanca en la boca y después roja translúcida, sin cortarse a lo lejos. En un bloque, el punto es el de JEG, pegado a la cara del bloque.
+- [ ] Aspecto (pedido del usuario): el haz se parece al del puntero láser de JEG: barra fina continua, casi blanca en la boca, después roja translúcida y transparente en la punta, tanto en el aire como al chocar con un bloque cercano; sin cortarse a lo lejos. En un bloque, el punto es el de JEG, pegado a la cara del bloque.
 - [ ] Modo precisión (dos manos): el haz sigue la línea de las dos manos.
 - [ ] Al soltar (disparo) o cambiar de arma, el láser desaparece. El arco primitivo no tiene láser.
 - [ ] Config → "Láser del arco compuesto" = No: no aparece.

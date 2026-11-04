@@ -61,7 +61,7 @@ public final class VrClientConfig {
                 .define("mirrorLeftHand", true);
         BOW_LASER = builder
                 .comment("Laser sight on JEG's compound bow while it is drawn: follows the arrow's predicted flight",
-                        "for 32 blocks, fading out over the last 5.")
+                        "for 32 blocks, turning transparent towards the tip.")
                 .define("bowLaser", true);
         GUN_HUD = builder
                 .comment("Each gun's name, ammo and meters float beside the hand that holds it, instead of JEG's overlay",
