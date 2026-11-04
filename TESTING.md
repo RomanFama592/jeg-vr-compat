@@ -326,13 +326,13 @@ Con la HUD de Vivecraft en la mano o la muñeca, y "Hotbar con arma en la secund
 - [ ] La pantalla de config entra entera con todas las opciones (botón Listo visible), también con la escala de GUI más grande.
 
 ## F9.20 (animaciones de JEG eliminadas en VR: carrera, cuerpo a cuerpo, bayoneta y atasco)
-- [x] (auto) Compila; `AnimatedGunItemVRMixin` y `AnimationProcessorVRMixin` aplican al arrancar (32 mezclas). Sin validar en una partida.
-- [ ] VR, correr con un arma: el arma no se mueve.
-- [ ] VR, cuerpo a cuerpo y bayoneta: el arma no se mueve; el golpe funciona.
-- [ ] VR, atasco (rifle de ráfaga o de combate), si se da: el arma no se mueve.
-- [ ] VR, disparar: el modelo anima (cerrojo, corredera) como antes, y salen casquillos y sonidos.
-- [ ] VR, cambiar de arma: se ve la animación de sacar, con su sonido.
-- [ ] VR, arcos: al cargar se tensa la cuerda en el modelo.
-- [ ] VR, recargar (revólver, escopeta, rifle con cargador) e inspeccionar (tecla Y): las animaciones se ven completas.
-- [ ] Partes escondidas: con el lanzacohetes, la ametralladora ligera y el rifle Blossom no aparece ninguna pieza de más al correr, y el arma no se corre de lugar.
-- [ ] Flat: todas las animaciones de JEG, como siempre.
+- [x] (auto) Compila; `AnimatedGunItemVRMixin` y `AnimationProcessorVRMixin` aplican al arrancar (32 mezclas).
+- [x] VR, correr con un arma: el arma no se mueve.
+- [x] VR, cuerpo a cuerpo y bayoneta: el arma no se mueve; el golpe funciona.
+- [x] VR, atasco (rifle de ráfaga o de combate), si se da: el arma no se mueve.
+- [x] VR, disparar: el modelo anima (cerrojo, corredera) como antes, y salen casquillos y sonidos.
+- [x] VR, cambiar de arma: se ve la animación de sacar, con su sonido.
+- [x] VR, arcos: al cargar se tensa la cuerda en el modelo.
+- [x] VR, recargar (revólver, escopeta, rifle con cargador) e inspeccionar (tecla Y): las animaciones se ven completas.
+- [x] Partes escondidas: con el lanzacohetes, la ametralladora ligera y el rifle Blossom no aparece ninguna pieza de más al correr, y el arma no se corre de lugar.
+- [x] Flat: todas las animaciones de JEG, como siempre.
