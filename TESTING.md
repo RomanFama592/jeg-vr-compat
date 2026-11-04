@@ -324,3 +324,16 @@ Con la HUD de Vivecraft en la mano o la muñeca, y "Hotbar con arma en la secund
 - [ ] Config → "Hotbar en la mano con armas de la lista" = No: la minigun se comporta como las demás.
 - [ ] Config → agregar otra arma al campo de texto (por ejemplo `jeg:minigun, jeg:flamethrower`) y salir con Listo: el lanzallamas también deja la hotbar en la mano, y la lista sigue igual al reabrir la pantalla. Lo mismo editando el `.toml`.
 - [ ] La pantalla de config entra entera con todas las opciones (botón Listo visible), también con la escala de GUI más grande.
+
+## F9.20 (solo animaciones de recarga e inspección en VR)
+- [x] (auto) Compila; `AnimatedGunItemVRMixin` y `AnimationProcessorVRMixin` aplican al arrancar (32 mezclas). Sin validar en una partida.
+- [ ] VR, correr con un arma: el arma no se mueve.
+- [ ] VR, disparar: el modelo no anima (cerrojo, corredera), pero salen casquillos y sonidos como siempre. Sigue la sacudida del addon, que no es de JEG. El cerrojo y la escopeta de bomba eyectan el casquillo con su demora de siempre.
+- [ ] VR, cambiar de arma: no hay animación de sacar, y suena igual.
+- [ ] VR, cuerpo a cuerpo y bayoneta: el arma no se mueve; el golpe funciona.
+- [ ] VR, recargar (revólver, escopeta, rifle con cargador): la animación se ve completa, y al terminar el arma vuelve a su lugar sin saltos.
+- [ ] VR, inspeccionar (tecla Y): la animación se ve completa.
+- [ ] Partes escondidas: con el lanzacohetes, la ametralladora ligera, el rifle Blossom y el arco no aparece ninguna pieza de más al disparar o correr, y el arma no se corre de lugar.
+- [ ] Arcos: se cargan y disparan igual, sin tensar la cuerda en el modelo.
+- [ ] Sobrecalentar la minigun recién sacada: igual que antes.
+- [ ] Flat: todas las animaciones de JEG, como siempre.
