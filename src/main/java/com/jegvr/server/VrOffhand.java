@@ -84,7 +84,26 @@ public final class VrOffhand {
         }
     }
 
-    /** True while an off-hand shot or wind-up sound is being processed (server thread only). */
+    /** JEG's melee attack with the off-hand gun, with the player turned towards the target just for it. */
+    public static void melee(ServerPlayer player, float yaw, float pitch) {
+        if (!canDualWield(player.getOffhandItem()) || firing) {
+            return;
+        }
+        firing = true;
+        float currentYaw = player.getYRot();
+        float currentPitch = player.getXRot();
+        player.setYRot(Mth.wrapDegrees(yaw));
+        player.setXRot(Mth.clamp(pitch, -90.0F, 90.0F));
+        try {
+            ServerPlayHandler.handleMelee(player);
+        } finally {
+            player.setYRot(currentYaw);
+            player.setXRot(currentPitch);
+            firing = false;
+        }
+    }
+
+    /** True while an off-hand shot, wind-up sound or melee attack is being processed (server thread only). */
     public static boolean firing() {
         return firing;
     }

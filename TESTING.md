@@ -11,6 +11,7 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] (sin servidor, pero también pendiente) `.jar` (`-all`) en un Minecraft normal: poses del addon, `guns.json` del usuario y `/jegvr reset` (ver sección "Poses internas").
 - [ ] Dos jugadores en supervivencia: el disparo de la mano libre le baja vida al otro (F8.5).
 - [ ] Dos jugadores: el otro escucha el sonido de cada cartucho metido a mano (F7.8).
+- [ ] Servidor solo con JEG (F9.22): golpear moviendo el arma de la mano principal le pega al mob, también a un costado de donde mirás. Con el addon en el servidor, también con la secundaria.
 - [ ] Servidor dedicado con este `.jar` nuevo (la versión del canal subió a 4: cliente y servidor tienen que tener la misma versión del addon): disparo y medidores de la mano secundaria; el otro jugador escucha la preparación del lanzacohetes en esa mano.
 
 ## Fase 1
@@ -336,3 +337,18 @@ Con la HUD de Vivecraft en la mano o la muñeca, y "Hotbar con arma en la secund
 - [x] VR, recargar (revólver, escopeta, rifle con cargador) e inspeccionar (tecla Y): las animaciones se ven completas.
 - [x] Partes escondidas: con el lanzacohetes, la ametralladora ligera y el rifle Blossom no aparece ninguna pieza de más al correr, y el arma no se corre de lugar.
 - [x] Flat: todas las animaciones de JEG, como siempre.
+
+## F9.22 (melee como la espada de Vivecraft)
+Vivecraft → "Weapon collision" (colisión de armas): en AUTO está apagada en creativo, igual que con la espada. Probar en supervivencia o ponerla en ON.
+- [x] (auto) Compila; `SwingTrackerVRMixin` y `ServerPlayHandlerVRMixin` aplican al arrancar (33 mezclas). `GunModifierHelperVRMixin` se aplica al cargar su clase.
+- [ ] Arma en la principal: un movimiento fuerte contra un mob le pega, con vibración, sonido, partícula y empuje de JEG. Moverla despacio o tocarlo no le pega.
+- [ ] Mob a un costado o atrás de donde mirás: si el arma lo alcanza, le pega igual.
+- [ ] Sin bayoneta pega poco y con bayoneta más (daño de JEG).
+- [ ] Enfriamiento: dos golpes seguidos, el segundo no pega hasta pasar ~¾ s (2 s corriendo). Disparar y golpear comparten esa espera.
+- [ ] Bloques: el arma no los rompe al golpearlos, igual que la espada. Las puertas se siguen abriendo a golpes.
+- [ ] Arma en la secundaria: lo mismo, con el daño de la bayoneta de esa arma.
+- [ ] Arma en cada mano: cada golpe usa su arma.
+- [ ] Minigun y arcos: sin melee de JEG (golpe común de Vivecraft, como antes).
+- [ ] Apuntar y mover el arma rápido cerca de un mob: revisar que no pegue sin querer más de la cuenta.
+- [ ] La tecla de melee de JEG sigue funcionando.
+- [ ] Flat: el melee igual que siempre.

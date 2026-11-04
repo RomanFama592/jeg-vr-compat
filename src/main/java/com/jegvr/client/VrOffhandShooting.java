@@ -280,11 +280,11 @@ public final class VrOffhandShooting {
         }
     }
 
-    private static boolean onCooldown(Item item) {
+    static boolean onCooldown(Item item) {
         return cooldown > 0 && item == cooldownItem;
     }
 
-    private static void startCooldown(Item item, int ticks) {
+    static void startCooldown(Item item, int ticks) {
         cooldown = ticks;
         cooldownItem = item;
     }
