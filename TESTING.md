@@ -345,7 +345,7 @@ Vivecraft → "Weapon collision" (colisión de armas): en AUTO está apagada en 
 - [ ] Mob a un costado o atrás de donde mirás: si el arma lo alcanza, le pega igual.
 - [ ] Sin bayoneta pega poco y con bayoneta más (daño de JEG).
 - [ ] Enfriamiento: dos golpes seguidos, el segundo no pega hasta pasar ~¾ s (2 s corriendo). Disparar y golpear comparten esa espera.
-- [ ] Bloques: el arma no los rompe al golpearlos, igual que la espada. Las puertas se siguen abriendo a golpes.
+- [ ] Bloques y puertas: al golpearlos con el arma pasa lo mismo que con una espada.
 - [ ] Arma en la secundaria: lo mismo, con el daño de la bayoneta de esa arma.
 - [ ] Arma en cada mano: cada golpe usa su arma.
 - [ ] Minigun y arcos: sin melee de JEG (golpe común de Vivecraft, como antes).
