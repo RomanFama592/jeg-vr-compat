@@ -27,6 +27,7 @@ import ttv.migami.jeg.init.ModItems;
 import ttv.migami.jeg.init.ModSyncedDataKeys;
 import ttv.migami.jeg.item.AnimatedGunItem;
 import ttv.migami.jeg.item.GunItem;
+import ttv.migami.jeg.util.GunEnchantmentHelper;
 import ttv.migami.jeg.util.GunModifierHelper;
 
 /**
@@ -59,12 +60,18 @@ public final class VrDualReload {
         }
         // JEG takes this key's click whichever the event is, and only acts when it is a press.
         if (KeyBinds.KEY_UNLOAD.consumeClick() && action == GLFW.GLFW_PRESS) {
-            CompoundTag tag = player.getOffhandItem().getTag();
+            ItemStack stack = player.getOffhandItem();
+            CompoundTag tag = stack.getTag();
             if (tag != null) {
                 tag.putBoolean("IsReloading", false);
             }
             ReloadHandler.get().setReloading(false);
             VrNetwork.CHANNEL.sendToServer(new C2SVrUnloadOffhand());
+            // JEG's unload clears the gun's draw counter, so a main-hand gun plays its draw animation again.
+            if (stack.getItem() instanceof AnimatedGunItem gun) {
+                VrHands.drawOffhand(GunEnchantmentHelper.getModifiedDrawTick(stack,
+                        gun.getModifiedGun(stack).getGeneral().getDrawTimer()));
+            }
             return true;
         }
         return false;

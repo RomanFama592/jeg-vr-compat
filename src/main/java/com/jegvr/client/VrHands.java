@@ -18,6 +18,7 @@ public final class VrHands {
     private static final long FLASH_TICKS = 1;
     private static final int INSPECT_TICKS = 5;
     private static final String INSPECTING_TAG = "IsInspecting";
+    private static final String DRAWING_TAG = "IsDrawing";
 
     private static InteractionHand renderingHand;
     /** The hand whose gun the current JEG reload is for (JEG's RELOADING flag is per player). */
@@ -26,6 +27,8 @@ public final class VrHands {
     private static InteractionHand lastReloadHand = InteractionHand.MAIN_HAND;
     /** JEG inspects the gun whose tag says so for a moment, but it clears the tag of the off-hand gun every tick. */
     private static int offhandInspectTicks;
+    /** The same for the draw animation, whose tag JEG only keeps on the main-hand gun. */
+    private static int offhandDrawTicks;
     private static long mainShotTick = Long.MIN_VALUE;
     private static long offShotTick = Long.MIN_VALUE;
 
@@ -93,6 +96,9 @@ public final class VrHands {
         if (offhandInspectTicks > 0) {
             offhandInspectTicks--;
         }
+        if (offhandDrawTicks > 0) {
+            offhandDrawTicks--;
+        }
     }
 
     public static InteractionHand lastReloadHand() {
@@ -104,9 +110,18 @@ public final class VrHands {
         offhandInspectTicks = INSPECT_TICKS;
     }
 
+    /** Starts the draw animation of the off-hand gun, as long as JEG's own tag would last on a main-hand gun. */
+    public static void drawOffhand(int ticks) {
+        offhandInspectTicks = 0;
+        offhandDrawTicks = ticks;
+    }
+
     /** A boolean of a gun's tag, as the gun animation sees it. */
     public static boolean tagFlag(Player player, String key, boolean original) {
-        return original || (offhandInspectTicks > 0 && INSPECTING_TAG.equals(key) && renderingOffhand(player));
+        if (original || !renderingOffhand(player)) {
+            return original;
+        }
+        return (offhandInspectTicks > 0 && INSPECTING_TAG.equals(key)) || (offhandDrawTicks > 0 && DRAWING_TAG.equals(key));
     }
 
     public static InteractionHand reloadingHand() {

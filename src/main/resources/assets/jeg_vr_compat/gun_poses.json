@@ -18,6 +18,15 @@
       "tz": 0.0,
       "scale": 1.5
     },
+    "jeg:flashlight": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.0,
+      "tz": -0.02,
+      "scale": 0.75
+    },
     "jeg:holy_shotgun": {
       "pitch": 0.0,
       "yaw": 0.0,

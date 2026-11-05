@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Quaternionf;
+import ttv.migami.jeg.item.FlashlightItem;
 import ttv.migami.jeg.item.GunItem;
 import ttv.migami.jeg.item.TrumpetItem;
 
@@ -19,10 +20,12 @@ public final class VrGunPose {
 
     /**
      * Items held like a gun in VR: JEG guns, and the trumpet (F9.11), a 3D model with its bell along -Z that is not a
-     * {@link GunItem}. Vivecraft's per-type transforms are meant for flat sprites and tools and turn it sideways.
+     * {@link GunItem}, and the flashlight, likewise. Vivecraft's per-type transforms are meant for flat sprites and tools
+     * and turn them sideways.
      */
     public static boolean heldLikeGun(ItemStack stack) {
-        return stack.getItem() instanceof GunItem || stack.getItem() instanceof TrumpetItem;
+        return stack.getItem() instanceof GunItem || stack.getItem() instanceof TrumpetItem
+                || stack.getItem() instanceof FlashlightItem;
     }
 
     public static String gunId(ItemStack stack) {

@@ -23,7 +23,8 @@ public class CrosshairHandlerVRMixin {
             return;
         }
         var player = Minecraft.getInstance().player;
-        if (player != null && player.getMainHandItem().getItem() instanceof GunItem
+        if (player != null && (player.getMainHandItem().getItem() instanceof GunItem
+                || player.getOffhandItem().getItem() instanceof GunItem)
                 && event.getOverlay().id().equals(VanillaGuiOverlay.CROSSHAIR.id())) {
             event.setCanceled(true);
         }

@@ -394,5 +394,10 @@ Con `/jegvr zones` para ver la caja.
 - [ ] En violeta, igual que antes. Alejar la mano más de 70 cm, o girarla más de 50°: se suelta.
 
 ## F7.9 (Rocket Launcher cargado a mano)
-- [ ] Meter el cohete a mano: entra sin sacudida del modelo. Vibración y sonido siguen.
-- [ ] Escopeta cargada a mano: la sacudida sigue.
+- [ ] Agarrar el cohete de la cadera y tocar el arma: reproduce la recarga completa, igual que la tecla de recarga, y al terminar tiene el cohete. En las dos manos.
+- [ ] Escopeta cargada a mano: sigue uno a uno, al instante y con sacudida.
+
+## F9.24 (linterna, cruz y descarga en la secundaria)
+- [ ] Linterna en la mano: se ve en el puño, apuntando adelante, en las dos manos. La luz sale hacia donde apunta. Si la pose no convence, `/jegvr` la ajusta como a un arma.
+- [ ] Arma en la secundaria, mano principal vacía o con otro objeto: no se ve la cruz, ni en el mundo ni en el HUD. Sin armas en las manos, vuelve.
+- [ ] Descargar en la secundaria: reproduce "sacar el arma", como en la principal, y devuelve la munición.
