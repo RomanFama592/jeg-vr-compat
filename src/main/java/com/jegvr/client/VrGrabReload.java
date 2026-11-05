@@ -160,11 +160,13 @@ public final class VrGrabReload {
         VR.haptic(true, 0.08F, 0.8F);
         VR.haptic(false, 0.08F, 0.8F);
         boolean main = heldGunHand == InteractionHand.MAIN_HAND;
-        if (ReloadType.MANUAL.equals(gunItem.getModifiedGun(stack).getReloads().getReloadType())) {
+        // The rocket launcher holds one rocket: loading it by hand plays JEG's whole reload, like its reload key.
+        if (ReloadType.MANUAL.equals(gunItem.getModifiedGun(stack).getReloads().getReloadType())
+                && !stack.is(ModItems.ROCKET_LAUNCHER.get())) {
             if (VrAim.serverHasAddon()) {
                 // F7.8: the server loads this round at once (no JEG reload, no wait); the gun gives a short jolt.
                 VrNetwork.CHANNEL.sendToServer(new C2SVrInsertRound(heldGunHand));
-                if (main && !stack.is(ModItems.ROCKET_LAUNCHER.get())) {
+                if (main) {
                     VrRecoil.jolt(ROUND_JOLT_DEGREES);
                 }
                 return;
