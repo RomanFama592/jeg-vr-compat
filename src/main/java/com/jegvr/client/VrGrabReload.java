@@ -25,6 +25,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.client.handler.ReloadHandler;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ReloadType;
+import ttv.migami.jeg.init.ModItems;
 import ttv.migami.jeg.init.ModSyncedDataKeys;
 import ttv.migami.jeg.item.GunItem;
 import ttv.migami.jeg.util.GunModifierHelper;
@@ -163,7 +164,7 @@ public final class VrGrabReload {
             if (VrAim.serverHasAddon()) {
                 // F7.8: the server loads this round at once (no JEG reload, no wait); the gun gives a short jolt.
                 VrNetwork.CHANNEL.sendToServer(new C2SVrInsertRound(heldGunHand));
-                if (main) {
+                if (main && !stack.is(ModItems.ROCKET_LAUNCHER.get())) {
                     VrRecoil.jolt(ROUND_JOLT_DEGREES);
                 }
                 return;
