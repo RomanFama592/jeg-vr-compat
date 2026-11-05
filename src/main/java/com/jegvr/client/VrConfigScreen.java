@@ -25,7 +25,7 @@ public final class VrConfigScreen extends Screen {
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW = 24;
     /** Rows above the "Done" button, one of them a gap. */
-    private static final int ROWS = 9;
+    private static final int ROWS = 10;
     private static final int MARGIN = 28;
     private static final int LABEL_GAP = 6;
     private static final int LIST_MAX_LENGTH = 512;
@@ -97,6 +97,11 @@ public final class VrConfigScreen extends Screen {
                 .create(x, y + row * 7, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.gunHud"),
                         (button, hud) -> VrClientConfig.setGunHud(hud)));
+        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.handsFollowAnimations())
+                .withTooltip(follow -> Tooltip.create(Component.translatable("jeg_vr_compat.config.handsFollowAnimations.tooltip")))
+                .create(x, y + row * 8, BUTTON_WIDTH, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
+                        (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .bounds(x, y + row * ROWS, BUTTON_WIDTH, BUTTON_HEIGHT).build());
     }

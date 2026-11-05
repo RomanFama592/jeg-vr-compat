@@ -33,6 +33,7 @@ public final class VrGunPose {
     public static void apply(PoseStack poseStack, ItemStack stack, ItemDisplayContext context, boolean mainHand) {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(gunId(stack));
         boolean mirrored = VrGunMirror.mirrors(mainHand);
+        VrHandFollow.applyClassicReload(poseStack, stack, mainHand);
         // The left hand mirrors yaw/roll and the lateral offset; a mirrored frame already does.
         float side = !mirrored && context == ItemDisplayContext.FIRST_PERSON_LEFT_HAND ? -1.0F : 1.0F;
         // Precision mode: turn the gun about the grip so its barrel (-Z) runs from the gun hand to the free hand.

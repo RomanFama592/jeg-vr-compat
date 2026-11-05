@@ -362,7 +362,9 @@ Necesita ver las manos de Vivecraft ("Show player hands" encendido y sin el modo
 - [x] (auto) Compila sin avisos de mixin; `VRArmRendererVRMixin` aplica al arrancar y `VRArmHelperVRMixin`, que solo carga en VR, aplica sin errores al forzar su carga (36 mezclas).
 - [ ] Rifle de asalto en la principal, otra mano vacía, inspeccionar: la mano del arma se mueve con el arma y la otra va al arma y sigue la animación. Al terminar, las dos vuelven a los controles sin saltos.
 - [ ] Recargar y sacar el arma: lo mismo. Mover el control durante la animación: el conjunto lo sigue con pesadez, y al terminar vuelve a seguirlo sin retraso.
-- [ ] Disparar: las manos siguen la animación, pero el arma responde al control sin retraso y el tiro sale a donde apunta. Revisar si el viaje de la otra mano al arma en cada disparo se ve bien (semiautomática y automática).
+- [ ] Disparar: la mano del arma sigue la animación, sin retraso y con el tiro saliendo a donde apunta. La otra mano sigue con su control y conserva lo que sostiene (H.2).
+- [ ] Opción "Manos siguen las animaciones" apagada: inspeccionar, recargar y disparar sin que se muevan las manos ni haya pesadez, y el arma igual se anima (H.2).
+- [ ] Holy Shotgun, Typhoonee y Atlantean Spear, con la tecla de recarga: el arma sube y se inclina durante la recarga, la mano del arma va con ella y la otra empuja bajo el cañón. Vuelven solas al terminar. Probar también con cada una en la secundaria (H.2).
 - [ ] Otra mano con una antorcha o un bloque: se oculta mientras dura la animación y reaparece al terminar. La mano sigue la animación.
 - [ ] Un arma en cada mano: al animarse una, la otra mano y su arma siguen con su control. Probar en las dos manos.
 - [ ] Arma en la secundaria (espejada, F9.17): la mano del arma y la principal libre siguen la animación, en el lado correcto.
@@ -373,3 +375,24 @@ Necesita ver las manos de Vivecraft ("Show player hands" encendido y sin el modo
 - [ ] Tamaño: la mano sobre el arma se ve proporcionada y agarrando en un lugar razonable.
 - [ ] El panel de munición y la hotbar siguen en el control, no en la mano animada.
 - [ ] Flat: sin cambios.
+
+## F9.23 (descargar, inspeccionar y equipamiento en la secundaria)
+- [x] (auto) Compila; las mezclas nuevas aplican sin errores, forzando la carga de las que no cargan solas (`AttachmentScreen`). Canal en versión 6: cliente y servidor con el mismo `.jar`.
+- [ ] Arma solo en la secundaria: descargar devuelve su munición, inspeccionar la anima, y equipamiento abre su pantalla, con el nombre y el modelo de esa arma.
+- [ ] Poner y sacar un accesorio en esa pantalla: al cerrar, el arma de la secundaria lo tiene o no. Se ve igual después de reentrar al mundo.
+- [ ] Arma en cada mano, la secundaria hacia arriba y la principal no: las tres teclas actúan sobre la secundaria.
+- [ ] Arma en cada mano, las dos hacia arriba o ninguna: actúan sobre la principal.
+- [ ] Finger Gun en la secundaria: equipamiento no abre nada, como en la principal.
+- [ ] Inspeccionar dos veces seguidas en la secundaria: reinicia la animación, como en la principal.
+- [ ] Servidor sin el addon: las teclas siguen actuando sobre la principal.
+
+## S.7d (caja del modo precisión)
+Con `/jegvr zones` para ver la caja.
+- [ ] Acercar la otra mano al arma: la caja se desliza por el cañón al nivel de la mano, en un solo eje, y se pone verde con la mano adentro.
+- [ ] Con la mano al lado del control o detrás: la caja se queda a 5 cm del control, no más cerca.
+- [ ] Agarrar en distintos puntos del cañón, también a unos 5 cm: entra al modo precisión y no se suelta enseguida.
+- [ ] En violeta, igual que antes. Alejar la mano más de 70 cm, o girarla más de 50°: se suelta.
+
+## F7.9 (Rocket Launcher cargado a mano)
+- [ ] Meter el cohete a mano: entra sin sacudida del modelo. Vibración y sonido siguen.
+- [ ] Escopeta cargada a mano: la sacudida sigue.

@@ -30,6 +30,8 @@ public final class VrGunAnimations {
     /** Phase H: of those, the ones without shots, where the controller carries the gun with a delay. */
     private static final Set<String> HEAVY = Set.of("reload", "reload_alt", "reload_start", "reload_loop",
             "reload_stop", "inspect", "draw");
+    /** Phase H: the animations of shots, which leave the other hand with its controller. */
+    private static final Set<String> FIRING = Set.of("shoot", "aim_shoot", "hold_fire", "hold");
 
     private VrGunAnimations() {
     }
@@ -50,6 +52,10 @@ public final class VrGunAnimations {
 
     public static boolean isHeavy(String animation) {
         return animation != null && HEAVY.contains(animation);
+    }
+
+    public static boolean isFiring(String animation) {
+        return animation != null && FIRING.contains(animation);
     }
 
     /** Whether this controller of a JEG gun moves the bones now: JEG's, or instead of it the idle one. */

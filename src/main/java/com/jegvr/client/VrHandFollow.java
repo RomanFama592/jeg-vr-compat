@@ -1,14 +1,18 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.config.VrClientConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix3f;
@@ -16,6 +20,9 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import software.bernie.geckolib.cache.object.GeoBone;
+import ttv.migami.jeg.client.handler.ReloadHandler;
+import ttv.migami.jeg.init.ModSyncedDataKeys;
+import ttv.migami.jeg.item.AnimatedGunItem;
 import ttv.migami.jeg.item.GunItem;
 
 import java.util.HashMap;
@@ -27,13 +34,17 @@ import java.util.Map;
  * <ul>
  * <li>The hand holding that gun follows the gun's {@code right_arm} bone, measured from where the bone rests against the
  * hand ({@link Hand#rest}), so it only moves as much as the animation moves it.</li>
- * <li>The other hand goes to the {@code left_arm} bone, unless it holds a gun of its own: then it stays with its
- * controller. Whatever else it holds is hidden until it is back.</li>
+ * <li>The other hand goes to the {@code left_arm} bone, unless it holds a gun of its own or the animation is a shot:
+ * then it stays with its controller. Whatever else it holds is hidden until it is back.</li>
+ * <li>JEG's classic guns have no bones or animation files, only a movement of the whole gun while reloading: JEG's,
+ * on a smaller scale because here it is near the eyes ({@link #applyClassicReload}). The gun's hand moves with it, and
+ * the other hand goes under the barrel and pushes rounds in.</li>
  * <li>During reloads, inspections and draws the controller carries the gun and its hand with a delay ({@link #HEAVY}).
  * Not while firing: the gun must show where the shot goes.</li>
  * </ul>
  * A bone with scale 0 is an arm the animation does not show (the off arm of a one-handed gun): that hand stays free.
  * Bones are known once the gun is drawn, after Vivecraft draws the hand, so a following hand is drawn after both guns.
+ * The {@code handsFollowAnimations} option turns the hands' part off.
  */
 public final class VrHandFollow {
     private static final float FOLLOW_IN_SECONDS = 0.12F;
@@ -46,6 +57,16 @@ public final class VrHandFollow {
     private static final float MIN_BONE_VOLUME = 1.0E-7F;
     private static final float PIXEL = 1.0F / 16.0F;
 
+    /** Where JEG's classic reload takes the gun at its peak, in metres and degrees of the controller's frame. */
+    private static final float CLASSIC_RAISE = 0.08F;
+    private static final float CLASSIC_BACK = 0.03F;
+    private static final float CLASSIC_TILT_DEGREES = 45.0F;
+    /** Where the other hand goes on a classic gun, and how it pushes the rounds in. */
+    private static final float CLASSIC_SUPPORT_DOWN = 0.05F;
+    private static final float CLASSIC_SUPPORT_FORWARD = 0.2F;
+    private static final float CLASSIC_PUSH = 0.025F;
+    private static final float CLASSIC_PUSH_PER_TICK = 0.35F;
+
     /** One side of Vivecraft's arm: from the arm part's origin to the middle of the fingertips. */
     private static final float ARM_TIP_X = 1.0F;
     private static final float ARM_TIP_Y = 10.0F;
@@ -56,6 +77,7 @@ public final class VrHandFollow {
     private static final class Hand {
         // Measured while drawing the current view.
         boolean hasHand;
+        final Matrix4f controller = new Matrix4f();
         final Matrix4f pose = new Matrix4f();
         final Matrix3f normal = new Matrix3f();
         PlayerRenderer renderer;
@@ -138,15 +160,51 @@ public final class VrHandFollow {
     private static void advanceHand(Hand hand, boolean main, ItemStack stack, String own, String other, Hand otherHand,
                                     float dt) {
         // Two-handed aiming already places both hands on the gun, and turns it about the grip.
-        boolean free = !VrPrecision.active();
+        boolean allowed = VrClientConfig.handsFollowAnimations() && !VrPrecision.active();
         boolean holdsGun = stack.getItem() instanceof GunItem;
-        boolean follows = free && hand.sawHand
-                && (holdsGun ? own != null && hand.sawGrip : other != null && otherHand.sawSupport);
-        hand.follow = approach(hand.follow, follows, dt / FOLLOW_IN_SECONDS, dt / FOLLOW_OUT_SECONDS);
+        boolean ownClassic = classicReloading(stack, main);
+        LocalPlayer player = Minecraft.getInstance().player;
+        boolean otherClassic = classicReloading(player.getItemInHand(main ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND), !main);
+        boolean follows = holdsGun
+                ? ownClassic || (own != null && hand.sawGrip)
+                : otherClassic || (other != null && !VrGunAnimations.isFiring(other) && otherHand.sawSupport);
+        hand.follow = approach(hand.follow, allowed && hand.sawHand && follows, dt / FOLLOW_IN_SECONDS, dt / FOLLOW_OUT_SECONDS);
         hand.animating = own != null;
-        hand.heavy = approach(hand.heavy, free && VrGunAnimations.isHeavy(own), dt / HEAVY_FADE_SECONDS,
+        hand.heavy = approach(hand.heavy, allowed && (ownClassic || VrGunAnimations.isHeavy(own)), dt / HEAVY_FADE_SECONDS,
                 dt / HEAVY_FADE_SECONDS);
         advanceHeavy(hand, main, dt);
+    }
+
+    private static boolean isClassicGun(ItemStack stack) {
+        return stack.getItem() instanceof GunItem && !(stack.getItem() instanceof AnimatedGunItem);
+    }
+
+    private static boolean classicReloading(ItemStack stack, boolean main) {
+        Player player = Minecraft.getInstance().player;
+        return isClassicGun(stack) && player != null && ModSyncedDataKeys.RELOADING.getValue(player)
+                && VrHands.reloadingHand() == (main ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
+    }
+
+    /** How far JEG's reload movement is, 0 to 1, for this hand's classic gun; it also eases out after the reload. */
+    private static float classicProgress(ItemStack stack, boolean main) {
+        if (!isClassicGun(stack) || VrHands.lastReloadHand() != (main ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND)) {
+            return 0.0F;
+        }
+        return ReloadHandler.get().getReloadProgress(Minecraft.getInstance().getFrameTime());
+    }
+
+    /** The movement of a classic gun, about its controller. Does nothing for other guns or with no reload going on. */
+    public static void applyClassicReload(PoseStack poseStack, ItemStack stack, boolean main) {
+        float progress = classicProgress(stack, main);
+        if (progress > 0.0F) {
+            poseStack.last().pose().mul(classicReloadMatrix(progress));
+            poseStack.last().normal().rotate(Axis.XP.rotationDegrees(CLASSIC_TILT_DEGREES * progress));
+        }
+    }
+
+    private static Matrix4f classicReloadMatrix(float progress) {
+        return new Matrix4f().translate(0.0F, CLASSIC_RAISE * progress, -CLASSIC_BACK * progress)
+                .rotateX((float) Math.toRadians(CLASSIC_TILT_DEGREES * progress));
     }
 
     private static float approach(float value, boolean up, float stepUp, float stepDown) {
@@ -182,9 +240,14 @@ public final class VrHandFollow {
 
     /** Vivecraft set the frame of a hand to its controller: the delay applies to all that hand draws. */
     public static void applyHeavy(PoseStack poseStack, boolean main) {
-        if (VR.active() && hand(main).heavy > 0.0F) {
-            poseStack.last().pose().mul(hand(main).heavyOffset);
+        if (!VR.active()) {
+            return;
         }
+        Hand hand = hand(main);
+        if (hand.heavy > 0.0F) {
+            poseStack.last().pose().mul(hand.heavyOffset);
+        }
+        hand.controller.set(poseStack.last().pose());
     }
 
     /** What a hand holds as Vivecraft draws it: a hand away following the animation holds nothing but its gun. */
@@ -237,8 +300,8 @@ public final class VrHandFollow {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player != null) {
-            drawHand(MAIN, OFF, player.getMainHandItem(), player, poseStack, minecraft);
-            drawHand(OFF, MAIN, player.getOffhandItem(), player, poseStack, minecraft);
+            drawHand(MAIN, OFF, true, player, poseStack, minecraft);
+            drawHand(OFF, MAIN, false, player, poseStack, minecraft);
         }
         if (VR.isLeftEyePass()) {
             remember(MAIN);
@@ -252,11 +315,12 @@ public final class VrHandFollow {
         hand.sawSupport = hand.hasSupport;
     }
 
-    private static void drawHand(Hand hand, Hand other, ItemStack stack, LocalPlayer player, PoseStack poseStack,
+    private static void drawHand(Hand hand, Hand other, boolean main, LocalPlayer player, PoseStack poseStack,
                                  Minecraft minecraft) {
         if (!hand.hasHand) {
             return;
         }
+        ItemStack stack = player.getItemInHand(main ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND);
         boolean holdsGun = stack.getItem() instanceof GunItem;
         if (hand.follow <= 0.0F) {
             if (holdsGun && hand.hasGrip) {
@@ -264,7 +328,8 @@ public final class VrHandFollow {
             }
             return;
         }
-        Matrix4f target = target(hand, other, stack, holdsGun);
+        ItemStack otherStack = player.getItemInHand(main ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+        Matrix4f target = target(hand, other, stack, holdsGun, otherStack, main, player);
         poseStack.pushPose();
         poseStack.last().pose().set(target == null ? hand.pose : blend(hand.pose, target, hand.follow));
         poseStack.last().normal().set(hand.normal);
@@ -293,7 +358,20 @@ public final class VrHandFollow {
         hand.rest.computeIfAbsent(stack.getItem(), item -> new Matrix4f()).set(hand.grip).invert().mul(hand.pose);
     }
 
-    private static Matrix4f target(Hand hand, Hand other, ItemStack stack, boolean holdsGun) {
+    private static Matrix4f target(Hand hand, Hand other, ItemStack stack, boolean holdsGun, ItemStack otherStack,
+                                   boolean main, LocalPlayer player) {
+        if (holdsGun && isClassicGun(stack)) {
+            // Moves with the gun, about the controller.
+            return new Matrix4f(hand.controller).mul(classicReloadMatrix(classicProgress(stack, main)))
+                    .mul(new Matrix4f(hand.controller).invert()).mul(hand.pose);
+        }
+        if (!holdsGun && isClassicGun(otherStack)) {
+            float time = player.tickCount + Minecraft.getInstance().getFrameTime();
+            float push = CLASSIC_PUSH * Mth.sin(time * CLASSIC_PUSH_PER_TICK);
+            return new Matrix4f(other.controller).mul(classicReloadMatrix(classicProgress(otherStack, !main)))
+                    .translate(0.0F, -CLASSIC_SUPPORT_DOWN + push, -CLASSIC_SUPPORT_FORWARD)
+                    .mul(new Matrix4f(hand.controller).invert()).mul(hand.pose);
+        }
         if (holdsGun) {
             if (!hand.hasGrip) {
                 return null;

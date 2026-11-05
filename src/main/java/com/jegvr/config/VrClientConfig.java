@@ -35,6 +35,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
     public static final ForgeConfigSpec.BooleanValue GUN_HUD;
+    public static final ForgeConfigSpec.BooleanValue HANDS_FOLLOW_ANIMATIONS;
     public static final ForgeConfigSpec.BooleanValue HUD_EXCLUSION;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HUD_EXCLUDED_GUNS;
 
@@ -67,6 +68,11 @@ public final class VrClientConfig {
                 .comment("Each gun's name, ammo and meters float beside the hand that holds it, instead of JEG's overlay",
                         "on the HUD (which only shows the main-hand gun).")
                 .define("gunHud", true);
+        HANDS_FOLLOW_ANIMATIONS = builder
+                .comment("The hands let go of the controllers and follow the gun's animations, and the controller carries",
+                        "the gun with a delay during reloads and inspections. Off: the hands always stay with the",
+                        "controllers and the gun follows them at once; the guns still play their animations.")
+                .define("handsFollowAnimations", true);
         HUD_EXCLUSION = builder
                 .comment("With a gun from hudExcludedGuns in the off hand, Vivecraft's hand or wrist HUD (hotbar) stays",
                         "where Vivecraft puts it, on the back of the hand, whatever hudPlacement says.")
@@ -109,6 +115,15 @@ public final class VrClientConfig {
 
     public static boolean gunHud() {
         return !SPEC.isLoaded() || GUN_HUD.get();
+    }
+
+    public static boolean handsFollowAnimations() {
+        return !SPEC.isLoaded() || HANDS_FOLLOW_ANIMATIONS.get();
+    }
+
+    public static void setHandsFollowAnimations(boolean follow) {
+        HANDS_FOLLOW_ANIMATIONS.set(follow);
+        HANDS_FOLLOW_ANIMATIONS.save();
     }
 
     public static boolean hudExclusion() {
