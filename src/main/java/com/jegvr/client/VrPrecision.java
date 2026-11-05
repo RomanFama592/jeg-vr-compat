@@ -35,14 +35,14 @@ import ttv.migami.jeg.network.message.C2SMessageAim;
  * foregrip and everything is mirrored.
  */
 public final class VrPrecision {
-    /** Room-scale metres (multiplied by Vivecraft's world scale), along the main-hand aim from the controller. */
-    private static final double FOREGRIP_FORWARD = 0.3;
+    /** Room-scale metres (multiplied by Vivecraft's world scale): the box's nearest place along the gun's barrel. */
+    private static final double FOREGRIP_MIN_DEPTH = 0.05;
     private static final double FOREGRIP_DOWN = 0.02;
     private static final Vec3 FOREGRIP_HALF = new Vec3(0.08, 0.08, 0.08);
     /** The box is drawn when the free hand is this close, and the mode ends when the hand goes farther. */
     private static final double SHOW_DISTANCE = 0.45;
     /** With both hands on the gun, the hands may be this far apart (between the grip and the end of the barrel). */
-    private static final double MIN_HAND_GAP = 0.1;
+    private static final double MIN_HAND_GAP = FOREGRIP_MIN_DEPTH;
     private static final double MAX_HAND_GAP = 0.7;
     /** The line between the hands may turn this far from the main controller before the free hand lets go. */
     private static final double MAX_TWIST_COS = Math.cos(Math.toRadians(50.0));
@@ -135,7 +135,12 @@ public final class VrPrecision {
             return null;
         }
         double scale = VR.worldScale();
-        return gun.pos().add(gun.dir().normalize().scale(FOREGRIP_FORWARD * scale)).add(0.0, -FOREGRIP_DOWN * scale, 0.0);
+        Vec3 barrel = gun.dir().normalize();
+        // Slides along the barrel to stay level with the other hand, wherever on the gun it reaches for.
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        double depth = free == null ? FOREGRIP_MIN_DEPTH * scale : free.pos().subtract(gun.pos()).dot(barrel);
+        depth = Math.max(FOREGRIP_MIN_DEPTH * scale, Math.min(MAX_HAND_GAP * scale, depth));
+        return gun.pos().add(barrel.scale(depth)).add(0.0, -FOREGRIP_DOWN * scale, 0.0);
     }
 
     private static AABB foregripBox(InteractionHand gunHand) {
