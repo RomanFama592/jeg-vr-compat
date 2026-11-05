@@ -4,6 +4,8 @@ import com.jegvr.client.VrHands;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mrcrayfish.framework.api.sync.SyncedDataKey;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +26,13 @@ public abstract class GunAnimationsVRMixin {
             target = "Lnet/minecraft/world/entity/player/Player;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack jegvr$animatedHand(Player player, Operation<ItemStack> original) {
         return VrHands.animatedStack(player, original.call(player));
+    }
+
+    @WrapOperation(method = "lambda$animationController$0", at = @At(value = "INVOKE", remap = true,
+            target = "Lnet/minecraft/nbt/CompoundTag;getBoolean(Ljava/lang/String;)Z"))
+    private static boolean jegvr$tagFlag(CompoundTag tag, String key, Operation<Boolean> original) {
+        Player player = Minecraft.getInstance().player;
+        return player == null ? original.call(tag, key) : VrHands.tagFlag(player, key, original.call(tag, key));
     }
 
     @WrapOperation(method = "lambda$animationController$0", at = @At(value = "INVOKE",

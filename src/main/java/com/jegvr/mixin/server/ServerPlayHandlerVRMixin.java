@@ -30,8 +30,8 @@ public abstract class ServerPlayHandlerVRMixin {
         return original.call(player, VrOffhand.firing() ? InteractionHand.OFF_HAND : hand);
     }
 
-    /** The melee attack reads the gun and its bayonet the same way, through another call. */
-    @WrapOperation(method = "handleMelee", at = @At(value = "INVOKE",
+    /** The melee attack, the unload and the attachments screen read the gun the same way, through another call. */
+    @WrapOperation(method = {"handleMelee", "handleUnload", "handleAttachments"}, at = @At(value = "INVOKE",
             target = "Lnet/minecraft/server/level/ServerPlayer;getMainHandItem()Lnet/minecraft/world/item/ItemStack;",
             remap = true))
     private static ItemStack jegvr$offhandMeleeGun(ServerPlayer player, Operation<ItemStack> original) {

@@ -46,6 +46,7 @@ public final class VrOffhand {
 
     private static boolean firing;
     private static boolean attachmentsPass;
+    private static boolean clientMenuForOffhand;
 
     private VrOffhand() {
     }
@@ -107,7 +108,43 @@ public final class VrOffhand {
         }
     }
 
-    /** True while an off-hand shot, wind-up sound or melee attack is being processed (server thread only). */
+    /** JEG's unload of the off-hand gun: gives its ammo back. */
+    public static void unload(ServerPlayer player) {
+        runOnOffhandGun(player, () -> ServerPlayHandler.handleUnload(player));
+    }
+
+    /** JEG's attachments screen, on the off-hand gun. */
+    public static void openAttachments(ServerPlayer player) {
+        runOnOffhandGun(player, () -> ServerPlayHandler.handleAttachments(player));
+    }
+
+    private static void runOnOffhandGun(ServerPlayer player, Runnable jegHandler) {
+        if (!canDualWield(player.getOffhandItem()) || firing) {
+            return;
+        }
+        firing = true;
+        try {
+            jegHandler.run();
+        } finally {
+            firing = false;
+        }
+    }
+
+    /** The client asked for the attachments screen of its off-hand gun; it stays so until that screen closes. */
+    public static void setClientMenuForOffhand(boolean offhand) {
+        clientMenuForOffhand = offhand;
+    }
+
+    public static boolean clientMenuForOffhand() {
+        return clientMenuForOffhand;
+    }
+
+    /** Whether the attachments menu being built for {@code player} is for the off-hand gun, on either side. */
+    public static boolean menuForOffhand(Player player) {
+        return player.level().isClientSide ? clientMenuForOffhand : firing;
+    }
+
+    /** True while JEG's server code for one action is running on the off-hand gun (server thread only). */
     public static boolean firing() {
         return firing;
     }

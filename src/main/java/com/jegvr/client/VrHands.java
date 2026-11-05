@@ -16,10 +16,16 @@ import net.minecraft.world.item.ItemStack;
 public final class VrHands {
     /** A flash is drawn for this many ticks after the shot (JEG shows it for about one tick). */
     private static final long FLASH_TICKS = 1;
+    private static final int INSPECT_TICKS = 5;
+    private static final String INSPECTING_TAG = "IsInspecting";
 
     private static InteractionHand renderingHand;
     /** The hand whose gun the current JEG reload is for (JEG's RELOADING flag is per player). */
     private static InteractionHand reloadingHand = InteractionHand.MAIN_HAND;
+    /** The hand of the current or last reload, which {@link #reloadingHand} forgets as soon as it ends. */
+    private static InteractionHand lastReloadHand = InteractionHand.MAIN_HAND;
+    /** JEG inspects the gun whose tag says so for a moment, but it clears the tag of the off-hand gun every tick. */
+    private static int offhandInspectTicks;
     private static long mainShotTick = Long.MIN_VALUE;
     private static long offShotTick = Long.MIN_VALUE;
 
@@ -75,6 +81,32 @@ public final class VrHands {
 
     public static void markReload(InteractionHand hand) {
         reloadingHand = hand;
+    }
+
+    /** Called every client tick. */
+    public static void tick(boolean reloading) {
+        if (reloading) {
+            lastReloadHand = reloadingHand;
+        } else {
+            reloadingHand = InteractionHand.MAIN_HAND;
+        }
+        if (offhandInspectTicks > 0) {
+            offhandInspectTicks--;
+        }
+    }
+
+    public static InteractionHand lastReloadHand() {
+        return lastReloadHand;
+    }
+
+    /** Starts the inspect animation of the off-hand gun; as long as JEG's own tag lasts on a main-hand gun. */
+    public static void inspectOffhand() {
+        offhandInspectTicks = INSPECT_TICKS;
+    }
+
+    /** A boolean of a gun's tag, as the gun animation sees it. */
+    public static boolean tagFlag(Player player, String key, boolean original) {
+        return original || (offhandInspectTicks > 0 && INSPECTING_TAG.equals(key) && renderingOffhand(player));
     }
 
     public static InteractionHand reloadingHand() {
