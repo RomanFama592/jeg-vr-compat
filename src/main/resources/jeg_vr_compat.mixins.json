@@ -9,7 +9,7 @@
   "client": ["input.AimingHandlerVRMixin", "input.ItemCooldownInstanceAccessor", "input.ItemCooldownsAccessor", "input.ShootingHandlerAccessor", "input.SwingTrackerVRMixin","input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
     "input.MCOpenVRAccessor", "input.ReloadHandlerVRMixin", "input.ShootingHandlerVRMixin", "model.ItemInHandLayerVRMixin", "model.OneHandedPoseVRMixin", "model.WeaponPoseVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunItemVRMixin", "render.AnimatedGunRendererVRMixin", "render.AnimationProcessorVRMixin",
     "render.CrosshairHandlerVRMixin", "render.GuiHandlerVRMixin", "render.GuiRendererVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemInHandRendererVRMixin", "render.ItemRendererVRMixin",
-    "render.VRArmHelperVRMixin", "render.VREffectsHelperVRMixin","render.VivecraftItemRenderingVRMixin"],
+    "render.VRArmHelperVRMixin", "render.VRArmRendererVRMixin", "render.VREffectsHelperVRMixin","render.VivecraftItemRenderingVRMixin"],
   "injectors": {
     "defaultRequire": 1
   }

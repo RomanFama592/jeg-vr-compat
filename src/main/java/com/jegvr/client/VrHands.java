@@ -31,6 +31,11 @@ public final class VrHands {
         renderingHand = hand;
     }
 
+    /** The hand whose gun is being drawn, or the last one drawn; null before the first. */
+    public static InteractionHand renderingHand() {
+        return renderingHand;
+    }
+
     public static void markShot(InteractionHand hand) {
         long now = gameTime();
         if (hand == InteractionHand.OFF_HAND) {

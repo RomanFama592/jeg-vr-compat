@@ -10,6 +10,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.Matrix4f;
 
 /** Safe facade: every method is false/null when Vivecraft is absent or its API misbehaves. */
 public final class VR {
@@ -178,6 +179,32 @@ public final class VR {
         } catch (Throwable t) {
             disable(t);
             return null;
+        }
+    }
+
+    /** A controller's rotation and position in the room, or null outside VR. */
+    public static Matrix4f roomHand(boolean mainHand) {
+        if (!active()) {
+            return null;
+        }
+        try {
+            return VivecraftBridge.roomHand(mainHand);
+        } catch (Throwable t) {
+            disable(t);
+            return null;
+        }
+    }
+
+    /** True while Vivecraft draws the left eye, once per frame; false outside VR. */
+    public static boolean isLeftEyePass() {
+        if (!active()) {
+            return false;
+        }
+        try {
+            return VivecraftBridge.isLeftEyePass();
+        } catch (Throwable t) {
+            disable(t);
+            return false;
         }
     }
 

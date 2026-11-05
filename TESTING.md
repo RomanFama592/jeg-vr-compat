@@ -356,3 +356,20 @@ Vivecraft → "Weapon collision" (colisión de armas): en AUTO está apagada en 
 - [ ] Apuntar y mover el arma rápido cerca de un mob: revisar que no pegue sin querer más de la cuenta.
 - [ ] La tecla de melee de JEG sigue funcionando.
 - [ ] Flat: el melee igual que siempre.
+
+## Fase H (las manos siguen las animaciones)
+Necesita ver las manos de Vivecraft ("Show player hands" encendido y sin el modo de brazos completos con el cuerpo a la vista). Sin esa mano no se desacopla nada.
+- [x] (auto) Compila sin avisos de mixin; `VRArmRendererVRMixin` aplica al arrancar y `VRArmHelperVRMixin`, que solo carga en VR, aplica sin errores al forzar su carga (36 mezclas).
+- [ ] Rifle de asalto en la principal, otra mano vacía, inspeccionar: la mano del arma se mueve con el arma y la otra va al arma y sigue la animación. Al terminar, las dos vuelven a los controles sin saltos.
+- [ ] Recargar y sacar el arma: lo mismo. Mover el control durante la animación: el conjunto lo sigue con pesadez, y al terminar vuelve a seguirlo sin retraso.
+- [ ] Disparar: las manos siguen la animación, pero el arma responde al control sin retraso y el tiro sale a donde apunta. Revisar si el viaje de la otra mano al arma en cada disparo se ve bien (semiautomática y automática).
+- [ ] Otra mano con una antorcha o un bloque: se oculta mientras dura la animación y reaparece al terminar. La mano sigue la animación.
+- [ ] Un arma en cada mano: al animarse una, la otra mano y su arma siguen con su control. Probar en las dos manos.
+- [ ] Arma en la secundaria (espejada, F9.17): la mano del arma y la principal libre siguen la animación, en el lado correcto.
+- [ ] Jugador zurdo ("Reverse hands"): lo mismo.
+- [ ] Arma de una mano o minigun: la mano cuyo brazo no se ve en la animación se queda con el control y conserva su objeto.
+- [ ] Modo precisión (dos manos): las manos siguen con los controles.
+- [ ] Correr o hacer melee (animaciones eliminadas en F9.20): las manos no se mueven.
+- [ ] Tamaño: la mano sobre el arma se ve proporcionada y agarrando en un lugar razonable.
+- [ ] El panel de munición y la hotbar siguen en el control, no en la mano animada.
+- [ ] Flat: sin cambios.

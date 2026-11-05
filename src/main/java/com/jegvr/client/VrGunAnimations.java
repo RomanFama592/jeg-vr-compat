@@ -1,9 +1,12 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import net.minecraft.world.item.ItemStack;
+import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.AnimationProcessor;
+import ttv.migami.jeg.item.AnimatedGunItem;
 
 import java.util.Set;
 
@@ -21,7 +24,32 @@ public final class VrGunAnimations {
     private static final Set<String> KEPT = Set.of("idle", "reload", "reload_alt", "reload_start", "reload_loop",
             "reload_stop", "inspect", "shoot", "aim_shoot", "draw", "hold_fire", "hold");
 
+    /** Phase H: the animations the hands follow. The idle pose is not one: there the hands stay with the controllers. */
+    private static final Set<String> FOLLOWED = Set.of("reload", "reload_alt", "reload_start", "reload_loop",
+            "reload_stop", "inspect", "shoot", "aim_shoot", "draw", "hold_fire", "hold");
+    /** Phase H: of those, the ones without shots, where the controller carries the gun with a delay. */
+    private static final Set<String> HEAVY = Set.of("reload", "reload_alt", "reload_start", "reload_loop",
+            "reload_stop", "inspect", "draw");
+
     private VrGunAnimations() {
+    }
+
+    /** The name of the animation this gun plays that the hands follow, or null. */
+    public static String followedAnimation(ItemStack stack) {
+        if (!(stack.getItem() instanceof AnimatedGunItem gun)) {
+            return null;
+        }
+        AnimationController<?> jeg = gun.getAnimatableInstanceCache().getManagerForId(GeoItem.getId(stack))
+                .getAnimationControllers().get(JEG_CONTROLLER);
+        AnimationProcessor.QueuedAnimation current = jeg == null ? null : jeg.getCurrentAnimation();
+        if (current == null || jeg.getAnimationState() == AnimationController.State.STOPPED) {
+            return null;
+        }
+        return FOLLOWED.contains(current.animation().name()) ? current.animation().name() : null;
+    }
+
+    public static boolean isHeavy(String animation) {
+        return animation != null && HEAVY.contains(animation);
     }
 
     /** Whether this controller of a JEG gun moves the bones now: JEG's, or instead of it the idle one. */

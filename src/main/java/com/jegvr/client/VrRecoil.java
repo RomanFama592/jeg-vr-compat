@@ -96,6 +96,11 @@ public final class VrRecoil {
         return Mth.lerp(partialTick, prevKick, kick);
     }
 
+    /** True while the held gun is still displaced by a shot. */
+    public static boolean isKicking() {
+        return Math.max(prevKick, kick) > 0.01F;
+    }
+
     /** Backwards push of the held gun, in blocks of the controller frame. */
     public static float kickBack(float partialTick) {
         return kickDegrees(partialTick) * BACK_PER_DEGREE;

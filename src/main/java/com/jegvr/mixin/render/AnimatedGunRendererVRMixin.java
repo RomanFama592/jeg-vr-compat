@@ -10,7 +10,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
+import com.jegvr.client.VrHandFollow;
 import com.jegvr.client.VrHands;
+import software.bernie.geckolib.cache.object.GeoBone;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -71,8 +73,13 @@ public class AnimatedGunRendererVRMixin {
             at = @At(value = "INVOKE", remap = true,
                     target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
     private boolean jegvr$noStaticArms(ModelPart part, PoseStack stack, VertexConsumer consumer, int light, int overlay,
-                                       float r, float g, float b, float a) {
-        return !VR.active() || renderType == null || !renderType.firstPerson();
+                                       float r, float g, float b, float a, @Local(argsOnly = true) GeoBone bone) {
+        if (!VR.active() || renderType == null || !renderType.firstPerson()) {
+            return true;
+        }
+        // Phase H: where JEG would draw this arm is where the hand goes while the animation plays.
+        VrHandFollow.onArmBone(bone, part, stack);
+        return false;
     }
 
     @Inject(method = "renderByItem", at = @At("HEAD"))

@@ -5,6 +5,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.vivecraft.api_beta.VivecraftAPI;
 import org.vivecraft.client.VivecraftVRMod;
@@ -78,6 +79,24 @@ public final class VivecraftBridge {
         return new Vec3(dir.x * x.x + dir.y * x.y + dir.z * x.z,
                 dir.x * y.x + dir.y * y.y + dir.z * y.z,
                 dir.x * z.x + dir.y * z.y + dir.z * z.z);
+    }
+
+    /** A controller's rotation and position in the room, in metres: no world position, rotation or scale. */
+    public static Matrix4f roomHand(boolean mainHand) {
+        VRPlayer player = VRPlayer.get();
+        VRData room = player == null ? null : player.vrdata_room_pre;
+        if (room == null) {
+            return null;
+        }
+        VRData.VRDevicePose c = mainHand ? room.c0 : room.c1;
+        Vector3f position = c.getPositionF();
+        // Same rotation that RenderHelper.setupRenderingAtController uses.
+        return c.getMatrix().invert().transpose().setTranslation(position);
+    }
+
+    /** True while Vivecraft draws the left eye, the first view of every frame. */
+    public static boolean isLeftEyePass() {
+        return ClientDataHolderVR.getInstance().currentPass == RenderPass.LEFT;
     }
 
     /** A controller's own X, Y and Z axes in world space. */
