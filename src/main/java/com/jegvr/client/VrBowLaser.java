@@ -122,8 +122,11 @@ public final class VrBowLaser {
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
-        drawFlight(pose.last().pose(), buffers.getBuffer(RenderType.debugQuads()), flight, cam, worldScale);
-        buffers.endBatch(RenderType.debugQuads());
+        // A shader pack lights the debug quads like anything else, so the beam would go dark at night; lightning is its own
+        // full-bright program there. Both take the same vertices.
+        RenderType beam = VR.shadersActive() ? RenderType.lightning() : RenderType.debugQuads();
+        drawFlight(pose.last().pose(), buffers.getBuffer(beam), flight, cam, worldScale);
+        buffers.endBatch(beam);
         if (hit instanceof BlockHitResult block) {
             jegDot(mc, hand, block);
         } else if (hit != null) {

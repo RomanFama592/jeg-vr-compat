@@ -1,6 +1,7 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.compat.jeg.JegKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.InteractionHand;
@@ -17,8 +18,8 @@ public final class VrHands {
     /** A flash is drawn for this many ticks after the shot (JEG shows it for about one tick). */
     private static final long FLASH_TICKS = 1;
     private static final int INSPECT_TICKS = 5;
-    private static final String INSPECTING_TAG = "IsInspecting";
-    private static final String DRAWING_TAG = "IsDrawing";
+    private static final String INSPECTING_TAG = JegKeys.IS_INSPECTING;
+    private static final String DRAWING_TAG = JegKeys.IS_DRAWING;
 
     private static InteractionHand renderingHand;
     /** The hand whose gun the current JEG reload is for (JEG's RELOADING flag is per player). */

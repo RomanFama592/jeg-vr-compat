@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
  */
 @Mixin(ItemRenderer.class)
 public class ItemRendererVRMixin {
-    @WrapOperation(method = "render",
+    @WrapOperation(method = "render", require = 0,
             at = @At(value = "INVOKE", remap = false,
                     target = "Lnet/minecraftforge/client/ForgeHooksClient;handleCameraTransforms(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/resources/model/BakedModel;Lnet/minecraft/world/item/ItemDisplayContext;Z)Lnet/minecraft/client/resources/model/BakedModel;"))
     private BakedModel jegvr$noFlatDisplayOffset(PoseStack poseStack, BakedModel model, ItemDisplayContext context,

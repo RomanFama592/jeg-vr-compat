@@ -21,21 +21,34 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
    `mixins` del json, solo requieren `jeg`; nunca importan clases de cliente ni de Vivecraft).
 2. **Flat intacto.** Toda intervención está detrás de `VR.active()` (jugador local) o `VR.isVRPlayer(p)`
    (jugadores remotos). Con VR apagado o Vivecraft ausente, el comportamiento debe ser idéntico al de JEG.
-3. **Vivecraft opcional.** Ninguna clase fuera de `compat/vivecraft/VivecraftBridge.java` puede importar
-   `org.vivecraft.*`. `VR.java` comprueba `ModList.isLoaded("vivecraft")` antes de tocar el bridge.
+3. **Vivecraft opcional.** Fuera de los mixins (que `JegVrMixinPlugin` condiciona), ninguna clase salvo
+   `compat/vivecraft/VivecraftBridge.java` puede importar `org.vivecraft.*`. Lo que se le pide a un mod de VR está en
+   la interfaz `compat/VrBackend`, y el resto del addon usa `VR`, que comprueba `ModList.isLoaded("vivecraft")` antes de
+   crear el backend. Una línea nueva de Vivecraft es otra implementación de `VrBackend`.
 4. **Mixins condicionales.** `JegVrMixinPlugin.shouldApplyMixin` devuelve false si falta `jeg` o `vivecraft`.
 5. Mixins sobre clases de JEG: `@Mixin(value = X.class, remap = false)`; los `@At(INVOKE)` que apuntan a
    métodos vanilla llevan `remap = true`.
 6. No esconder bones de GeckoLib para quitar brazos: los hijos (cargador en mano, balas) deben seguir visibles.
    Se suprime solo el dibujo de `ModelPart.render` del modelo del jugador.
 7. Nada de rotar cámara/jugador en VR (mareo). El recoil va al modelo del arma, haptics y desviación de puntería.
+8. **Nombres de mixin en producción.** En un mixin `remap = false`, un método de JEG que sobrescribe uno vanilla se nombra
+   con los dos nombres (`{"renderByItem", "m_108829_"}`). Después de tocar mixins, correr `tools/check_mixins.py`.
+9. **Otros mods y shaders.** Lo que solo cambia cómo se ve lleva `require = 0`. Nada de shaders ni `RenderType` propios sin
+   revisar `COMPATIBILIDAD.md`. Para saber si hay shaders, `VR.shadersActive()`; nunca importar Sodium, Iris ni OptiFine.
+10. **Contrato entre versiones del addon.** Red: un ID de paquete solo se agrega y un paquete no cambia de formato; lo nuevo
+    sube `VrNetwork.PROTOCOL` y se envía según `serverProtocol`. Configuración: el TOML solo suma opciones, con el
+    comportamiento actual por defecto; `guns.json` lleva `schema`. No se renombran teclas `key.jeg_vr_compat.*` ni
+    subcomandos de `/jegvr`. Datos propios en ítems: bajo un sub-compuesto `jeg_vr_compat`. Mejora nueva: con su
+    interruptor. Textos para el jugador: en `en_us` y `es_es`. Claves y constantes de JEG: en `compat/jeg/JegKeys`.
 
 ## Estructura esperada
 ```
 src/main/java/com/jegvr/
   JegVrCompat.java                 # @Mod("jeg_vr_compat")
   compat/VR.java                   # fachada segura
-  compat/vivecraft/VivecraftBridge.java
+  compat/VrBackend.java            # lo que se le pide a un mod de VR
+  compat/vivecraft/VivecraftBridge.java  # VrBackend para Vivecraft 1.2
+  compat/jeg/JegKeys.java          # claves NBT y constantes privadas de JEG
   mixin/JegVrMixinPlugin.java
   mixin/render/GunRenderingHandlerVRMixin.java
   mixin/render/AnimatedGunRendererVRMixin.java
@@ -70,7 +83,9 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 `javap -c -p -classpath libs/jeg-0.13.2.jar <clase>` antes de escribir un `@At` o un descriptor.
 
 ## Comandos
-- `./gradlew build` — compila (debe pasar sin warnings de mixin).
+- `./gradlew build` — compila (debe pasar sin warnings de mixin). Publicar `build/libs/jeg_vr_compat-<versión>.jar`, nunca el `-slim`.
+- `./gradlew runClientAudit [-Pcompat]` — aplica todos los mixins de todos los mods, loguea lo que falla y cierra (carpeta `run-audit/`, VR apagado). `-Pcompat` suma Embeddium y Oculus.
+- `python tools/check_mixins.py <javap> <jars originales>` — revisa los nombres de los mixins `remap = false` contra los jars que tienen los jugadores.
 - `./gradlew runClient` — cliente de prueba (flat).
 - `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
 - Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `MULTIJUGADOR.md`.

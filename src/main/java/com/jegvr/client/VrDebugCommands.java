@@ -17,19 +17,11 @@ import java.util.Locale;
 
 /**
  * Client commands to calibrate gun poses with the headset on. Values are always the final pose of the held gun
- * (global default included); without a gun in hand they edit the global default.
+ * (global default included); without a gun in hand they edit the global default. The texts are in the lang files.
  */
 public final class VrDebugCommands {
-    /** Shown by /jegvr help (same text as COMANDOS.md). */
-    private static final String[] HELP = {
-            "§e/jegvr: calibrar el arma que tenés en la mano principal (sin arma: la pose general)",
-            "§7Ejes del control: X = derecha, Y = arriba, Z = hacia atrás (negativo = hacia adelante). 0.01 = 1 cm",
-            "§f/jegvr move <dx> <dy> <dz>§7: correr; 0 en los ejes que no cambian. Ej: /jegvr move 0 0.02 0 = 2 cm arriba",
-            "§f/jegvr rot <dpitch> <dyaw> <droll>§7: girar en grados; 0 en los que no cambian. Ej: /jegvr rot 0 0 10",
-            "§f/jegvr scale <factor>§7: tamaño final (el que muestra el chat; más grande = mayor)",
-            "§f/jegvr pose <pitch> <yaw> <roll> [tx ty tz]§7: poner valores absolutos (los que muestra el chat)",
-            "§f/jegvr show§7: ver los valores · §f/jegvr save§7: guardar · §f/jegvr reset§7: volver a la pose del addon",
-    };
+    private static final String KEY = "jeg_vr_compat.command.";
+    private static final int HELP_LINES = 7;
 
     private VrDebugCommands() {
     }
@@ -82,44 +74,44 @@ public final class VrDebugCommands {
 
         root.then(Commands.literal("show").executes(c -> edit(c, p -> {
         })));
-        root.then(Commands.literal("zones").executes(c -> reply(c, VrGrabReload.toggleZones()
-                ? "Guías de recarga visibles: caja en la cadera (azul = agarrar, verde = mano adentro, roja = sin munición)"
-                : "Guías de recarga ocultas")));
+        root.then(Commands.literal("zones").executes(c ->
+                reply(c, Component.translatable(KEY + (VrGrabReload.toggleZones() ? "zones.on" : "zones.off")))));
         LiteralArgumentBuilder<CommandSourceStack> grabZone = Commands.literal("grabzone");
         for (VrClientConfig.GrabZone zone : VrClientConfig.GrabZone.values()) {
-            grabZone.then(Commands.literal(zone.name().toLowerCase(Locale.ROOT)).executes(c -> {
+            String name = zone.name().toLowerCase(Locale.ROOT);
+            grabZone.then(Commands.literal(name).executes(c -> {
                 VrClientConfig.setGrabZone(zone);
-                return reply(c, switch (zone) {
-                    case HIP -> "Cargador en la cadera (de pie)";
-                    case FRONT -> "Cargador delante de la panza (sentado)";
-                    case OFF -> "Recarga con la mano apagada (la tecla de recarga y el botón secundario siguen recargando)";
-                });
+                return reply(c, Component.translatable(KEY + "grabzone." + name));
             }));
         }
         root.then(grabZone);
         root.then(Commands.literal("help").executes(c -> {
-            for (String line : HELP) {
-                reply(c, line);
+            for (int line = 0; line < HELP_LINES; line++) {
+                reply(c, Component.translatable(KEY + "help." + line));
             }
             return 1;
         }));
         root.then(Commands.literal("save").executes(c -> {
             java.nio.file.Path path = VrGunConfig.save();
             if (path == null) {
-                return reply(c, "§cNo se pudo guardar (ver el log)");
+                return reply(c, Component.translatable(KEY + "save.failed"));
             }
-            return reply(c, (VrGunConfig.editsBuiltIn() ? "Guardado en las poses internas del addon (van en el próximo .jar): "
-                    : "Guardado en tus poses: ") + path);
+            return reply(c, Component.translatable(KEY + (VrGunConfig.editsBuiltIn() ? "save.builtin" : "save.user"), path.toString()));
         }));
         root.then(Commands.literal("reset").executes(c -> {
             String id = heldGunId();
             VrGunConfig.reset(id);
-            String what = id == null ? "la pose general" : id;
-            return reply(c, VrGunConfig.editsBuiltIn()
-                    ? "Restablecido " + what + (id == null ? " a lo guardado en el archivo interno" : ": sin ajuste propio (solo la pose general)")
-                    : "Restablecido " + what + " a la pose del addon");
+            Component what = poseName(id);
+            if (!VrGunConfig.editsBuiltIn()) {
+                return reply(c, Component.translatable(KEY + "reset.user", what));
+            }
+            return reply(c, Component.translatable(KEY + (id == null ? "reset.builtin.defaults" : "reset.builtin.gun"), what));
         }));
         d.register(root);
+    }
+
+    private static Component poseName(String gunId) {
+        return gunId == null ? Component.translatable(KEY + "pose.defaults") : Component.literal(gunId);
     }
 
     private static int edit(CommandContext<CommandSourceStack> c, java.util.function.Consumer<VrGunConfig.Pose> change) {
@@ -127,9 +119,9 @@ public final class VrDebugCommands {
         VrGunConfig.Pose pose = VrGunConfig.poseFor(id == null ? "" : id);
         change.accept(pose);
         VrGunConfig.setEffective(id, pose);
-        return reply(c, String.format("%s: pitch=%.1f yaw=%.1f roll=%.1f | t=(%.3f, %.3f, %.3f) | scale=%.2f  (/jegvr save)",
-                id == null ? "default (sin arma en mano)" : id, pose.pitch, pose.yaw, pose.roll,
-                pose.tx, pose.ty, pose.tz, pose.scale));
+        return reply(c, Component.empty().append(poseName(id)).append(String.format(
+                ": pitch=%.1f yaw=%.1f roll=%.1f | t=(%.3f, %.3f, %.3f) | scale=%.2f  (/jegvr save)",
+                pose.pitch, pose.yaw, pose.roll, pose.tx, pose.ty, pose.tz, pose.scale)));
     }
 
     /** Registry id of the gun in the main hand, or null (edits the global default then). */
@@ -142,8 +134,8 @@ public final class VrDebugCommands {
         return VrGunPose.heldLikeGun(stack) ? VrGunPose.gunId(stack) : null;
     }
 
-    private static int reply(CommandContext<CommandSourceStack> c, String message) {
-        c.getSource().sendSuccess(() -> Component.literal(message), false);
+    private static int reply(CommandContext<CommandSourceStack> c, Component message) {
+        c.getSource().sendSuccess(() -> message, false);
         return 1;
     }
 }

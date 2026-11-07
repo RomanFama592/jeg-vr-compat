@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -139,7 +140,7 @@ public final class VrGunHud {
     private static boolean showsAmmo(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         return stack.getItem() instanceof GunItem && !stack.is(ModItems.FINGER_GUN.get()) && tag != null
-                && tag.contains("AmmoCount");
+                && tag.contains(JegKeys.AMMO_COUNT);
     }
 
     private static boolean hasMeters(ItemStack stack) {
@@ -184,7 +185,7 @@ public final class VrGunHud {
 
         boolean reloading = ModSyncedDataKeys.RELOADING.getValue(player) && VrHands.reloadingHand() == hand;
         String ammo = reloading ? Component.translatable("jeg_vr_compat.hud.reloading").getString()
-                : String.format("%03d", stack.getTag().getInt("AmmoCount"));
+                : String.format("%03d", stack.getTag().getInt(JegKeys.AMMO_COUNT));
         String reserve = reloading ? "" : reserve(player, stack, gun);
         float ammoWidth = font.width(ammo) * AMMO_SCALE;
         float left = -(ammoWidth + (reserve.isEmpty() ? 0 : RESERVE_GAP + font.width(reserve))) / 2.0F;
@@ -251,7 +252,7 @@ public final class VrGunHud {
 
     /** As JEG's overlay: the rarity's colour, or the colour of the gun's modifier. */
     private static int nameColor(ItemStack stack) {
-        String modifier = stack.getOrCreateTag().getString("CustomModifier");
+        String modifier = stack.getOrCreateTag().getString(JegKeys.CUSTOM_MODIFIER);
         Modifier group = modifier.isEmpty() ? null : ModifierHelper.getGroupByName(modifier);
         if (group != null) {
             return group.getColor();
@@ -263,7 +264,7 @@ public final class VrGunHud {
     /** As JEG's overlay: the rounds left in the inventory for this gun. */
     private static String reserve(LocalPlayer player, ItemStack stack, Gun gun) {
         if (player.isCreative() || stack.getEnchantmentLevel(ModEnchantments.INFINITY.get()) != 0
-                || stack.getTag().getBoolean("IgnoreAmmo")) {
+                || stack.getTag().getBoolean(JegKeys.IGNORE_AMMO)) {
             return "9999";
         }
         if (gun.getReloads().getReloadType().equals(ReloadType.SINGLE_ITEM)) {

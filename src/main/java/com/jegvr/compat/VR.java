@@ -12,18 +12,42 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joml.Matrix4f;
 
-/** Safe facade: every method is false/null when Vivecraft is absent or its API misbehaves. */
+import java.util.function.Function;
+
+/**
+ * Safe facade over the {@link VrBackend}: every method answers false, null or a neutral value when Vivecraft is absent or
+ * its API misbehaves. The first failure turns VR support off for the session, which leaves JEG as it is in flat.
+ */
 public final class VR {
     private static final Logger LOGGER = LogManager.getLogger(JegVrCompat.MOD_ID);
     private static final KeyMapping[] NO_KEYS = new KeyMapping[0];
+    /** The classes our mixins change, loaded (not initialized) at startup so that injection errors show up there. */
+    private static final String[] VIVECRAFT_MIXIN_TARGETS = {
+            "org.vivecraft.client_vr.render.VivecraftItemRendering",
+            "org.vivecraft.client_vr.render.helpers.VREffectsHelper"
+    };
+    private static final String[] JEG_MIXIN_TARGETS = {
+            "ttv.migami.jeg.network.message.C2SMessageShoot",
+            "ttv.migami.jeg.common.network.ServerPlayHandler",
+            "ttv.migami.jeg.common.ReloadTracker",
+            "ttv.migami.jeg.animations.GunAnimations",
+            "ttv.migami.jeg.client.handler.ReloadHandler",
+            "ttv.migami.jeg.client.handler.AimingHandler"
+    };
+
     private static Boolean loaded;
     private static boolean broken;
+    private static VrBackend backend;
     private static KeyMapping[] teleportKeys;
     private static long attackSideCheckedAt;
     private static boolean attackOnOffHand;
     private static boolean attackSideLogged;
 
     private VR() {
+    }
+
+    /** World-space position and aim direction of a tracked device. */
+    public record Aim(Vec3 pos, Vec3 dir) {
     }
 
     public static boolean loaded() {
@@ -37,34 +61,46 @@ public final class VR {
         return loaded && !broken;
     }
 
-    /** Forces Vivecraft classes that we mix into to load now, so injection problems surface at startup. */
+    /** The backend for the Vivecraft that is installed. Only called with Vivecraft present (see the class's Javadoc). */
+    private static VrBackend backend() {
+        if (backend == null) {
+            backend = new VivecraftBridge();
+        }
+        return backend;
+    }
+
+    /** The VR mod's line for bug reports, or a note that there is none. */
+    public static String description() {
+        return loaded() ? backend().name() : "none";
+    }
+
+    /** Forces the classes we mix into to load now, so injection problems surface at startup. */
     public static void preload() {
         if (!loaded()) {
             return;
         }
         try {
-            Class.forName("org.vivecraft.client_vr.render.VivecraftItemRendering");
-            Class.forName("org.vivecraft.client_vr.render.helpers.VREffectsHelper");
+            ClassLoader classLoader = VR.class.getClassLoader();
+            for (String name : VIVECRAFT_MIXIN_TARGETS) {
+                Class.forName(name, false, classLoader);
+            }
             if (ModList.get().isLoaded("jeg")) {
-                Class.forName("ttv.migami.jeg.network.message.C2SMessageShoot");
-                Class.forName("ttv.migami.jeg.common.network.ServerPlayHandler");
-                Class.forName("ttv.migami.jeg.common.ReloadTracker");
-                Class.forName("ttv.migami.jeg.animations.GunAnimations");
-                Class.forName("ttv.migami.jeg.client.handler.ReloadHandler");
-                Class.forName("ttv.migami.jeg.client.handler.AimingHandler");
+                for (String name : JEG_MIXIN_TARGETS) {
+                    Class.forName(name, false, classLoader);
+                }
             }
         } catch (Throwable t) {
             disable(t);
         }
     }
 
-    /** True when the local player is currently playing in VR. */
+    /** True when the local player is currently playing in VR. Called constantly: no allocation on this path. */
     public static boolean active() {
         if (!loaded()) {
             return false;
         }
         try {
-            return VivecraftBridge.isActive();
+            return backend().isActive();
         } catch (Throwable t) {
             disable(t);
             return false;
@@ -76,149 +112,80 @@ public final class VR {
             return false;
         }
         try {
-            return VivecraftBridge.isVRPlayer(player);
+            return backend().isVRPlayer(player);
         } catch (Throwable t) {
             disable(t);
             return false;
         }
     }
 
-    /** World-space position and aim direction of a controller. */
-    public record Aim(Vec3 pos, Vec3 dir) {
+    /** Asks the backend while the player is in VR; {@code outside} otherwise or when it fails. */
+    private static <T> T inVr(Function<VrBackend, T> call, T outside) {
+        return active() ? safely(call, outside) : outside;
+    }
+
+    /** Asks the backend with Vivecraft installed, in VR or not; {@code outside} otherwise or when it fails. */
+    private static <T> T installed(Function<VrBackend, T> call, T outside) {
+        return loaded() ? safely(call, outside) : outside;
+    }
+
+    private static <T> T safely(Function<VrBackend, T> call, T fallback) {
+        try {
+            return call.apply(backend());
+        } catch (Throwable t) {
+            disable(t);
+            return fallback;
+        }
     }
 
     /** Main-hand controller aim, or null outside VR. */
     public static Aim mainHandAim() {
-        if (!active()) {
-            return null;
-        }
-        try {
-            VivecraftBridge.Pose pose = VivecraftBridge.mainHand();
-            return pose == null ? null : new Aim(pose.pos(), pose.dir());
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(VrBackend::mainHand, null);
     }
 
     /** Off-hand controller aim, or null outside VR. */
     public static Aim offHandAim() {
-        if (!active()) {
-            return null;
-        }
-        try {
-            VivecraftBridge.Pose pose = VivecraftBridge.offHand();
-            return pose == null ? null : new Aim(pose.pos(), pose.dir());
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(VrBackend::offHand, null);
     }
 
     /** Headset position and look direction, or null outside VR. */
     public static Aim hmdAim() {
-        if (!active()) {
-            return null;
-        }
-        try {
-            VivecraftBridge.Pose pose = VivecraftBridge.hmd();
-            return pose == null ? null : new Aim(pose.pos(), pose.dir());
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(VrBackend::hmd, null);
     }
 
     /** The headset's up axis in world space, or null outside VR. */
     public static Vec3 hmdUp() {
-        if (!active()) {
-            return null;
-        }
-        try {
-            return VivecraftBridge.hmdUp();
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(VrBackend::hmdUp, null);
     }
 
     /** Vivecraft's world scale (1 = real size); distances measured in metres in the room scale with it. */
     public static float worldScale() {
-        if (!active()) {
-            return 1.0F;
-        }
-        try {
-            return VivecraftBridge.worldScale();
-        } catch (Throwable t) {
-            disable(t);
-            return 1.0F;
-        }
+        return inVr(VrBackend::worldScale, 1.0F);
     }
 
-    /** True when Vivecraft's hands are reversed (main hand on the left controller). */
     /** A world direction in a controller's axes (where the gun in that hand is drawn), or null outside VR. */
     public static Vec3 toHandLocal(boolean mainHand, Vec3 dir) {
-        if (!active()) {
-            return null;
-        }
-        try {
-            return VivecraftBridge.toHandLocal(mainHand, dir);
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(vr -> vr.toHandLocal(mainHand, dir), null);
     }
 
     /** A controller's X, Y and Z axes in world space, or null outside VR. */
     public static Vec3[] handAxes(boolean mainHand) {
-        if (!active()) {
-            return null;
-        }
-        try {
-            return VivecraftBridge.handAxes(mainHand);
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(vr -> vr.handAxes(mainHand), null);
     }
 
     /** A controller's rotation and position in the room, or null outside VR. */
     public static Matrix4f roomHand(boolean mainHand) {
-        if (!active()) {
-            return null;
-        }
-        try {
-            return VivecraftBridge.roomHand(mainHand);
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return inVr(vr -> vr.roomHand(mainHand), null);
     }
 
     /** True while Vivecraft draws the left eye, once per frame; false outside VR. */
     public static boolean isLeftEyePass() {
-        if (!active()) {
-            return false;
-        }
-        try {
-            return VivecraftBridge.isLeftEyePass();
-        } catch (Throwable t) {
-            disable(t);
-            return false;
-        }
+        return inVr(VrBackend::isLeftEyePass, false);
     }
 
     /** False while Vivecraft draws a view that is not the player's eyes (third-person or mixed-reality camera). */
     public static boolean isEyePass() {
-        if (!active()) {
-            return true;
-        }
-        try {
-            return VivecraftBridge.isEyePass();
-        } catch (Throwable t) {
-            disable(t);
-            return true;
-        }
+        return inVr(VrBackend::isEyePass, true);
     }
 
     /**
@@ -233,12 +200,12 @@ public final class VR {
         if (now - attackSideCheckedAt > 1000L) {
             attackSideCheckedAt = now;
             try {
-                Boolean main = VivecraftBridge.boundToMainHand(Minecraft.getInstance().options.keyAttack);
+                Boolean main = backend().boundToMainHand(Minecraft.getInstance().options.keyAttack);
                 boolean crossed = main != null && !main;
-                if (crossed != attackOnOffHand || attackSideCheckedAt == now && !attackSideLogged) {
+                if (crossed != attackOnOffHand || !attackSideLogged) {
                     attackSideLogged = true;
                     LOGGER.info("SteamVR attack trigger: {} (left-handed: {}) -> gun triggers {}",
-                            main == null ? "unknown" : main ? "main hand" : "off hand", VivecraftBridge.isLeftHanded(),
+                            main == null ? "unknown" : main ? "main hand" : "off hand", backend().isLeftHanded(),
                             crossed ? "swapped" : "as bound");
                 }
                 attackOnOffHand = crossed;
@@ -252,66 +219,32 @@ public final class VR {
 
     /** True when Vivecraft's HUD is locked to the off-hand controller (hand or wrist). */
     public static boolean hudOnHand() {
-        if (!active()) {
-            return false;
-        }
-        try {
-            return VivecraftBridge.isHudOnHand();
-        } catch (Throwable t) {
-            disable(t);
-            return false;
-        }
+        return inVr(VrBackend::isHudOnHand, false);
     }
 
     /** True in Vivecraft's seated mode (hands not tracked). */
     public static boolean seated() {
-        if (!active()) {
-            return false;
-        }
-        try {
-            return VivecraftBridge.isSeated();
-        } catch (Throwable t) {
-            disable(t);
-            return false;
-        }
+        return inVr(VrBackend::isSeated, false);
     }
 
+    /** True when Vivecraft's hands are reversed (main hand on the left controller). */
     public static boolean leftHanded() {
-        if (!loaded()) {
-            return false;
-        }
-        try {
-            return VivecraftBridge.isLeftHanded();
-        } catch (Throwable t) {
-            disable(t);
-            return false;
-        }
+        return installed(VrBackend::isLeftHanded, false);
+    }
+
+    /** True in VR with a shader pack on: what is drawn then goes through the pack's programs, not the game's. */
+    public static boolean shadersActive() {
+        return inVr(VrBackend::isShaderActive, false);
     }
 
     /** The key on the off-hand grip with Vivecraft's default bindings, or null without Vivecraft. */
     public static KeyMapping offHandGripKey() {
-        if (!loaded()) {
-            return null;
-        }
-        try {
-            return VivecraftBridge.offHandGripKey();
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return installed(VrBackend::offHandGripKey, null);
     }
 
     /** The key on the main-hand grip with Vivecraft's default bindings, or null without Vivecraft. */
     public static KeyMapping mainHandGripKey() {
-        if (!loaded()) {
-            return null;
-        }
-        try {
-            return VivecraftBridge.mainHandGripKey();
-        } catch (Throwable t) {
-            disable(t);
-            return null;
-        }
+        return installed(VrBackend::mainHandGripKey, null);
     }
 
     /** Vivecraft's teleport keys (normally the off-hand trigger), or none without Vivecraft. */
@@ -321,7 +254,7 @@ public final class VR {
         }
         if (teleportKeys == null) {
             try {
-                teleportKeys = VivecraftBridge.teleportKeys();
+                teleportKeys = backend().teleportKeys();
             } catch (Throwable t) {
                 disable(t);
                 return NO_KEYS;
@@ -341,15 +274,7 @@ public final class VR {
 
     /** True when Vivecraft treats {@code stack} as a roomscale bow (false without Vivecraft). */
     public static boolean isBow(ItemStack stack) {
-        if (!loaded()) {
-            return false;
-        }
-        try {
-            return VivecraftBridge.isBow(stack);
-        } catch (Throwable t) {
-            disable(t);
-            return false;
-        }
+        return installed(vr -> vr.isBow(stack), false);
     }
 
     /** Vibrates the main-hand or off-hand controller; no-op outside VR. */
@@ -358,7 +283,7 @@ public final class VR {
             return;
         }
         try {
-            VivecraftBridge.haptic(mainHand, seconds, amplitude);
+            backend().haptic(mainHand, seconds, amplitude);
         } catch (Throwable t) {
             disable(t);
         }

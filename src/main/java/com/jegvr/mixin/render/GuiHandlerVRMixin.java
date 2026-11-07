@@ -21,7 +21,7 @@ import org.vivecraft.client_vr.gameplay.screenhandlers.GuiHandler;
  */
 @Mixin(value = GuiHandler.class, remap = false)
 public abstract class GuiHandlerVRMixin {
-    @Inject(method = "applyGUIModelView", at = @At(value = "INVOKE",
+    @Inject(method = "applyGUIModelView", require = 0, at = @At(value = "INVOKE",
             target = "Lorg/vivecraft/client_vr/render/helpers/RenderHelper;getSmoothCameraPosition(Lorg/vivecraft/client_vr/render/RenderPass;Lorg/vivecraft/client_vr/VRData;)Lnet/minecraft/world/phys/Vec3;"))
     private static void jegvr$hudOnForearm(CallbackInfoReturnable<Vec3> cir, @Local(name = "guipos") LocalRef<Vec3> guipos,
                                            @Local(name = "guirot") Matrix4f guirot,

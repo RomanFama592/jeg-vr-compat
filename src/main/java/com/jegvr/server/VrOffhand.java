@@ -1,5 +1,6 @@
 package com.jegvr.server;
 
+import com.jegvr.compat.jeg.JegKeys;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -40,9 +41,6 @@ public final class VrOffhand {
     /** JEG keys fire-rate cooldowns by item: the same gun in both hands needs its own tracker per hand. */
     private static final Map<UUID, ShootTracker> OFF_HAND_TRACKERS = new ConcurrentHashMap<>();
     private static final Set<UUID> RELOADING = ConcurrentHashMap.newKeySet();
-    /** Same length as JEG's main-hand shoot animation (AnimatedGunItem.inventoryTick). */
-    private static final int SHOOT_ANIMATION_TICKS = 5;
-    private static final String CHARGE_KEY = "ChargeProgress";
 
     private static boolean firing;
     private static boolean attachmentsPass;
@@ -61,17 +59,18 @@ public final class VrOffhand {
      * shot it reads the off-hand gun's; the main hand's goes back right after, even in the middle of charging.
      */
     public static void fire(ServerPlayer player, float yaw, float pitch, float charge) {
-        if (!canDualWield(player.getOffhandItem()) || firing) {
+        if (!canDualWield(player.getOffhandItem()) || firing || !Float.isFinite(yaw) || !Float.isFinite(pitch)
+                || !Float.isFinite(charge)) {
             return;
         }
         firing = true;
         CompoundTag data = player.getPersistentData();
-        float mainCharge = data.getFloat(CHARGE_KEY);
-        data.putFloat(CHARGE_KEY, Mth.clamp(charge, 0.0F, 1.0F));
+        float mainCharge = data.getFloat(JegKeys.CHARGE_PROGRESS);
+        data.putFloat(JegKeys.CHARGE_PROGRESS, Mth.clamp(charge, 0.0F, 1.0F));
         try {
             ServerPlayHandler.handleShoot(new C2SMessageShoot(yaw, pitch), player);
         } finally {
-            data.putFloat(CHARGE_KEY, mainCharge);
+            data.putFloat(JegKeys.CHARGE_PROGRESS, mainCharge);
             firing = false;
         }
     }
@@ -91,7 +90,7 @@ public final class VrOffhand {
 
     /** JEG's melee attack with the off-hand gun, with the player turned towards the target just for it. */
     public static void melee(ServerPlayer player, float yaw, float pitch) {
-        if (!canDualWield(player.getOffhandItem()) || firing) {
+        if (!canDualWield(player.getOffhandItem()) || firing || !Float.isFinite(yaw) || !Float.isFinite(pitch)) {
             return;
         }
         firing = true;
@@ -161,13 +160,13 @@ public final class VrOffhand {
         }
         Gun gun = ((GunItem) stack.getItem()).getModifiedGun(stack);
         CompoundTag tag = stack.getTag();
-        if (tag != null && tag.getInt("AmmoCount") >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
+        if (tag != null && tag.getInt(JegKeys.AMMO_COUNT) >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
             return;
         }
         RELOADING.add(player.getUUID());
         ModSyncedDataKeys.RELOADING.setValue(player, true);
         // Drives the off-hand gun's reload animation; set here too so inventory sync does not wipe the client's copy.
-        stack.getOrCreateTag().putBoolean("IsReloading", true);
+        stack.getOrCreateTag().putBoolean(JegKeys.IS_RELOADING, true);
     }
 
     /** True while {@code player}'s current JEG reload is for the off-hand gun. */
@@ -189,8 +188,8 @@ public final class VrOffhand {
         tickAttachments(event, player, offhand);
         tickShootAnimation(offhand);
         CompoundTag tag = offhand.getTag();
-        if (!jegReloading && tag != null && tag.getBoolean("IsReloading") && offhand.getItem() instanceof GunItem) {
-            tag.remove("IsReloading");
+        if (!jegReloading && tag != null && tag.getBoolean(JegKeys.IS_RELOADING) && offhand.getItem() instanceof GunItem) {
+            tag.remove(JegKeys.IS_RELOADING);
         }
     }
 
@@ -228,15 +227,15 @@ public final class VrOffhand {
      */
     private static void tickShootAnimation(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-        if (!(stack.getItem() instanceof AnimatedGunItem) || tag == null || !tag.getBoolean("IsShooting")) {
+        if (!(stack.getItem() instanceof AnimatedGunItem) || tag == null || !tag.getBoolean(JegKeys.IS_SHOOTING)) {
             return;
         }
-        int tick = tag.getInt("AnimationTick") + 1;
-        if (tick >= SHOOT_ANIMATION_TICKS) {
-            tag.remove("IsShooting");
-            tag.remove("AnimationTick");
+        int tick = tag.getInt(JegKeys.ANIMATION_TICK) + 1;
+        if (tick >= JegKeys.SHOOT_ANIMATION_TICKS) {
+            tag.remove(JegKeys.IS_SHOOTING);
+            tag.remove(JegKeys.ANIMATION_TICK);
         } else {
-            tag.putInt("AnimationTick", tick);
+            tag.putInt(JegKeys.ANIMATION_TICK, tick);
         }
     }
 

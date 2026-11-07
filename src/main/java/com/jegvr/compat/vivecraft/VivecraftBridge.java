@@ -1,5 +1,7 @@
 package com.jegvr.compat.vivecraft;
 
+import com.jegvr.compat.VR;
+import com.jegvr.compat.VrBackend;
 import com.jegvr.mixin.input.MCOpenVRAccessor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
@@ -20,44 +22,48 @@ import org.vivecraft.client_vr.provider.openvr_lwjgl.MCOpenVR;
 import org.vivecraft.client_vr.provider.openvr_lwjgl.VRInputAction;
 import org.vivecraft.client_vr.render.RenderPass;
 import org.vivecraft.client_vr.settings.VRSettings;
+import org.vivecraft.mod_compat_vr.shaders.ShadersHelper;
 
 /**
- * The only class that touches Vivecraft 1.2.5 directly. Never load it unless the "vivecraft" mod is present;
- * go through {@link com.jegvr.compat.VR}.
+ * {@link VrBackend} for Vivecraft 1.2.x. Outside the mixins, the only class that touches Vivecraft directly. Never load it
+ * unless the "vivecraft" mod is present; go through {@link VR}.
  */
-public final class VivecraftBridge {
-    /** World-space pose of a tracked device. */
-    public record Pose(Vec3 pos, Vec3 dir) {
+public final class VivecraftBridge implements VrBackend {
+    @Override
+    public String name() {
+        return "Vivecraft 1.2";
     }
 
-    private VivecraftBridge() {
-    }
-
-    public static boolean isActive() {
+    @Override
+    public boolean isActive() {
         return VivecraftClientAPI.getInstance().isVrActive() && data() != null;
     }
 
-    public static boolean isVRPlayer(Player player) {
+    @Override
+    public boolean isVRPlayer(Player player) {
         return VivecraftAPI.getInstance().isVRPlayer(player);
     }
 
-    /** Pose of the hand holding the main item (follows Vivecraft's left-handed setting). */
-    public static Pose mainHand() {
+    @Override
+    public VR.Aim mainHand() {
         VRData d = data();
         return d == null ? null : pose(d.c0);
     }
 
-    public static Pose offHand() {
+    @Override
+    public VR.Aim offHand() {
         VRData d = data();
         return d == null ? null : pose(d.c1);
     }
 
-    public static Pose hmd() {
+    @Override
+    public VR.Aim hmd() {
         VRData d = data();
         return d == null ? null : pose(d.hmd);
     }
 
-    public static Vec3 hmdUp() {
+    @Override
+    public Vec3 hmdUp() {
         VRData d = data();
         if (d == null) {
             return null;
@@ -66,8 +72,8 @@ public final class VivecraftBridge {
         return new Vec3(up.x, up.y, up.z);
     }
 
-    /** {@code dir} (world space) in a controller's own axes, the frame the gun held in that hand is drawn in. */
-    public static Vec3 toHandLocal(boolean mainHand, Vec3 dir) {
+    @Override
+    public Vec3 toHandLocal(boolean mainHand, Vec3 dir) {
         VRData d = data();
         VRData.VRDevicePose c = d == null ? null : mainHand ? d.c0 : d.c1;
         if (c == null) {
@@ -81,8 +87,8 @@ public final class VivecraftBridge {
                 dir.x * z.x + dir.y * z.y + dir.z * z.z);
     }
 
-    /** A controller's rotation and position in the room, in metres: no world position, rotation or scale. */
-    public static Matrix4f roomHand(boolean mainHand) {
+    @Override
+    public Matrix4f roomHand(boolean mainHand) {
         VRPlayer player = VRPlayer.get();
         VRData room = player == null ? null : player.vrdata_room_pre;
         if (room == null) {
@@ -94,13 +100,13 @@ public final class VivecraftBridge {
         return c.getMatrix().invert().transpose().setTranslation(position);
     }
 
-    /** True while Vivecraft draws the left eye, the first view of every frame. */
-    public static boolean isLeftEyePass() {
+    @Override
+    public boolean isLeftEyePass() {
         return ClientDataHolderVR.getInstance().currentPass == RenderPass.LEFT;
     }
 
-    /** A controller's own X, Y and Z axes in world space. */
-    public static Vec3[] handAxes(boolean mainHand) {
+    @Override
+    public Vec3[] handAxes(boolean mainHand) {
         VRData d = data();
         VRData.VRDevicePose c = d == null ? null : mainHand ? d.c0 : d.c1;
         if (c == null) {
@@ -112,14 +118,14 @@ public final class VivecraftBridge {
         return new Vec3[]{new Vec3(x.x, x.y, x.z), new Vec3(y.x, y.y, y.z), new Vec3(z.x, z.y, z.z)};
     }
 
-    /** False while Vivecraft draws the third-person or the mixed-reality camera view (not the player's own eyes). */
-    public static boolean isEyePass() {
+    @Override
+    public boolean isEyePass() {
         RenderPass pass = ClientDataHolderVR.getInstance().currentPass;
         return pass != RenderPass.THIRD && pass != RenderPass.CAMERA;
     }
 
-    /** Vibrates a controller; {@code mainHand} false targets the free hand. */
-    public static void haptic(boolean mainHand, float seconds, float amplitude) {
+    @Override
+    public void haptic(boolean mainHand, float seconds, float amplitude) {
         MCVR vr = MCVR.get();
         if (vr == null) {
             return;
@@ -129,32 +135,30 @@ public final class VivecraftBridge {
         vr.triggerHapticPulse(mainHand ? ControllerType.RIGHT : ControllerType.LEFT, seconds, 160.0F, amplitude);
     }
 
-    /** Vivecraft's teleport keys (teleport mode and free-move fallback), bound to the off-hand trigger by default. */
-    public static KeyMapping[] teleportKeys() {
+    @Override
+    public KeyMapping[] teleportKeys() {
         VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
         return new KeyMapping[]{mod.keyTeleport, mod.keyTeleportFallback};
     }
 
     /**
-     * The key on the off-hand grip: Vivecraft's default bindings put "hotbar previous" on the left grip and "hotbar
-     * next" on the right one, and the off hand is the left one unless hands are reversed.
+     * Vivecraft's default bindings put "hotbar previous" on the left grip and "hotbar next" on the right one, and the off
+     * hand is the left one unless hands are reversed.
      */
-    public static KeyMapping offHandGripKey() {
+    @Override
+    public KeyMapping offHandGripKey() {
         VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
         return isLeftHanded() ? mod.keyHotbarNext : mod.keyHotbarPrev;
     }
 
-    /** The key on the main-hand grip: the other "hotbar" key. */
-    public static KeyMapping mainHandGripKey() {
+    @Override
+    public KeyMapping mainHandGripKey() {
         VivecraftVRMod mod = VivecraftVRMod.INSTANCE;
         return isLeftHanded() ? mod.keyHotbarPrev : mod.keyHotbarNext;
     }
 
-    /**
-     * Whether {@code key} is bound, in the current SteamVR binding, to the main-hand controller (true), the off-hand one
-     * (false), or neither or both (null).
-     */
-    public static Boolean boundToMainHand(KeyMapping key) {
+    @Override
+    public Boolean boundToMainHand(KeyMapping key) {
         MCVR vr = MCVR.get();
         if (!(vr instanceof MCOpenVR openVr)) {
             return null;
@@ -177,29 +181,36 @@ public final class VivecraftBridge {
         return right;
     }
 
-    /** Vivecraft's roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */
-    public static boolean isBow(ItemStack stack) {
+    @Override
+    public boolean isBow(ItemStack stack) {
         return BowTracker.isBow(stack);
     }
 
-    /** True when Vivecraft's HUD (with the hotbar) is locked to the off-hand controller, not to the head. */
-    public static boolean isHudOnHand() {
+    @Override
+    public boolean isHudOnHand() {
         VRSettings.HUDLock lock = ClientDataHolderVR.getInstance().vrSettings.vrHudLockMode;
         return lock == VRSettings.HUDLock.HAND || lock == VRSettings.HUDLock.WRIST;
     }
 
-    /** Vivecraft's seated mode: the hands follow the view, they are not tracked. */
-    public static boolean isSeated() {
+    @Override
+    public boolean isSeated() {
         return ClientDataHolderVR.getInstance().vrSettings.seated;
     }
 
-    public static boolean isLeftHanded() {
+    @Override
+    public boolean isLeftHanded() {
         return ClientDataHolderVR.getInstance().vrSettings.reverseHands;
     }
 
-    public static float worldScale() {
+    @Override
+    public float worldScale() {
         VRPlayer vrPlayer = VRPlayer.get();
         return vrPlayer == null ? 1.0F : vrPlayer.worldScale;
+    }
+
+    @Override
+    public boolean isShaderActive() {
+        return ShadersHelper.isShaderActive();
     }
 
     private static VRData data() {
@@ -210,11 +221,11 @@ public final class VivecraftBridge {
         return vrPlayer.vrdata_world_render != null ? vrPlayer.vrdata_world_render : vrPlayer.getVRDataWorld();
     }
 
-    private static Pose pose(VRData.VRDevicePose pose) {
+    private static VR.Aim pose(VRData.VRDevicePose pose) {
         if (pose == null) {
             return null;
         }
         Vector3f dir = pose.getDirection();
-        return new Pose(pose.getPosition(), new Vec3(dir.x, dir.y, dir.z));
+        return new VR.Aim(pose.getPosition(), new Vec3(dir.x, dir.y, dir.z));
     }
 }

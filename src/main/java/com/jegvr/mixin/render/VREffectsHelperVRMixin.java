@@ -11,7 +11,7 @@ import ttv.migami.jeg.item.GunItem;
 /** Hides Vivecraft's in-world crosshair while a JEG gun is in either hand: the gun itself is the sight. */
 @Mixin(value = VREffectsHelper.class, remap = false)
 public class VREffectsHelperVRMixin {
-    @Inject(method = "shouldRenderCrosshair", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "shouldRenderCrosshair", at = @At("RETURN"), cancellable = true, require = 0)
     private static void jegvr$noCrosshairWithGun(CallbackInfoReturnable<Boolean> cir) {
         var player = Minecraft.getInstance().player;
         // This class only renders in VR, so no VR.active() check is needed.

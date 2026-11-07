@@ -7,10 +7,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.renderer.MultiBufferSource;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 /**
  * F9.17: JEG guns are modelled for the right hand (bolt, ejection port and sights on its right side). A gun in the
  * physical left controller is drawn mirrored across its X axis, animation included (the mirror applies to the whole
@@ -63,72 +59,106 @@ public final class VrGunMirror {
     }
 
     /**
-     * Holds the vertices of one primitive and replays them as 0, n-1, ..., 1. Each vertex's element calls are replayed
-     * in their own order, which must match the buffer's vertex format.
+     * Holds the vertices of one primitive and replays them as 0, n-1, ..., 1. Each vertex's element calls are replayed in
+     * their own order, which must match the buffer's vertex format. It runs for every vertex of a model, for each eye, so
+     * it records into arrays it reuses and allocates nothing per vertex.
      */
-    private static final class ReversedWinding implements VertexConsumer {
+    static final class ReversedWinding implements VertexConsumer {
+        private static final int MAX_ELEMENTS = 6;
+        private static final int VALUES_PER_ELEMENT = 4;
+        private static final byte POSITION = 0;
+        private static final byte COLOR = 1;
+        private static final byte UV = 2;
+        private static final byte OVERLAY = 3;
+        private static final byte LIGHT = 4;
+        private static final byte NORMAL = 5;
+
         private final VertexConsumer delegate;
         private final int size;
-        private final List<List<Consumer<VertexConsumer>>> vertices = new ArrayList<>(4);
-        private List<Consumer<VertexConsumer>> current = new ArrayList<>(7);
+        private final byte[][] kinds;
+        private final int[] counts;
+        private final double[][] values;
+        private int current;
 
-        private ReversedWinding(VertexConsumer delegate, int size) {
+        ReversedWinding(VertexConsumer delegate, int size) {
             this.delegate = delegate;
             this.size = size;
+            this.kinds = new byte[size][MAX_ELEMENTS];
+            this.counts = new int[size];
+            this.values = new double[size][MAX_ELEMENTS * VALUES_PER_ELEMENT];
+        }
+
+        private ReversedWinding record(byte kind, double a, double b, double c, double d) {
+            int count = counts[current];
+            kinds[current][count] = kind;
+            double[] vertex = values[current];
+            int at = count * VALUES_PER_ELEMENT;
+            vertex[at] = a;
+            vertex[at + 1] = b;
+            vertex[at + 2] = c;
+            vertex[at + 3] = d;
+            counts[current] = count + 1;
+            return this;
         }
 
         @Override
         public VertexConsumer vertex(double x, double y, double z) {
-            current.add(c -> c.vertex(x, y, z));
-            return this;
+            return record(POSITION, x, y, z, 0.0);
         }
 
         @Override
         public VertexConsumer color(int r, int g, int b, int a) {
-            current.add(c -> c.color(r, g, b, a));
-            return this;
+            return record(COLOR, r, g, b, a);
         }
 
         @Override
         public VertexConsumer uv(float u, float v) {
-            current.add(c -> c.uv(u, v));
-            return this;
+            return record(UV, u, v, 0.0, 0.0);
         }
 
         @Override
         public VertexConsumer overlayCoords(int u, int v) {
-            current.add(c -> c.overlayCoords(u, v));
-            return this;
+            return record(OVERLAY, u, v, 0.0, 0.0);
         }
 
         @Override
         public VertexConsumer uv2(int u, int v) {
-            current.add(c -> c.uv2(u, v));
-            return this;
+            return record(LIGHT, u, v, 0.0, 0.0);
         }
 
         @Override
         public VertexConsumer normal(float x, float y, float z) {
-            current.add(c -> c.normal(x, y, z));
-            return this;
+            return record(NORMAL, x, y, z, 0.0);
         }
 
         @Override
         public void endVertex() {
-            vertices.add(current);
-            current = new ArrayList<>(7);
-            if (vertices.size() == size) {
+            current++;
+            if (current == size) {
                 emit(0);
                 for (int i = size - 1; i > 0; i--) {
                     emit(i);
                 }
-                vertices.clear();
+                current = 0;
+                java.util.Arrays.fill(counts, 0);
             }
         }
 
         private void emit(int index) {
-            for (Consumer<VertexConsumer> element : vertices.get(index)) {
-                element.accept(delegate);
+            double[] vertex = values[index];
+            for (int element = 0; element < counts[index]; element++) {
+                int at = element * VALUES_PER_ELEMENT;
+                double a = vertex[at];
+                double b = vertex[at + 1];
+                double c = vertex[at + 2];
+                switch (kinds[index][element]) {
+                    case POSITION -> delegate.vertex(a, b, c);
+                    case COLOR -> delegate.color((int) a, (int) b, (int) c, (int) vertex[at + 3]);
+                    case UV -> delegate.uv((float) a, (float) b);
+                    case OVERLAY -> delegate.overlayCoords((int) a, (int) b);
+                    case LIGHT -> delegate.uv2((int) a, (int) b);
+                    default -> delegate.normal((float) a, (float) b, (float) c);
+                }
             }
             delegate.endVertex();
         }

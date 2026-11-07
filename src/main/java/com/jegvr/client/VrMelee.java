@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
 import com.jegvr.network.C2SVrMeleeOffhand;
 import com.jegvr.network.VrNetwork;
@@ -43,7 +44,7 @@ public final class VrMelee {
             return false;
         }
         CompoundTag tag = stack.getTag();
-        return (tag == null || !tag.getString("GunId").endsWith("blowpipe")) && (mainHand || VrAim.serverHasAddon());
+        return (tag == null || !tag.getString(JegKeys.GUN_ID).endsWith("blowpipe")) && (mainHand || VrAim.serverHasAddon());
     }
 
     /** The swing hit {@code target}. Does nothing while the gun cools down or if JEG would not reach the target. */

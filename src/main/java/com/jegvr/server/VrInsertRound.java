@@ -1,5 +1,6 @@
 package com.jegvr.server;
 
+import com.jegvr.compat.jeg.JegKeys;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -44,8 +45,8 @@ public final class VrInsertRound {
         }
         Gun gun = gunItem.getModifiedGun(stack);
         CompoundTag tag = stack.getOrCreateTag();
-        int ammo = tag.getInt("AmmoCount");
-        if (!ReloadType.MANUAL.equals(gun.getReloads().getReloadType()) || tag.getBoolean("IgnoreAmmo")
+        int ammo = tag.getInt(JegKeys.AMMO_COUNT);
+        if (!ReloadType.MANUAL.equals(gun.getReloads().getReloadType()) || tag.getBoolean(JegKeys.IGNORE_AMMO)
                 || ammo >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
             return;
         }
@@ -66,7 +67,7 @@ public final class VrInsertRound {
             }
         }
         LAST_ROUND.put(player.getUUID(), now);
-        tag.putInt("AmmoCount", ammo + 1);
+        tag.putInt(JegKeys.AMMO_COUNT, ammo + 1);
         playSound(player, gun.getSounds().getReloadLoad());
         if (ammo == 0) {
             // An empty gun also gets JEG's closing sound on its first round, without JEG's extra wait.

@@ -35,7 +35,7 @@ public abstract class ItemInHandLayerVRMixin {
     @Unique
     private static boolean jegvr$lookedUp;
 
-    @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderArmWithItem", at = @At("HEAD"), cancellable = true, require = 0)
     private void jegvr$drawOffhandGun(LivingEntity entity, ItemStack stack, ItemDisplayContext context, HumanoidArm arm,
                                       PoseStack poseStack, MultiBufferSource buffer, int light, CallbackInfo ci) {
         if (!(entity instanceof Player player) || !(stack.getItem() instanceof GunItem gunItem)

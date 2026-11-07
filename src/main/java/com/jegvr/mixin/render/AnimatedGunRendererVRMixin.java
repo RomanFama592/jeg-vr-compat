@@ -26,6 +26,7 @@ import ttv.migami.jeg.client.render.gun.animated.AnimatedGunRenderer;
 
 @Mixin(value = AnimatedGunRenderer.class, remap = false)
 public class AnimatedGunRendererVRMixin {
+    // renderByItem overrides a vanilla method: that name exists in development, m_108829_ in the game (remap = false here).
     private static final String POSE = "Lcom/mojang/blaze3d/vertex/PoseStack;";
 
     @Inject(method = {
@@ -39,25 +40,25 @@ public class AnimatedGunRendererVRMixin {
     }
 
     // Ordinal 0 of translate/mulPose is the static bow orientation fix; the rest is the ADS centering.
-    @WrapWithCondition(method = "renderByItem",
+    @WrapWithCondition(method = {"renderByItem", "m_108829_"},
             at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 1))
     private boolean jegvr$noAdsTranslate1(PoseStack stack, double x, double y, double z) {
         return !VR.active();
     }
 
-    @WrapWithCondition(method = "renderByItem",
+    @WrapWithCondition(method = {"renderByItem", "m_108829_"},
             at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 2))
     private boolean jegvr$noAdsTranslate2(PoseStack stack, double x, double y, double z) {
         return !VR.active();
     }
 
-    @WrapWithCondition(method = "renderByItem",
+    @WrapWithCondition(method = {"renderByItem", "m_108829_"},
             at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 3))
     private boolean jegvr$noAdsTranslate3(PoseStack stack, double x, double y, double z) {
         return !VR.active();
     }
 
-    @WrapWithCondition(method = "renderByItem",
+    @WrapWithCondition(method = {"renderByItem", "m_108829_"},
             at = @At(value = "INVOKE", target = POSE + "mulPose(Lorg/joml/Quaternionf;)V", remap = true, ordinal = 1))
     private boolean jegvr$noAdsRotate(PoseStack stack, Quaternionf rotation) {
         return !VR.active();
@@ -82,7 +83,7 @@ public class AnimatedGunRendererVRMixin {
         return false;
     }
 
-    @Inject(method = "renderByItem", at = @At("HEAD"))
+    @Inject(method = {"renderByItem", "m_108829_"}, at = @At("HEAD"), require = 0)
     private void jegvr$diagRenderByItem(ItemStack stack, ItemDisplayContext context, PoseStack poseStack,
                                         MultiBufferSource buffer, int light, int overlay, CallbackInfo ci) {
         if (VR.active() && context.firstPerson()) {
@@ -91,7 +92,7 @@ public class AnimatedGunRendererVRMixin {
     }
 
     /** Muzzle flash and its light boost: in VR only on the gun of the hand that fired (see {@link VrHands}). */
-    @WrapOperation(method = "renderByItem", at = @At(value = "INVOKE",
+    @WrapOperation(method = {"renderByItem", "m_108829_"}, require = 0, at = @At(value = "INVOKE",
             target = "Lttv/migami/jeg/client/handler/ShootingHandler;isShooting()Z"))
     private boolean jegvr$flashPerHand(ShootingHandler handler, Operation<Boolean> original,
                                        @Local(argsOnly = true) ItemDisplayContext context) {

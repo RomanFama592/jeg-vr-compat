@@ -38,6 +38,13 @@ minecraft {
             workingDirectory project.file('run-client2')
             args '--username', 'Flat'
         }
+        // Applies every mixin of every mod, logs what fails and closes the game: ./gradlew runClientAudit [-Pcompat]
+        // Its own folder, with VR off, so it never starts SteamVR.
+        clientAudit {
+            parent runs.client
+            workingDirectory project.file('run-audit')
+            property 'jegvr.audit', 'true'
+        }
         // Dedicated server for phase S: ./gradlew runServer -PnoVivecraft (JEG + addon, no Vivecraft).
         server {
             workingDirectory project.file('run-server')
@@ -56,6 +63,9 @@ def seedFile = { String path, String text ->
 }
 tasks.matching { it.name == 'runClient2' }.configureEach {
     doFirst { seedFile('run-client2/config/vivecraft-client-config.json', '{"vrEnabled": "false", "rememberVr": "true"}\n') }
+}
+tasks.matching { it.name == 'runClientAudit' }.configureEach {
+    doFirst { seedFile('run-audit/config/vivecraft-client-config.json', '{"vrEnabled": "false", "rememberVr": "true"}\n') }
 }
 tasks.matching { it.name == 'runServer' }.configureEach {
     // Dev clients have no Mojang session, so the test server must not authenticate them.
@@ -76,34 +86,57 @@ repositories {
     }
     maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
     flatDir { dirs 'libs' }
+    // Only the test libraries: everything else keeps coming from where ForgeGradle resolves it.
+    mavenCentral {
+        content {
+            includeGroup 'org.junit'
+            includeGroup 'org.junit.jupiter'
+            includeGroup 'org.junit.platform'
+            includeGroup 'org.opentest4j'
+            includeGroup 'org.apiguardian'
+        }
+    }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.2.0'
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // Only compat/vivecraft/VivecraftBridge may import org.vivecraft.* (Vivecraft is optional at runtime).
-    compileOnly fg.deobf('maven.modrinth:vivecraft:1.20.1-1.2.5-forge')
+    // Only compat/vivecraft/VivecraftBridge and the mixins may import org.vivecraft.* (Vivecraft is optional at runtime).
+    compileOnly fg.deobf("maven.modrinth:vivecraft:${vivecraft_version}")
     // ./gradlew runClient -PnoVivecraft  -> test the flat path without Vivecraft installed
     if (!project.hasProperty('noVivecraft')) {
-        runtimeOnly fg.deobf('maven.modrinth:vivecraft:1.20.1-1.2.5-forge')
+        runtimeOnly fg.deobf("maven.modrinth:vivecraft:${vivecraft_version}")
     }
-    compileOnly fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4')
-    compileOnly fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')
-    compileOnly fg.deobf('local:framework-forge:1.20.1-0.7.11')
+    // ./gradlew runClient -Pcompat  -> with Embeddium and Oculus (see COMPATIBILIDAD.md)
+    if (project.hasProperty('compat')) {
+        runtimeOnly fg.deobf("maven.modrinth:embeddium:${embeddium_version}")
+        runtimeOnly fg.deobf("maven.modrinth:oculus:${oculus_version}")
+    }
+    compileOnly fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
+    compileOnly fg.deobf("local:JustEnoughGuns:${jeg_version}")
+    compileOnly fg.deobf("local:framework-forge:${framework_version}")
 
-    runtimeOnly fg.deobf('software.bernie.geckolib:geckolib-forge-1.20.1:4.4.4')
-    runtimeOnly fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')
-    runtimeOnly fg.deobf('local:framework-forge:1.20.1-0.7.11')
+    runtimeOnly fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
+    runtimeOnly fg.deobf("local:JustEnoughGuns:${jeg_version}")
+    runtimeOnly fg.deobf("local:framework-forge:${framework_version}")
 
-    compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.3.5'))
-    implementation(jarJar('io.github.llamalad7:mixinextras-forge:0.3.5')) {
-        jarJar.ranged(it, '[0.3.5,)')
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
+        jarJar.ranged(it, "[${mixinextras_version},)")
     }
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
 }
 
 tasks.named('processResources', ProcessResources).configure {
-    var replaceProperties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version]
+    var replaceProperties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version, mod_authors: mod_authors,
+                             mod_license: mod_license, jeg_version_range: jeg_version_range,
+                             vivecraft_version_range: vivecraft_version_range]
     inputs.properties replaceProperties
     filesMatching(['META-INF/mods.toml']) {
         expand replaceProperties
@@ -116,7 +149,18 @@ tasks.named('jar', Jar).configure {
         'Implementation-Title' : mod_name,
         'Implementation-Version': mod_version
     ])
+    // The jar that gets published is the jarJar one, which carries MixinExtras: this one only feeds it.
+    archiveClassifier = 'slim'
     finalizedBy 'reobfJar'
+}
+
+tasks.named('jarJar').configure {
+    archiveClassifier = ''
+    manifest.attributes([
+        'Specification-Title'  : mod_id,
+        'Implementation-Title' : mod_name,
+        'Implementation-Version': mod_version
+    ])
 }
 
 tasks.withType(JavaCompile).configureEach {

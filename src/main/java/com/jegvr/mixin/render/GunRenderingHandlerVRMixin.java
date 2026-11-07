@@ -56,7 +56,7 @@ public class GunRenderingHandlerVRMixin {
         return !VR.active();
     }
 
-    @Inject(method = "renderWeapon", at = @At("HEAD"))
+    @Inject(method = "renderWeapon", at = @At("HEAD"), require = 0)
     private void jegvr$diagRenderWeapon(LivingEntity entity, ItemStack stack, ItemDisplayContext context,
                                         PoseStack poseStack, MultiBufferSource buffer, int light, float partialTick,
                                         CallbackInfoReturnable<Boolean> cir) {
@@ -67,7 +67,7 @@ public class GunRenderingHandlerVRMixin {
     }
 
     /** Muzzle flash of classic guns: in VR only on the gun of the hand that fired (see {@link VrHands}). */
-    @WrapOperation(method = "renderWeapon", at = @At(value = "INVOKE",
+    @WrapOperation(method = "renderWeapon", require = 0, at = @At(value = "INVOKE",
             target = "Lttv/migami/jeg/client/handler/ShootingHandler;isShooting()Z"))
     private boolean jegvr$flashPerHand(ShootingHandler handler, Operation<Boolean> original,
                                        @Local(argsOnly = true) ItemDisplayContext context) {

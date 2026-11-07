@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
 import com.jegvr.mixin.input.ReloadHandlerAccessor;
 import com.jegvr.network.C2SVrAttachmentsOffhand;
@@ -63,7 +64,7 @@ public final class VrDualReload {
             ItemStack stack = player.getOffhandItem();
             CompoundTag tag = stack.getTag();
             if (tag != null) {
-                tag.putBoolean("IsReloading", false);
+                tag.putBoolean(JegKeys.IS_RELOADING, false);
             }
             ReloadHandler.get().setReloading(false);
             VrNetwork.CHANNEL.sendToServer(new C2SVrUnloadOffhand());
@@ -165,7 +166,7 @@ public final class VrDualReload {
     public static void reloadMainHand(LocalPlayer player) {
         CompoundTag tag = player.getMainHandItem().getTag();
         if (tag != null) {
-            tag.putBoolean("IsReloading", true);
+            tag.putBoolean(JegKeys.IS_RELOADING, true);
         }
         ReloadHandler.get().setReloading(true);
     }
@@ -176,13 +177,13 @@ public final class VrDualReload {
         GunItem gunItem = (GunItem) stack.getItem();
         Gun gun = gunItem.getModifiedGun(stack);
         CompoundTag tag = stack.getTag();
-        if (ModSyncedDataKeys.RELOADING.getValue(player) || tag == null || tag.getBoolean("IgnoreAmmo")
-                || tag.getInt("AmmoCount") >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
+        if (ModSyncedDataKeys.RELOADING.getValue(player) || tag == null || tag.getBoolean(JegKeys.IGNORE_AMMO)
+                || tag.getInt(JegKeys.AMMO_COUNT) >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
             return;
         }
         // Mirror JEG's ReloadHandler.setReloading(true): predict the flag, start the reload animation, and record the
         // slot so JEG's slot check does not cancel it.
-        tag.putBoolean("IsReloading", true);
+        tag.putBoolean(JegKeys.IS_RELOADING, true);
         ModSyncedDataKeys.RELOADING.setValue(player, true);
         VrHands.markReload(InteractionHand.OFF_HAND);
         ((ReloadHandlerAccessor) ReloadHandler.get()).jegvr$setReloadingSlot(player.getInventory().selected);

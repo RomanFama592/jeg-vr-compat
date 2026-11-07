@@ -3,6 +3,8 @@ package com.jegvr.client;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jegvr.JegVrCompat;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +37,7 @@ public final class VrGunConfig {
     private static final Logger LOGGER = LogManager.getLogger(JegVrCompat.MOD_ID);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final long RELOAD_CHECK_MS = 1000L;
+    private static final int SCHEMA = 1;
     private static final String RESOURCE = "assets/" + JegVrCompat.MOD_ID + "/gun_poses.json";
 
     /** Rotation in degrees, translation in blocks (controller frame, applied before the gun is drawn). */
@@ -74,6 +77,8 @@ public final class VrGunConfig {
     }
 
     private static final class Data {
+        /** The format of the file; a later format brings its migration, and older files keep working. */
+        int schema = SCHEMA;
         /** Null in the user layer until the user edits the defaults. */
         Pose defaults;
         Map<String, Pose> guns = new LinkedHashMap<>();
@@ -119,9 +124,16 @@ public final class VrGunConfig {
         return SOURCE != null;
     }
 
+    /** The disk is only looked at here, between frames: {@link #poseFor} runs in the middle of drawing each eye. */
+    @SubscribeEvent
+    public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            reloadIfChanged();
+        }
+    }
+
     /** Effective pose for a gun: defaults plus the gun's entry. */
     public static Pose poseFor(String gunId) {
-        reloadIfChanged();
         Pose gun = entry(gunId);
         Pose result = defaults().copy();
         if (gun != null) {
@@ -279,24 +291,30 @@ public final class VrGunConfig {
             if (modified == layer.lastModified) {
                 return;
             }
+            // Remembered first, so a broken file is reported once and tried again only when it changes.
+            layer.lastModified = modified;
             try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
                 Data loaded = parse(reader);
                 if (loaded != null) {
                     layer.data = loaded;
                 }
             }
-            layer.lastModified = modified;
             LOGGER.info("Loaded VR gun poses from {}", path);
         } catch (Exception e) {
-            layer.lastModified = -2L;
             LOGGER.error("Could not read {}, keeping previous values", path, e);
         }
     }
 
     private static Data parse(Reader reader) {
         Data loaded = GSON.fromJson(reader, Data.class);
-        if (loaded != null && loaded.guns == null) {
+        if (loaded == null) {
+            return null;
+        }
+        if (loaded.guns == null) {
             loaded.guns = new LinkedHashMap<>();
+        }
+        if (loaded.schema > SCHEMA) {
+            LOGGER.warn("VR gun poses in format {} are from a newer version of the addon (this one reads {})", loaded.schema, SCHEMA);
         }
         return loaded;
     }

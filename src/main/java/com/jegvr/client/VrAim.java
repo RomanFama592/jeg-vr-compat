@@ -79,7 +79,7 @@ public final class VrAim {
     }
 
     private static void sendMuzzle(InteractionHand hand, VR.Aim aim, Vec3 barrel) {
-        Vec3 muzzle = aim.pos().add(barrel.scale(MUZZLE_FORWARD));
+        Vec3 muzzle = aim.pos().add(barrel.scale(MUZZLE_FORWARD * VR.worldScale()));
         VrNetwork.CHANNEL.sendToServer(new C2SVrAim(hand, muzzle, barrel));
     }
 

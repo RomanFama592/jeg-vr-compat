@@ -1,6 +1,8 @@
 package com.jegvr.mixin.render;
 
 import com.jegvr.client.VrGunHud;
+import com.jegvr.client.VrGunMirror;
+import com.jegvr.client.VrHands;
 import com.jegvr.client.VrHandFollow;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -73,5 +75,8 @@ public abstract class VRArmHelperVRMixin {
         if ((renderMain || renderOff) && !menuHandMain && !menuHandOff) {
             VrGunHud.render(poseStack);
         }
+        // What is drawn from here on (a shader pack's shadows, the third-person camera, the hotbar) is no hand's gun.
+        VrHands.setRenderingHand(null);
+        VrGunMirror.drawn();
     }
 }

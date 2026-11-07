@@ -14,6 +14,18 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Servidor solo con JEG (F9.22): golpear moviendo el arma de la mano principal le pega al mob, también a un costado de donde mirás. Con el addon en el servidor, también con la secundaria.
 - [ ] Servidor dedicado con este `.jar` nuevo (la versión del canal subió a 4: cliente y servidor tienen que tener la misma versión del addon): disparo y medidores de la mano secundaria; el otro jugador escucha la preparación del lanzacohetes en esa mano.
 
+## Auditoría, revisión 4 (rama `refactor/auditoria-publicacion`)
+Verificado automáticamente: build, pruebas de `VrGunMirror`, `tools/check_mixins.py` y `runClientAudit` con Embeddium y
+Oculus en plano.
+- [ ] **Jar real**: `build/libs/jeg_vr_compat-0.1.0.jar` en un Minecraft normal con Forge, JEG, Vivecraft, Framework y GeckoLib: arranca, y un arma animada se ve y se anima, en plano y en VR.
+- [ ] Versión equivocada: con Vivecraft 1.3 o JEG 0.14, Forge muestra el error de versión en lugar de crashear.
+- [ ] VR: arma en la mano izquierda (espejada): caras correctas, sin agujeros ni bajones de FPS.
+- [ ] VR: dos armas animadas distintas: recargar una y disparar otra no anima a la otra, tampoco en la hotbar (G2).
+- [ ] `guns.json`: romperlo a propósito con el juego abierto: un solo error en el log; al arreglarlo, se aplica solo.
+- [ ] `/jegvr help`: sale en el idioma del juego (inglés y español).
+- [ ] Protocolo de shaders de `COMPATIBILIDAD.md`.
+- [ ] Servidor dedicado con este jar: arranca sin clases de cliente y el cliente VR detecta el addon (arma en la secundaria).
+
 ## Fase 1
 - [ ] Flat, sin Vivecraft: arranca, se puede disparar y recargar.
 - [ ] Flat, con Vivecraft en modo NONVR: arranca sin errores de mixin.

@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
 import com.jegvr.network.C2SVrInsertRound;
@@ -214,7 +215,7 @@ public final class VrGrabReload {
         }
         Gun gun = gunItem.getModifiedGun(stack);
         CompoundTag tag = stack.getTag();
-        if (tag == null || tag.getBoolean("IgnoreAmmo")
+        if (tag == null || tag.getBoolean(JegKeys.IGNORE_AMMO)
                 || ReloadType.INVENTORY_FED.equals(gun.getReloads().getReloadType())
                 || ammo(stack) >= GunModifierHelper.getModifiedAmmoCapacity(stack, gun)) {
             return Pouch.HIDDEN;
@@ -231,7 +232,7 @@ public final class VrGrabReload {
 
     private static int ammo(ItemStack stack) {
         CompoundTag tag = stack.getTag();
-        return tag == null ? 0 : tag.getInt("AmmoCount");
+        return tag == null ? 0 : tag.getInt(JegKeys.AMMO_COUNT);
     }
 
     private static boolean handInPouch(LocalPlayer player) {

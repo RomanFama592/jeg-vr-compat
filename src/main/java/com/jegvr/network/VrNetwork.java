@@ -3,21 +3,34 @@ package com.jegvr.network;
 import com.jegvr.JegVrCompat;
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.network.ConnectionData;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Optional channel: either side may lack it (a JEG-only server, or a server with the addon and a flat client without
- * it). The client only sends on it after checking {@link #isPresent(Connection)}.
+ * it), and the two sides may run different releases of the addon. Nothing is rejected on join: the client reads the
+ * server's {@link #PROTOCOL} and only sends what that server understands.
+ * <p>
+ * The contract between releases: a packet id only ever gets added, and an existing packet never changes its format. A new
+ * packet raises {@link #PROTOCOL}, and the client checks {@link #serverProtocol} before sending it.
  */
 public final class VrNetwork {
-    /** Bump when a packet changes; a mismatch (not an absence) is rejected on join. */
-    private static final String VERSION = "6";
+    /** The packets below are all there since this one, the first public protocol. */
+    private static final int BASE_PROTOCOL = 6;
+    public static final int PROTOCOL = BASE_PROTOCOL;
 
-    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(JegVrCompat.MOD_ID, "main"), () -> VERSION,
-            NetworkRegistry.acceptMissingOr(VERSION), NetworkRegistry.acceptMissingOr(VERSION));
+    private static final ResourceLocation NAME = new ResourceLocation(JegVrCompat.MOD_ID, "main");
+
+    public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(NAME, () -> Integer.toString(PROTOCOL),
+            remote -> true, remote -> true);
+
+    private static WeakReference<Connection> readConnection = new WeakReference<>(null);
+    private static int readProtocol;
 
     private VrNetwork() {
     }
@@ -65,7 +78,33 @@ public final class VrNetwork {
                 .add();
     }
 
+    /** True when the other side has this channel with at least the first public protocol. */
     public static boolean isPresent(Connection connection) {
-        return connection != null && CHANNEL.isRemotePresent(connection);
+        return serverProtocol(connection) >= BASE_PROTOCOL;
+    }
+
+    /** The protocol of the addon on the other side of {@code connection}, or 0 without it. Read once per connection. */
+    public static int serverProtocol(Connection connection) {
+        if (connection == null) {
+            return 0;
+        }
+        if (readConnection.get() != connection) {
+            ConnectionData data = NetworkHooks.getConnectionData(connection);
+            if (data == null) {
+                // The handshake is not over yet: ask again next time.
+                return 0;
+            }
+            readProtocol = parse(data.getChannels().get(NAME));
+            readConnection = new WeakReference<>(connection);
+        }
+        return readProtocol;
+    }
+
+    private static int parse(String version) {
+        try {
+            return version == null ? 0 : Integer.parseInt(version);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 }

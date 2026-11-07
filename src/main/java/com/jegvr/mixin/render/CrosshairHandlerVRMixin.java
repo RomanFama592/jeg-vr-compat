@@ -17,7 +17,7 @@ import ttv.migami.jeg.item.GunItem;
  */
 @Mixin(value = CrosshairHandler.class, remap = false)
 public class CrosshairHandlerVRMixin {
-    @Inject(method = "onRenderOverlay", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onRenderOverlay", at = @At("HEAD"), cancellable = true, require = 0)
     private void jegvr$noScreenCrosshair(RenderGuiOverlayEvent.Pre event, CallbackInfo ci) {
         if (!VR.active()) {
             return;

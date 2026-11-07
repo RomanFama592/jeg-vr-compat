@@ -46,6 +46,7 @@ public final class VrPrecision {
     private static final double MAX_HAND_GAP = 0.7;
     /** The line between the hands may turn this far from the main controller before the free hand lets go. */
     private static final double MAX_TWIST_COS = Math.cos(Math.toRadians(50.0));
+    private static final int AIMING_RETRY_TICKS = 20;
     /** Recoil deviation and kick while in precision mode. */
     public static final float RECOIL_FACTOR = 0.4F;
 
@@ -53,6 +54,8 @@ public final class VrPrecision {
     private static int slot;
     /** The hand holding the gun while active. */
     private static InteractionHand hand = InteractionHand.MAIN_HAND;
+    /** Ticks until asking the server again for its aiming flag, when it does not take it. */
+    private static int aimingRetry;
 
     private VrPrecision() {
     }
@@ -98,8 +101,11 @@ public final class VrPrecision {
         }
         if (holdableHand(player) != hand || player.getInventory().selected != slot || twoHandDir(hand) == null) {
             stop(player);
+        } else if (aimingRetry > 0) {
+            aimingRetry--;
         } else if (!ModSyncedDataKeys.AIMING.getValue(player)) {
-            // The server answered with its own value (e.g. after a respawn): ask again.
+            // The server answered with its own value (e.g. after a respawn): ask again, without flooding it.
+            aimingRetry = AIMING_RETRY_TICKS;
             sendAiming(player, true);
         }
     }

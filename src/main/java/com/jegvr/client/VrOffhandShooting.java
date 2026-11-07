@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
 import com.jegvr.mixin.input.ItemCooldownInstanceAccessor;
 import com.jegvr.mixin.input.ItemCooldownsAccessor;
@@ -215,7 +216,7 @@ public final class VrOffhandShooting {
         }
         CompoundTag tag = stack.getTag();
         // JEG reloads the main-hand gun when its trigger is pulled empty (ShootingHandler); same for this hand.
-        if (trigger && !Gun.hasAmmo(stack) && !creative && tag != null && tag.getInt("AmmoCount") <= 0
+        if (trigger && !Gun.hasAmmo(stack) && !creative && tag != null && tag.getInt(JegKeys.AMMO_COUNT) <= 0
                 && !ReloadType.INVENTORY_FED.equals(gun.getReloads().getReloadType())) {
             VrDualReload.reloadOffhand(player);
         }
