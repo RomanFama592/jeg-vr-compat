@@ -18,9 +18,10 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 Verificado automáticamente: build, pruebas de `VrGunMirror`, `tools/check_mixins.py` y `runClientAudit` con Embeddium y
 Oculus en plano.
 - [x] **Jar real**: probado por el usuario con visor en su modpack, con Complementary Reimagined (ver `COMPATIBILIDAD.md`).
-- [ ] Con shaders, cajas guía (`/jegvr zones`): se ven en el mismo lugar con cada ojo, también con el arma en movimiento.
-- [ ] Con shaders, láser del arco compuesto: se ve en el mismo lugar con cada ojo, y también de noche.
-- [ ] Crash de Acedium: apagar y prender shaders en un mundo sin Acedium no crashea. Con Acedium y sin el addon, confirmar que crashea igual.
+- [x] Con shaders, cajas guía (`/jegvr zones`): se ven en el mismo lugar con cada ojo (usuario, 2026-11-07).
+- [x] Con shaders, láser del arco compuesto: se ve bien (usuario, 2026-11-07).
+- [x] Crash de Acedium: sin Acedium, apagar y prender shaders en un mundo no crashea (usuario, 2026-11-07).
+- [ ] (opcional) Con Acedium y sin el addon: confirmar que crashea igual.
 - [ ] Versión equivocada: con Vivecraft 1.3 o JEG 0.14, Forge muestra el error de versión en lugar de crashear.
 - [ ] VR: arma en la mano izquierda (espejada): caras correctas, sin agujeros ni bajones de FPS.
 - [ ] VR: dos armas animadas distintas: recargar una y disparar otra no anima a la otra, tampoco en la hotbar (G2).

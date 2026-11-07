@@ -7,15 +7,15 @@ sin errores, no que se vea bien en VR.
 
 | Problema | Causa | Qué hacer |
 |---|---|---|
-| **Acedium 0.2.7-beta + Oculus: el juego crashea al apagar y volver a prender los shaders en un mundo** (`IllegalStateException` en `SodiumResultCompatibility.packageSectionGeometry`) | Acedium comprueba que el tamaño de la malla de cada chunk coincida con el formato de vértices que espera, y falla. El addon no aparece en la traza. Lo más probable es que el cambio de formato al recargar los shaders sea lo que dispara esa comprobación | No cambiar los shaders dentro de un mundo con Acedium instalado: elegirlos en el menú principal, o sacar Acedium. Falta confirmar que pasa también sin el addon |
+| **Acedium 0.2.7-beta + Oculus: el juego crashea al apagar y volver a prender los shaders en un mundo** (`IllegalStateException` en `SodiumResultCompatibility.packageSectionGeometry`) | Acedium comprueba que el tamaño de la malla de cada chunk coincida con el formato de vértices que espera, y falla. El addon no aparece en la traza. Lo más probable es que el cambio de formato al recargar los shaders sea lo que dispara esa comprobación | No cambiar los shaders dentro de un mundo con Acedium instalado: elegirlos en el menú principal, o sacar Acedium. Sin Acedium no crashea (probado por el usuario). Sin confirmar si pasa también sin el addon |
 
 ## Qué se comprobó
 
 | Combinación | Cómo | Resultado |
 |---|---|---|
-| Modpack real del usuario, **con el `.jar` publicable y con visor**: Forge 47.4.4, JEG 0.13.2, Vivecraft 1.2.5, Embeddium 0.3.31, Oculus 1.8.0, ImmediatelyFast 1.5.1, EntityCulling 1.8.1, Create 6.0.6, GeckoLib 4.7.4, Framework 0.7.15, Acedium 0.2.7, Complementary Reimagined r5.2.2 + Euphoria Patches 1.3.2 | Prueba del usuario en juego | Anduvo muy bien, salvo el crash de arriba y las cajas guía desfasadas entre ojos (arreglo pendiente de prueba). Falta el protocolo completo de abajo |
+| Modpack real del usuario, **con el `.jar` publicable y con visor**: Forge 47.4.4, JEG 0.13.2, Vivecraft 1.2.5, Embeddium 0.3.31, Oculus 1.8.0, ImmediatelyFast 1.5.1, EntityCulling 1.8.1, Create 6.0.6, GeckoLib 4.7.4, Framework 0.7.15, Acedium 0.2.7, Complementary Reimagined r5.2.2 + Euphoria Patches 1.3.2 | Prueba del usuario en juego | Anduvo muy bien, salvo el crash de arriba. Las cajas guía desfasadas entre ojos se arreglaron y el usuario lo confirmó, igual que el láser del arco. Falta el protocolo completo de abajo |
 | Embeddium 0.3.31 + Oculus 1.8.0 + Vivecraft + JEG + addon | `runClientAudit`, en plano y en entorno de desarrollo: aplica todos los mixins de todos los mods y cierra el juego | **Mixins OK**: 43 aplicaciones del addon, audit completo, sin errores de inyección |
-| Nombres que usan los mixins `remap = false` | `tools/check_mixins.py` contra los jars originales de JEG, Vivecraft, GeckoLib y Framework | **0 problemas** tras corregir `renderByItem` |
+| Nombres que usan los mixins `remap = false` | `./gradlew checkMixins`, contra los jars originales de JEG, Vivecraft, GeckoLib y Framework | **0 problemas** tras corregir `renderByItem` |
 | Rangos de versión de `mods.toml` | El juego arrancó con los rangos nuevos | Aceptan JEG 0.13.2 y Vivecraft 1.20.1-1.2.5 |
 
 ## Cómo se relacionan estos mods con el addon
@@ -80,12 +80,10 @@ Cada resultado se anota en la tabla "Tested with" de la página del mod. Lo que 
 ./gradlew runClientAudit -Pcompat
 ```
 
-`-Pcompat` agrega Embeddium y Oculus desde Modrinth Maven. La auditoría del 2026-11-07 usó en su lugar copias locales en
-`run-audit/mods/`, tomadas de la caché de Gradle. Esas copias siguen ahí, así que para probar sin esos mods hay que
-sacarlas de esa carpeta.
+`-Pcompat` agrega Embeddium y Oculus desde Modrinth Maven.
 
-Para revisar los nombres en producción (ajustar las rutas a tus jars):
+Para revisar los nombres en producción (necesita Python):
 
 ```bash
-python tools/check_mixins.py <ruta a javap> "libs/JustEnoughGuns-0.13.2-1.20.1.jar;<vivecraft.jar>;<geckolib.jar>;libs/framework-forge-1.20.1-0.7.11.jar"
+./gradlew checkMixins
 ```

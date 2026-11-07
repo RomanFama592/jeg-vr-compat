@@ -1,7 +1,7 @@
 plugins {
     id 'java'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7-SNAPSHOT'
+    id 'net.minecraftforge.gradle' version '6.0.54'
+    id 'org.spongepowered.mixin' version '0.7.38'
 }
 
 group = mod_group
@@ -85,7 +85,10 @@ repositories {
         content { includeGroup 'maven.modrinth' }
     }
     maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
-    flatDir { dirs 'libs' }
+    maven {
+        url = 'https://www.cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
     // Only the test libraries: everything else keeps coming from where ForgeGradle resolves it.
     mavenCentral {
         content {
@@ -96,6 +99,10 @@ repositories {
             includeGroup 'org.apiguardian'
         }
     }
+}
+
+configurations {
+    originalMods { transitive = false }
 }
 
 dependencies {
@@ -113,12 +120,12 @@ dependencies {
         runtimeOnly fg.deobf("maven.modrinth:oculus:${oculus_version}")
     }
     compileOnly fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
-    compileOnly fg.deobf("local:JustEnoughGuns:${jeg_version}")
-    compileOnly fg.deobf("local:framework-forge:${framework_version}")
+    compileOnly fg.deobf("maven.modrinth:just-enough-guns:${jeg_version}")
+    compileOnly fg.deobf("curse.maven:framework-549225:${framework_file_id}")
 
     runtimeOnly fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}")
-    runtimeOnly fg.deobf("local:JustEnoughGuns:${jeg_version}")
-    runtimeOnly fg.deobf("local:framework-forge:${framework_version}")
+    runtimeOnly fg.deobf("maven.modrinth:just-enough-guns:${jeg_version}")
+    runtimeOnly fg.deobf("curse.maven:framework-549225:${framework_file_id}")
 
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixinextras_version}"))
     implementation(jarJar("io.github.llamalad7:mixinextras-forge:${mixinextras_version}")) {
@@ -127,6 +134,23 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+
+    // The jars as players have them, for checkMixins: not deobfuscated.
+    originalMods "maven.modrinth:just-enough-guns:${jeg_version}"
+    originalMods "maven.modrinth:vivecraft:${vivecraft_version}"
+    originalMods "software.bernie.geckolib:geckolib-forge-1.20.1:${geckolib_version}"
+    originalMods "curse.maven:framework-549225:${framework_file_id}"
+}
+
+// ./gradlew checkMixins -> looks the names our remap=false mixins use up in those jars (see tools/check_mixins.py).
+tasks.register('checkMixins', Exec) {
+    group = 'verification'
+    def compiler = javaToolchains.compilerFor(java.toolchain)
+    doFirst {
+        commandLine 'python', 'tools/check_mixins.py',
+                compiler.get().metadata.installationPath.file('bin/javap').asFile.path,
+                configurations.originalMods.asPath
+    }
 }
 
 tasks.named('test', Test).configure {

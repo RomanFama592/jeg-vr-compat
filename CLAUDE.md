@@ -8,7 +8,7 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
 - Minecraft 1.20.1, Forge 47.2.x, ForgeGradle 6, Java 17, mappings oficiales (Mojang).
 - JEG 0.13.2 (paquete raíz `ttv.migami.jeg`), usa GeckoLib `4.4.4` para armas animadas.
 - Vivecraft **1.20.1-1.2.5-forge** (decisión del usuario). Solo trae `org.vivecraft.api_beta` (`VivecraftAPI.isVRPlayer`, `VivecraftClientAPI.isVrActive`); el resto se toma de internals (`VRPlayer.get().vrdata_world_render`: `c0` mano principal, `c1` libre, `hmd`; `MCVR.get().triggerHapticPulse`; `ClientDataHolderVR.getInstance().vrSettings.reverseHands`). `VivecraftBridge` los llama directo (Vivecraft es `compileOnly` + `runtimeOnly`), sin reflexión; `VR` captura `Throwable` y se desactiva si algo falla.
-- JEG requiere además **MrCrayfish Framework >= 0.7.0** (obligatorio) y GeckoLib >= 4.4.4. El jar de JEG es `libs/JustEnoughGuns-0.13.2-1.20.1.jar` (se referencia como `fg.deobf('local:JustEnoughGuns:0.13.2-1.20.1')`; `files()` no se deobfusca).
+- JEG requiere además **MrCrayfish Framework >= 0.7.0** (obligatorio) y GeckoLib >= 4.4.4. Vienen de repositorios públicos, sin archivos locales: JEG de Modrinth Maven (`maven.modrinth:just-enough-guns`, el mismo jar que publica Modrinth) y Framework de Curse Maven (`curse.maven:framework-549225:<id de archivo>`, porque no está en Modrinth). Se compila y se prueba con Framework 0.7.12. Las versiones están en `gradle.properties`.
 - Toolchain local (no instalado en el sistema): JDK 17 en `.tools/jdk-17*`, Gradle wrapper 8.1.1. Usar `JAVA_HOME=.tools/jdk-17.0.20.1+1`.
 - Mixin (SpongePowered) + MixinExtras 0.3.5 (`@WrapWithCondition`, `@WrapOperation`).
 - Todas las dependencias de mods son `compileOnly` + `fg.deobf(...)`. Nunca `implementation` salvo MixinExtras (jarJar).
@@ -32,7 +32,7 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
    Se suprime solo el dibujo de `ModelPart.render` del modelo del jugador.
 7. Nada de rotar cámara/jugador en VR (mareo). El recoil va al modelo del arma, haptics y desviación de puntería.
 8. **Nombres de mixin en producción.** En un mixin `remap = false`, un método de JEG que sobrescribe uno vanilla se nombra
-   con los dos nombres (`{"renderByItem", "m_108829_"}`). Después de tocar mixins, correr `tools/check_mixins.py`.
+   con los dos nombres (`{"renderByItem", "m_108829_"}`). Después de tocar mixins, correr `./gradlew checkMixins`.
 9. **Otros mods y shaders.** Lo que solo cambia cómo se ve lleva `require = 0`. Nada de shaders ni `RenderType` propios sin
    revisar `COMPATIBILIDAD.md`. Para saber si hay shaders, `VR.shadersActive()`; nunca importar Sodium, Iris ni OptiFine. Lo que se dibuja en el mundo se vacía con `buffers.endBatch()`, nunca con `endBatch(RenderType)`: con Oculus esa no hace nada y el dibujo sale en la pasada del otro ojo.
 10. **Contrato entre versiones del addon.** Red: un ID de paquete solo se agrega y un paquete no cambia de formato; lo nuevo
@@ -80,12 +80,12 @@ src/main/resources/
 | `mixin.client.PlayerModelMixin`, `HumanoidModelMixin`, `client.handler.PlayerModelHandler` | poses de brazos en tercera persona |
 
 Los números de línea son de `master` a fecha 2026-10; **verificar siempre contra el jar 0.13.2** con
-`javap -c -p -classpath libs/jeg-0.13.2.jar <clase>` antes de escribir un `@At` o un descriptor.
+`javap -c -p -classpath <jar de JEG en la caché de Gradle> <clase>` antes de escribir un `@At` o un descriptor.
 
 ## Comandos
 - `./gradlew build` — compila (debe pasar sin warnings de mixin). Publicar `build/libs/jeg_vr_compat-<versión>.jar`, nunca el `-slim`.
 - `./gradlew runClientAudit [-Pcompat]` — aplica todos los mixins de todos los mods, loguea lo que falla y cierra (carpeta `run-audit/`, VR apagado). `-Pcompat` suma Embeddium y Oculus.
-- `python tools/check_mixins.py <javap> <jars originales>` — revisa los nombres de los mixins `remap = false` contra los jars que tienen los jugadores.
+- `./gradlew checkMixins` — revisa los nombres de los mixins `remap = false` contra los jars que tienen los jugadores (necesita Python).
 - `./gradlew runClient` — cliente de prueba (flat).
 - `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
 - Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `MULTIJUGADOR.md`.

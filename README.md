@@ -24,8 +24,7 @@ Install it on the client. Also installed on the server, it adds off-hand guns an
 
 ## Building
 
-JEG and Framework are not published in a Maven repository this build uses yet: put
-`JustEnoughGuns-0.13.2-1.20.1.jar` and `framework-forge-1.20.1-0.7.11.jar` in `libs/`.
+Needs JDK 17 (`JAVA_HOME`). Dependencies come from public repositories, so a fresh clone builds as it is:
 
 ```bash
 ./gradlew build
@@ -37,7 +36,7 @@ The jar to use is `build/libs/jeg_vr_compat-<version>.jar`. The `-slim` one lack
 |---|---|
 | `./gradlew runClient` | Test client (add `-PnoVivecraft` or `-Pcompat` for Embeddium and Oculus) |
 | `./gradlew runClientAudit` | Applies every mixin, logs failures and closes |
-| `python tools/check_mixins.py` | Checks mixin names against the jars players have |
+| `./gradlew checkMixins` | Checks mixin names against the jars players have (needs Python) |
 
 More: [compatibility](COMPATIBILIDAD.md), [commands](COMANDOS.md), [two-player setup](MULTIJUGADOR.md), [plan](PLAN.md).
 
