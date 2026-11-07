@@ -126,7 +126,8 @@ public final class VrBowLaser {
         // full-bright program there. Both take the same vertices.
         RenderType beam = VR.shadersActive() ? RenderType.lightning() : RenderType.debugQuads();
         drawFlight(pose.last().pose(), buffers.getBuffer(beam), flight, cam, worldScale);
-        buffers.endBatch(beam);
+        // Not endBatch(type): with shaders it does nothing, and the beam would be drawn later, in the other eye's view.
+        buffers.endBatch();
         if (hit instanceof BlockHitResult block) {
             jegDot(mc, hand, block);
         } else if (hit != null) {
@@ -135,7 +136,7 @@ public final class VrBowLaser {
             LevelRenderer.addChainedFilledBoxVertices(pose, buffers.getBuffer(RenderType.debugFilledBox()),
                     at.x - half, at.y - half, at.z - half, at.x + half, at.y + half, at.z + half,
                     RED, TINTS[5], TINTS[5], DOT_ALPHA);
-            buffers.endBatch(RenderType.debugFilledBox());
+            buffers.endBatch();
         }
         pose.popPose();
     }

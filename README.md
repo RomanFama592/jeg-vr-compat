@@ -41,6 +41,14 @@ The jar to use is `build/libs/jeg_vr_compat-<version>.jar`. The `-slim` one lack
 
 More: [compatibility](COMPATIBILIDAD.md), [commands](COMANDOS.md), [two-player setup](MULTIJUGADOR.md), [plan](PLAN.md).
 
+## License
+
+This addon is free software under the [GNU General Public License](LICENSE), version 3 or (at your option) any later
+version (`GPL-3.0-or-later`). It comes with no warranty.
+
+The published jar also carries [MixinExtras](https://github.com/LlamaLad7/MixinExtras) (MIT, its license is inside its
+jar). Just Enough Guns, Vivecraft, Framework and GeckoLib are separate mods with their own licenses, and are not included.
+
 ---
 
 ## Español
@@ -57,3 +65,7 @@ en el cliente. También en el servidor, suma las armas en la mano libre y las ba
 - **Modo precisión:** mano libre en el guardamanos de un arma a dos manos, y grip.
 - **Cuerpo a cuerpo:** mover el arma con fuerza.
 - **Opciones:** botón Config en la lista de mods. **Calibrar un arma:** `/jegvr help`.
+
+**Licencia:** software libre bajo la [GNU GPL](LICENSE), versión 3 o, si preferís, cualquier versión posterior
+(`GPL-3.0-or-later`), sin garantía. El jar publicado incluye MixinExtras (MIT). JEG, Vivecraft, Framework y GeckoLib son mods
+aparte, con sus propias licencias, y no van incluidos.

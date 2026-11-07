@@ -151,11 +151,13 @@ tasks.named('jar', Jar).configure {
     ])
     // The jar that gets published is the jarJar one, which carries MixinExtras: this one only feeds it.
     archiveClassifier = 'slim'
+    from('LICENSE')
     finalizedBy 'reobfJar'
 }
 
 tasks.named('jarJar').configure {
     archiveClassifier = ''
+    from('LICENSE')
     manifest.attributes([
         'Specification-Title'  : mod_id,
         'Implementation-Title' : mod_name,

@@ -34,7 +34,7 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
 8. **Nombres de mixin en producción.** En un mixin `remap = false`, un método de JEG que sobrescribe uno vanilla se nombra
    con los dos nombres (`{"renderByItem", "m_108829_"}`). Después de tocar mixins, correr `tools/check_mixins.py`.
 9. **Otros mods y shaders.** Lo que solo cambia cómo se ve lleva `require = 0`. Nada de shaders ni `RenderType` propios sin
-   revisar `COMPATIBILIDAD.md`. Para saber si hay shaders, `VR.shadersActive()`; nunca importar Sodium, Iris ni OptiFine.
+   revisar `COMPATIBILIDAD.md`. Para saber si hay shaders, `VR.shadersActive()`; nunca importar Sodium, Iris ni OptiFine. Lo que se dibuja en el mundo se vacía con `buffers.endBatch()`, nunca con `endBatch(RenderType)`: con Oculus esa no hace nada y el dibujo sale en la pasada del otro ojo.
 10. **Contrato entre versiones del addon.** Red: un ID de paquete solo se agrega y un paquete no cambia de formato; lo nuevo
     sube `VrNetwork.PROTOCOL` y se envía según `serverProtocol`. Configuración: el TOML solo suma opciones, con el
     comportamiento actual por defecto; `guns.json` lleva `schema`. No se renombran teclas `key.jeg_vr_compat.*` ni

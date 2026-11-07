@@ -348,9 +348,9 @@ public final class VrGrabReload {
         VertexConsumer fill = buffers.getBuffer(RenderType.debugFilledBox());
         LevelRenderer.addChainedFilledBoxVertices(pose, fill, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ,
                 r, g, b, 0.2F);
-        buffers.endBatch(RenderType.debugFilledBox());
         VertexConsumer lines = buffers.getBuffer(RenderType.lines());
         LevelRenderer.renderLineBox(pose, lines, box, r, g, b, 1.0F);
-        buffers.endBatch(RenderType.lines());
+        // Not endBatch(type): with shaders it does nothing, and the box would be drawn later, in the other eye's view.
+        buffers.endBatch();
     }
 }
