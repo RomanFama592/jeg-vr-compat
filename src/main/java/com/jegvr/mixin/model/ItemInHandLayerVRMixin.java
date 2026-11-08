@@ -2,6 +2,7 @@ package com.jegvr.mixin.model;
 
 import com.jegvr.client.VrDiag;
 import com.jegvr.compat.VR;
+import com.jegvr.compat.jeg.JegKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -65,7 +66,7 @@ public abstract class ItemInHandLayerVRMixin {
         if (!jegvr$lookedUp) {
             jegvr$lookedUp = true;
             try {
-                Method method = ItemInHandLayer.class.getDeclaredMethod("mrCrayfishGunMod$renderArmWithGun",
+                Method method = ItemInHandLayer.class.getDeclaredMethod(JegKeys.RENDER_ARM_WITH_GUN,
                         PlayerItemInHandLayer.class, Player.class, ItemStack.class, GunItem.class,
                         ItemDisplayContext.class, InteractionHand.class, HumanoidArm.class, PoseStack.class,
                         MultiBufferSource.class, int.class, float.class);

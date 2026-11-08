@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ttv.migami.jeg.client.render.gun.animated.AnimatedGunRenderer;
 
@@ -28,6 +29,8 @@ import ttv.migami.jeg.client.render.gun.animated.AnimatedGunRenderer;
 public class AnimatedGunRendererVRMixin {
     // renderByItem overrides a vanilla method: that name exists in development, m_108829_ in the game (remap = false here).
     private static final String POSE = "Lcom/mojang/blaze3d/vertex/PoseStack;";
+    /** JEG's ADS centering starts where it first reads the ADS progress: the ordinals below count from there. */
+    private static final String ADS_PROGRESS = "Lttv/migami/jeg/client/handler/AimingHandler;getNormalisedAdsProgress()D";
 
     @Inject(method = {
             "applyBobbingTransforms", "applyAimingTransforms", "applySwayTransforms", "applySprintingTransforms",
@@ -39,27 +42,31 @@ public class AnimatedGunRendererVRMixin {
         }
     }
 
-    // Ordinal 0 of translate/mulPose is the static bow orientation fix; the rest is the ADS centering.
+    // Before the ADS progress is read, translate/mulPose are the static bow orientation fix; after it, the ADS centering.
     @WrapWithCondition(method = {"renderByItem", "m_108829_"},
-            at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 1))
+            slice = @Slice(from = @At(value = "INVOKE", target = ADS_PROGRESS, ordinal = 0)),
+            at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 0))
     private boolean jegvr$noAdsTranslate1(PoseStack stack, double x, double y, double z) {
         return !VR.active();
     }
 
     @WrapWithCondition(method = {"renderByItem", "m_108829_"},
-            at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 2))
+            slice = @Slice(from = @At(value = "INVOKE", target = ADS_PROGRESS, ordinal = 0)),
+            at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 1))
     private boolean jegvr$noAdsTranslate2(PoseStack stack, double x, double y, double z) {
         return !VR.active();
     }
 
     @WrapWithCondition(method = {"renderByItem", "m_108829_"},
-            at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 3))
+            slice = @Slice(from = @At(value = "INVOKE", target = ADS_PROGRESS, ordinal = 0)),
+            at = @At(value = "INVOKE", target = POSE + "translate(DDD)V", remap = true, ordinal = 2))
     private boolean jegvr$noAdsTranslate3(PoseStack stack, double x, double y, double z) {
         return !VR.active();
     }
 
     @WrapWithCondition(method = {"renderByItem", "m_108829_"},
-            at = @At(value = "INVOKE", target = POSE + "mulPose(Lorg/joml/Quaternionf;)V", remap = true, ordinal = 1))
+            slice = @Slice(from = @At(value = "INVOKE", target = ADS_PROGRESS, ordinal = 0)),
+            at = @At(value = "INVOKE", target = POSE + "mulPose(Lorg/joml/Quaternionf;)V", remap = true, ordinal = 0))
     private boolean jegvr$noAdsRotate(PoseStack stack, Quaternionf rotation) {
         return !VR.active();
     }

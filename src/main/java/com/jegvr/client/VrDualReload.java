@@ -98,9 +98,9 @@ public final class VrDualReload {
         ItemStack stack = player.getOffhandItem();
         if (stack.getItem() instanceof AnimatedGunItem gun) {
             AnimationController<GeoAnimatable> controller = gun.getAnimatableInstanceCache()
-                    .<GeoAnimatable>getManagerForId(GeoItem.getId(stack)).getAnimationControllers().get("Controller");
+                    .<GeoAnimatable>getManagerForId(GeoItem.getId(stack)).getAnimationControllers().get(JegKeys.CONTROLLER);
             if (controller != null && controller.getCurrentAnimation() != null
-                    && GunAnimations.isAnimationPlaying(controller, "inspect")) {
+                    && GunAnimations.isAnimationPlaying(controller, JegKeys.INSPECT_ANIMATION)) {
                 controller.forceAnimationReset();
             }
             VrHands.inspectOffhand();

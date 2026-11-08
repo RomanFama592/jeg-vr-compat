@@ -27,6 +27,10 @@ def main(javap, classpath):
         return cache[cls]
 
     def has(text, name):
+        if name.startswith('/') and name.endswith('/') and len(name) > 1:
+            # Mixin's regex selector: /pattern/ (the addon writes them without backslashes, e.g. [$] for a dollar).
+            pattern = name[1:-1].lstrip('^').rstrip('$')
+            return re.search(r'[\s.]' + pattern + r'\(', text) is not None
         return name == '<init>' or re.search(r'[\s.]' + re.escape(name) + r'[(;\s]', text) is not None
 
     problems = 0

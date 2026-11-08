@@ -1,6 +1,7 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.config.VrClientConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -280,8 +281,8 @@ public final class VrHandFollow {
             return;
         }
         String name = bone.getName();
-        boolean fake = name.startsWith("fake_");
-        if (name.endsWith("right_arm")) {
+        boolean fake = name.startsWith(JegKeys.FAKE_BONE_PREFIX);
+        if (name.endsWith(JegKeys.RIGHT_ARM_BONE)) {
             if (!fake || !hand.hasGrip) {
                 hand.grip.set(frame);
                 hand.hasGrip = true;

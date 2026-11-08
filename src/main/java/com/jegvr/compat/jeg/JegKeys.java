@@ -20,6 +20,22 @@ public final class JegKeys {
     /** Length of JEG's main-hand shoot animation ({@code AnimatedGunItem.inventoryTick}). */
     public static final int SHOOT_ANIMATION_TICKS = 5;
 
+    /** The GeckoLib controller JEG gives every animated gun ({@code GunAnimations.animationController}). */
+    public static final String CONTROLLER = "Controller";
+    /** JEG's inspect animation, in that controller. */
+    public static final String INSPECT_ANIMATION = "inspect";
+    /**
+     * Arm bones of JEG's gun models: {@code right_arm}/{@code left_arm}, and {@code fake_*} copies some guns use while
+     * an arm leaves the gun. The right arm holds the grip.
+     */
+    public static final String RIGHT_ARM_BONE = "right_arm";
+    public static final String FAKE_BONE_PREFIX = "fake_";
+    /**
+     * JEG's third-person gun renderer, merged into {@code ItemInHandLayer} by JEG's mixin and private there: the addon
+     * reaches it by reflection ({@code ItemInHandLayerVRMixin}).
+     */
+    public static final String RENDER_ARM_WITH_GUN = "mrCrayfishGunMod$renderArmWithGun";
+
     private JegKeys() {
     }
 }

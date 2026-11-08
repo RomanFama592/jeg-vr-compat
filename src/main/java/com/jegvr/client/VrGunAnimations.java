@@ -1,6 +1,7 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.compat.jeg.JegKeys;
 import net.minecraft.world.item.ItemStack;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.core.animation.AnimatableManager;
@@ -19,8 +20,6 @@ import java.util.Set;
  */
 public final class VrGunAnimations {
     public static final String IDLE_CONTROLLER = "jegvr_idle";
-    /** The name JEG gives its controller ({@code GunAnimations.animationController}). */
-    private static final String JEG_CONTROLLER = "Controller";
     private static final Set<String> KEPT = Set.of("idle", "reload", "reload_alt", "reload_start", "reload_loop",
             "reload_stop", "inspect", "shoot", "aim_shoot", "draw", "hold_fire", "hold");
 
@@ -42,7 +41,7 @@ public final class VrGunAnimations {
             return null;
         }
         AnimationController<?> jeg = gun.getAnimatableInstanceCache().getManagerForId(GeoItem.getId(stack))
-                .getAnimationControllers().get(JEG_CONTROLLER);
+                .getAnimationControllers().get(JegKeys.CONTROLLER);
         AnimationProcessor.QueuedAnimation current = jeg == null ? null : jeg.getCurrentAnimation();
         if (current == null || jeg.getAnimationState() == AnimationController.State.STOPPED) {
             return null;
@@ -68,7 +67,7 @@ public final class VrGunAnimations {
         if (!VR.active()) {
             return false;
         }
-        AnimationController<?> jeg = manager.getAnimationControllers().get(JEG_CONTROLLER);
+        AnimationController<?> jeg = manager.getAnimationControllers().get(JegKeys.CONTROLLER);
         AnimationProcessor.QueuedAnimation current = jeg == null ? null : jeg.getCurrentAnimation();
         return current != null && !KEPT.contains(current.animation().name());
     }

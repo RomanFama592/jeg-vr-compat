@@ -22,20 +22,26 @@ import ttv.migami.jeg.init.ModSyncedDataKeys;
  */
 @Mixin(value = GunAnimations.class, remap = false)
 public abstract class GunAnimationsVRMixin {
-    @WrapOperation(method = "lambda$animationController$0", at = @At(value = "INVOKE", remap = true,
+    /**
+     * The controller's lambda, by pattern: javac numbers lambdas in order, and JEG's other classes already renumbered
+     * theirs between versions. Mixin reads {@code /.../} as a regular expression.
+     */
+    private static final String CONTROLLER_LAMBDA = "/^lambda[$]animationController[$][0-9]+$/";
+
+    @WrapOperation(method = CONTROLLER_LAMBDA, at = @At(value = "INVOKE", remap = true,
             target = "Lnet/minecraft/world/entity/player/Player;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"))
     private static ItemStack jegvr$animatedHand(Player player, Operation<ItemStack> original) {
         return VrHands.animatedStack(player, original.call(player));
     }
 
-    @WrapOperation(method = "lambda$animationController$0", at = @At(value = "INVOKE", remap = true,
+    @WrapOperation(method = CONTROLLER_LAMBDA, at = @At(value = "INVOKE", remap = true,
             target = "Lnet/minecraft/nbt/CompoundTag;getBoolean(Ljava/lang/String;)Z"))
     private static boolean jegvr$tagFlag(CompoundTag tag, String key, Operation<Boolean> original) {
         Player player = Minecraft.getInstance().player;
         return player == null ? original.call(tag, key) : VrHands.tagFlag(player, key, original.call(tag, key));
     }
 
-    @WrapOperation(method = "lambda$animationController$0", at = @At(value = "INVOKE",
+    @WrapOperation(method = CONTROLLER_LAMBDA, at = @At(value = "INVOKE",
             target = "Lcom/mrcrayfish/framework/api/sync/SyncedDataKey;getValue(Lnet/minecraft/world/entity/Entity;)Ljava/lang/Object;"))
     private static Object jegvr$shootingFlag(SyncedDataKey<?, ?> key, Entity entity, Operation<Object> original) {
         Object value = original.call(key, entity);
