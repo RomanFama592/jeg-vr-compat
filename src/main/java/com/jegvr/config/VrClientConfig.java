@@ -52,9 +52,9 @@ public final class VrClientConfig {
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
         RELOAD_WITH_BOTH_GUNS = builder
-                .comment("Allow reloading while holding a gun in each hand. Off: put one gun away first (no free hand for",
-                        "the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
-                .define("reloadWithBothGuns", true);
+                .comment("Allow reloading while holding a gun in each hand. Off (default): put one gun away first (no free",
+                        "hand for the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
+                .define("reloadWithBothGuns", false);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -180,7 +180,7 @@ public final class VrClientConfig {
     }
 
     public static boolean reloadWithBothGuns() {
-        return !SPEC.isLoaded() || RELOAD_WITH_BOTH_GUNS.get();
+        return SPEC.isLoaded() && RELOAD_WITH_BOTH_GUNS.get();
     }
 
     public static void setReloadWithBothGuns(boolean allow) {

@@ -33,15 +33,16 @@ Oculus en plano.
 - [ ] Servidor dedicado con este jar: arranca sin clases de cliente y el cliente VR detecta el addon (arma en la secundaria).
 
 ## F9.25 — Sin recarga con un arma en cada mano
-Opción: botón Config del mod en la lista de mods → "Recargar con un arma en cada mano" (por defecto encendida).
-- [ ] Apagada, un arma en cada mano: la tecla de recarga, el botón de apuntar (secundario) y el gatillo con el arma vacía
+Opción: botón Config del mod en la lista de mods → "Recargar con un arma en cada mano" (por defecto apagada).
+Probado por el usuario en VR (2026-11-08): funciona.
+- [x] Apagada, un arma en cada mano: la tecla de recarga, el botón de apuntar (secundario) y el gatillo con el arma vacía
   no recargan ninguna de las dos; la mano de esa arma vibra dos veces cortito, sin repetirse sin parar al mantener el
   gatillo.
-- [ ] Apagada: con el arma de la secundaria apuntando hacia arriba, tampoco recarga; descargar sí funciona.
-- [ ] Apagada: soltar o guardar un arma y recargar la otra funciona normal (tecla, botón y con la mano).
-- [ ] Apagada: una recarga que ya había empezado antes de agarrar la segunda arma termina bien.
-- [ ] Encendida: todo como antes, con dos armas y con una.
-- [ ] En plano (sin VR), con la opción apagada: recarga como siempre.
+- [x] Apagada: con el arma de la secundaria apuntando hacia arriba, tampoco recarga; descargar sí funciona.
+- [x] Apagada: soltar o guardar un arma y recargar la otra funciona normal (tecla, botón y con la mano).
+- [x] Apagada: una recarga que ya había empezado antes de agarrar la segunda arma termina bien.
+- [x] Encendida: todo como antes, con dos armas y con una.
+- [x] En plano (sin VR), con la opción apagada: recarga como siempre.
 
 ## Fase 1
 - [ ] Flat, sin Vivecraft: arranca, se puede disparar y recargar.
