@@ -5,6 +5,8 @@ import com.jegvr.compat.VrBackend;
 import com.jegvr.mixin.input.MCOpenVRAccessor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
+import org.vivecraft.client.network.ClientNetworking;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -119,6 +121,22 @@ public final class VivecraftBridge implements VrBackend {
     }
 
     @Override
+    public Vec3 roomHandPosition(boolean mainHand) {
+        VRPlayer player = VRPlayer.get();
+        VRData room = player == null ? null : player.vrdata_room_pre;
+        if (room == null) {
+            return null;
+        }
+        return (mainHand ? room.c0 : room.c1).getPosition();
+    }
+
+    @Override
+    public float roomYaw() {
+        VRData d = data();
+        return d == null ? 0.0F : d.rotation_radians;
+    }
+
+    @Override
     public boolean isEyePass() {
         RenderPass pass = ClientDataHolderVR.getInstance().currentPass;
         return pass != RenderPass.THIRD && pass != RenderPass.CAMERA;
@@ -184,6 +202,11 @@ public final class VivecraftBridge implements VrBackend {
     @Override
     public boolean isBow(ItemStack stack) {
         return BowTracker.isBow(stack);
+    }
+
+    @Override
+    public void setActiveHand(InteractionHand hand) {
+        ClientNetworking.sendActiveHand(hand);
     }
 
     @Override

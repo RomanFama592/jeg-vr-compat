@@ -5,6 +5,7 @@ import com.jegvr.mixin.input.KeyMappingAccessor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import ttv.migami.jeg.item.GunItem;
 
 /**
@@ -54,6 +55,11 @@ public final class VrTriggers {
         mainLatch = false;
     }
 
+    /** The trigger of the main-hand controller, read raw (hidden keys still count). */
+    public static boolean mainTriggerRaw() {
+        return crossed() ? teleportDown() : raw(Minecraft.getInstance().options.keyAttack);
+    }
+
     /** The trigger of the off-hand controller, read raw (hidden keys still count). */
     public static boolean offTriggerDown() {
         return crossed() ? raw(Minecraft.getInstance().options.keyAttack) : teleportDown();
@@ -61,6 +67,10 @@ public final class VrTriggers {
 
     /** Vivecraft's teleport keys must read as not pressed: they are a gun trigger right now. */
     public static boolean hidesTeleport() {
+        // A grenade in the hand of the teleport trigger (F9.26).
+        if (VrThrow.ownsTrigger(crossed() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND)) {
+            return true;
+        }
         if (!crossed()) {
             return VrOffhandShooting.triggerTakenOver();
         }
@@ -68,9 +78,14 @@ public final class VrTriggers {
         return player != null && player.getMainHandItem().getItem() instanceof GunItem;
     }
 
-    /** The attack key must read as not pressed: crossed, it is the off-hand gun's trigger. */
+    /** The attack key must read as not pressed: crossed, it is the off-hand gun's trigger; or a grenade's (F9.26). */
     public static boolean hidesAttack(KeyMapping key) {
-        return key == Minecraft.getInstance().options.keyAttack && crossed() && VrOffhandShooting.triggerTakenOver();
+        if (key != Minecraft.getInstance().options.keyAttack) {
+            return false;
+        }
+        boolean crossed = crossed();
+        return (crossed && VrOffhandShooting.triggerTakenOver())
+                || VrThrow.ownsTrigger(crossed ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
     }
 
     private static boolean teleportDown() {

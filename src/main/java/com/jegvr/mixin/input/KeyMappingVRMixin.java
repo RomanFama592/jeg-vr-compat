@@ -3,7 +3,9 @@ package com.jegvr.mixin.input;
 import com.jegvr.client.VrGrabReload;
 import com.jegvr.client.VrPrecision;
 import com.jegvr.client.VrOffhandShooting;
+import com.jegvr.client.VrThrow;
 import com.jegvr.client.VrTriggers;
+import net.minecraft.client.Minecraft;
 import com.jegvr.compat.VR;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,6 +27,9 @@ public abstract class KeyMappingVRMixin {
         KeyMapping key = (KeyMapping) (Object) this;
         if ((VR.isTeleportKey(key) && VrTriggers.hidesTeleport()) || VrTriggers.hidesAttack(key)) {
             cir.setReturnValue(false);
+        } else if (key == Minecraft.getInstance().options.keyUse && VrThrow.holdsUseKey()) {
+            // F9.26: a grenade held by its trigger; Minecraft would stop using it (and JEG throw it) with the key up.
+            cir.setReturnValue(true);
         }
     }
 

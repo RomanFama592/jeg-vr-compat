@@ -2,6 +2,7 @@ package com.jegvr.compat;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -37,6 +38,12 @@ public interface VrBackend {
     /** A controller's own X, Y and Z axes in world space. */
     Vec3[] handAxes(boolean mainHand);
 
+    /** A controller's position in the play area, in real metres (no world scale, no player movement). */
+    Vec3 roomHandPosition(boolean mainHand);
+
+    /** The play area's turn in the world, in radians: world = room turned by this about Y (then scaled and moved). */
+    float roomYaw();
+
     /** True while the left eye is drawn, the first view of every frame. */
     boolean isLeftEyePass();
 
@@ -60,6 +67,12 @@ public interface VrBackend {
 
     /** Roomscale bow: drawn with the off-hand trigger, so that trigger must keep its normal role. */
     boolean isBow(ItemStack stack);
+
+    /**
+     * Tells the VR mod on the server which hand uses an item, as it does itself before using one: its server code
+     * places thrown items in that hand.
+     */
+    void setActiveHand(InteractionHand hand);
 
     /** True when the HUD (with the hotbar) is locked to the off-hand controller, not to the head. */
     boolean isHudOnHand();

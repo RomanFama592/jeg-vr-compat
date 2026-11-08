@@ -22,7 +22,9 @@ import java.lang.ref.WeakReference;
 public final class VrNetwork {
     /** The packets below are all there since this one, the first public protocol. */
     private static final int BASE_PROTOCOL = 6;
-    public static final int PROTOCOL = BASE_PROTOCOL;
+    /** Adds {@link C2SVrThrow} (F9.26). */
+    public static final int THROW_PROTOCOL = 7;
+    public static final int PROTOCOL = THROW_PROTOCOL;
 
     private static final ResourceLocation NAME = new ResourceLocation(JegVrCompat.MOD_ID, "main");
 
@@ -75,6 +77,11 @@ public final class VrNetwork {
                 .encoder(C2SVrAttachmentsOffhand::encode)
                 .decoder(C2SVrAttachmentsOffhand::decode)
                 .consumerMainThread(C2SVrAttachmentsOffhand::handle)
+                .add();
+        CHANNEL.messageBuilder(C2SVrThrow.class, 8, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrThrow::encode)
+                .decoder(C2SVrThrow::decode)
+                .consumerMainThread(C2SVrThrow::handle)
                 .add();
     }
 

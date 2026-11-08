@@ -5,6 +5,7 @@ import com.jegvr.compat.vivecraft.VivecraftBridge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.ModList;
@@ -24,7 +25,8 @@ public final class VR {
     /** The classes our mixins change, loaded (not initialized) at startup so that injection errors show up there. */
     private static final String[] VIVECRAFT_MIXIN_TARGETS = {
             "org.vivecraft.client_vr.render.VivecraftItemRendering",
-            "org.vivecraft.client_vr.render.helpers.VREffectsHelper"
+            "org.vivecraft.client_vr.render.helpers.VREffectsHelper",
+            "org.vivecraft.client_vr.gameplay.trackers.BowTracker"
     };
     private static final String[] JEG_MIXIN_TARGETS = {
             "ttv.migami.jeg.network.message.C2SMessageShoot",
@@ -32,7 +34,10 @@ public final class VR {
             "ttv.migami.jeg.common.ReloadTracker",
             "ttv.migami.jeg.animations.GunAnimations",
             "ttv.migami.jeg.client.handler.ReloadHandler",
-            "ttv.migami.jeg.client.handler.AimingHandler"
+            "ttv.migami.jeg.client.handler.AimingHandler",
+            "ttv.migami.jeg.item.GrenadeItem",
+            "ttv.migami.jeg.item.MolotovCocktailItem",
+            "ttv.migami.jeg.item.WaterBombItem"
     };
 
     private static Boolean loaded;
@@ -174,6 +179,15 @@ public final class VR {
     }
 
     /** A controller's rotation and position in the room, or null outside VR. */
+    public static Vec3 roomHandPosition(boolean mainHand) {
+        return inVr(vr -> vr.roomHandPosition(mainHand), null);
+    }
+
+    /** See {@link VrBackend#roomYaw}; 0 outside VR. */
+    public static float roomYaw() {
+        return inVr(VrBackend::roomYaw, 0.0F);
+    }
+
     public static Matrix4f roomHand(boolean mainHand) {
         return inVr(vr -> vr.roomHand(mainHand), null);
     }
@@ -275,6 +289,18 @@ public final class VR {
     /** True when Vivecraft treats {@code stack} as a roomscale bow (false without Vivecraft). */
     public static boolean isBow(ItemStack stack) {
         return installed(vr -> vr.isBow(stack), false);
+    }
+
+    /** Tells the VR mod which hand uses an item (see {@link VrBackend#setActiveHand}); no-op outside VR. */
+    public static void setActiveHand(InteractionHand hand) {
+        if (!active()) {
+            return;
+        }
+        try {
+            backend().setActiveHand(hand);
+        } catch (Throwable t) {
+            disable(t);
+        }
     }
 
     /** Vibrates the main-hand or off-hand controller; no-op outside VR. */

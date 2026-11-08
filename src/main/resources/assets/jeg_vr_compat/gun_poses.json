@@ -63,6 +63,51 @@
       "ty": 0.082,
       "tz": -0.14,
       "scale": 1.0
+    },
+    "jeg:grenade": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.1,
+      "tz": 0.04,
+      "scale": 0.4
+    },
+    "jeg:smoke_grenade": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.1,
+      "tz": 0.04,
+      "scale": 0.4
+    },
+    "jeg:stun_grenade": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.1,
+      "tz": 0.04,
+      "scale": 0.4
+    },
+    "jeg:molotov_cocktail": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.1,
+      "tz": 0.04,
+      "scale": 0.4
+    },
+    "jeg:water_bomb": {
+      "pitch": 0.0,
+      "yaw": 0.0,
+      "roll": 0.0,
+      "tx": 0.0,
+      "ty": 0.1,
+      "tz": 0.04,
+      "scale": 0.4
     }
   }
 }

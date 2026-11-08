@@ -14,6 +14,9 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Dos jugadores en supervivencia: el disparo de la mano libre le baja vida al otro (F8.5).
 - [ ] Dos jugadores: el otro escucha el sonido de cada cartucho metido a mano (F7.8).
 - [ ] Servidor solo con JEG (F9.22): golpear moviendo el arma de la mano principal le pega al mob, también a un costado de donde mirás. Con el addon en el servidor, también con la secundaria.
+- [ ] Granadas (F9.26) en un servidor solo-JEG: salen hacia donde apunta la mano (desde la cabeza). Con el addon en el
+  servidor: salen desde la mano, y con el gesto la fuerza cambia. Un cliente con addon viejo (protocolo 6) en un servidor
+  nuevo y al revés: lanzan sin errores.
 - [ ] Servidor dedicado con este `.jar` nuevo (la versión del canal subió a 4: cliente y servidor tienen que tener la misma versión del addon): disparo y medidores de la mano secundaria; el otro jugador escucha la preparación del lanzacohetes en esa mano.
 
 ## Auditoría, revisión 4 (rama `refactor/auditoria-publicacion`)
@@ -31,6 +34,24 @@ Oculus en plano.
 - [ ] `/jegvr help`: sale en el idioma del juego (inglés y español).
 - [ ] Protocolo de shaders de `COMPATIBILIDAD.md`.
 - [ ] Servidor dedicado con este jar: arranca sin clases de cliente y el cliente VR detecta el addon (arma en la secundaria).
+
+## F9.26 — Granadas en VR
+Opción: Config del mod → "Granadas" (Gatillo por defecto, Gesto de lanzar, Como en Vivecraft).
+- [ ] Al elegir una granada en la hotbar se ve en la mano principal, de pie sobre la mano y de un tamaño razonable
+  (no en la secundaria ni enorme). Igual la de humo, la aturdidora, la molotov y la bomba de agua.
+- [ ] Gatillo: apretar saca el seguro (sonido y vibración); soltar la lanza hacia donde apunta la mano, también apuntando
+  a un costado o arriba, sin mirar hacia ahí.
+- [ ] Soltar enseguida: igual se lanza, apenas después (JEG pide medio segundo).
+- [ ] Mantener la granada común: vibra una vez por segundo y más rápido al final; si no la soltás, explota en la mano
+  como en JEG.
+- [ ] Mientras la sostenés, el gatillo no golpea, no rompe bloques ni teletransporta.
+- [ ] En la mano secundaria (con la tecla de cambiar de mano), con un arma en la principal: cada gatillo hace lo suyo.
+- [ ] Gesto: hacer el movimiento de lanzar y soltar en el medio: va hacia donde iba la mano, y más lejos cuanto más
+  rápido. Soltar quieta: cae cerca, hacia donde apunta la mano. Caminando, el paso no suma a la fuerza.
+- [ ] Mientras la sostenés con el seguro quitado, ¿la granada tiembla o se mueve sola en la mano? (Minecraft usa la
+  animación de tensar un arco para estos ítems; si se ve, se corrige).
+- [ ] "Como en Vivecraft": vuelve a lo de antes (arco en la secundaria).
+- [ ] En plano (sin VR): las granadas funcionan como siempre.
 
 ## F9.25 — Sin recarga con un arma en cada mano
 Opción: botón Config del mod en la lista de mods → "Recargar con un arma en cada mano" (por defecto apagada).

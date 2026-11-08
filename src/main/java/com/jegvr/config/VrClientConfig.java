@@ -28,7 +28,18 @@ public final class VrClientConfig {
         FOREARM
     }
 
+    /** How JEG's grenades, molotov and water bomb are thrown in VR (F9.26). */
+    public enum ThrowMode {
+        /** Hold the trigger of the hand that holds it to pull the pin, release to throw where that hand points. */
+        TRIGGER,
+        /** Hold the trigger, swing as if throwing and release: direction and strength come from the hand's motion. */
+        GESTURE,
+        /** As Vivecraft does it: like a bow, drawn with the other hand. */
+        VIVECRAFT
+    }
+
     public static final ForgeConfigSpec SPEC;
+    public static final ForgeConfigSpec.EnumValue<ThrowMode> THROW_MODE;
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.BooleanValue RELOAD_WITH_BOTH_GUNS;
@@ -55,6 +66,14 @@ public final class VrClientConfig {
                 .comment("Allow reloading while holding a gun in each hand. Off (default): put one gun away first (no free",
                         "hand for the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
                 .define("reloadWithBothGuns", false);
+        builder.pop();
+        builder.push("grenades");
+        THROW_MODE = builder
+                .comment("How grenades, the molotov and the water bomb are thrown: TRIGGER (hold the trigger of the hand",
+                        "that holds it, release to throw where it points), GESTURE (hold the trigger, swing and release:",
+                        "direction and strength from the hand's motion; strength needs this mod on the server too),",
+                        "VIVECRAFT (like a bow, drawn with the other hand).")
+                .defineEnum("throwMode", ThrowMode.TRIGGER);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -177,6 +196,15 @@ public final class VrClientConfig {
     public static void setGrabZone(GrabZone zone) {
         GRAB_ZONE.set(zone);
         GRAB_ZONE.save();
+    }
+
+    public static ThrowMode throwMode() {
+        return SPEC.isLoaded() ? THROW_MODE.get() : ThrowMode.TRIGGER;
+    }
+
+    public static void setThrowMode(ThrowMode mode) {
+        THROW_MODE.set(mode);
+        THROW_MODE.save();
     }
 
     public static boolean reloadWithBothGuns() {

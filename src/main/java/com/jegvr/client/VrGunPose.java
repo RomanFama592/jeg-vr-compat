@@ -21,11 +21,12 @@ public final class VrGunPose {
     /**
      * Items held like a gun in VR: JEG guns, and the trumpet (F9.11), a 3D model with its bell along -Z that is not a
      * {@link GunItem}, and the flashlight, likewise. Vivecraft's per-type transforms are meant for flat sprites and tools
-     * and turn them sideways.
+     * and turn them sideways. Also JEG's grenades, molotov and water bomb while this addon throws them (F9.26): a sprite
+     * standing upright on the hand, facing the player.
      */
     public static boolean heldLikeGun(ItemStack stack) {
         return stack.getItem() instanceof GunItem || stack.getItem() instanceof TrumpetItem
-                || stack.getItem() instanceof FlashlightItem;
+                || stack.getItem() instanceof FlashlightItem || (VrThrow.isThrowable(stack) && VrThrow.enabled());
     }
 
     public static String gunId(ItemStack stack) {

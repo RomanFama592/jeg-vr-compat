@@ -25,7 +25,7 @@ public final class VrConfigScreen extends Screen {
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW = 24;
     /** Rows above the "Done" button, one of them a gap. */
-    private static final int ROWS = 11;
+    private static final int ROWS = 12;
     private static final int MARGIN = 28;
     private static final int LABEL_GAP = 6;
     private static final int LIST_MAX_LENGTH = 512;
@@ -107,12 +107,24 @@ public final class VrConfigScreen extends Screen {
                 .create(x, y + row * 9, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.reloadWithBothGuns"),
                         (button, allow) -> VrClientConfig.setReloadWithBothGuns(allow)));
+        addRenderableWidget(CycleButton.<VrClientConfig.ThrowMode>builder(
+                        mode -> Component.translatable(throwModeKey(mode)))
+                .withValues(VrClientConfig.ThrowMode.values())
+                .withInitialValue(VrClientConfig.throwMode())
+                .withTooltip(mode -> Tooltip.create(Component.translatable(throwModeKey(mode) + ".tooltip")))
+                .create(x, y + row * 10, BUTTON_WIDTH, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.throwMode"),
+                        (button, mode) -> VrClientConfig.setThrowMode(mode)));
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .bounds(x, y + row * ROWS, BUTTON_WIDTH, BUTTON_HEIGHT).build());
     }
 
     private static Component zoneName(VrClientConfig.GrabZone zone) {
         return Component.translatable(zoneKey(zone));
+    }
+
+    private static String throwModeKey(VrClientConfig.ThrowMode mode) {
+        return "jeg_vr_compat.config.throwMode." + mode.name().toLowerCase(Locale.ROOT);
     }
 
     private static String placementKey(VrClientConfig.HudPlacement placement) {
