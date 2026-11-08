@@ -3,6 +3,8 @@
 Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usuario manualmente.
 
 ## Pendientes con servidor (el usuario las deja para más adelante)
+**Decisión (2026-11-08):** la alpha sale sin estas pruebas; la página avisa que el servidor no se probó en un servidor
+dedicado. Quedan para cuando alguien reporte o el usuario decida correrlas.
 Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arman con `MULTIJUGADOR.md`.
 - [ ] Matriz de servidores F8.3 / S.6: solo JEG | JEG + Vivecraft | JEG + Vivecraft + addon, con cliente VR y flat.
 - [ ] Servidor dedicado solo con JEG: balas desde el controlador (F6.3), cliente VR entra sin errores (Fase S), gatillo de la mano libre teletransporta (S.5/S.5b), recarga con la mano y modo precisión funcionan (Fase 7, S.7), cartuchos con la recarga de JEG cortada (F7.8).
@@ -23,7 +25,7 @@ Oculus en plano.
 - [x] Crash de Acedium: sin Acedium, apagar y prender shaders en un mundo no crashea (usuario, 2026-11-07).
 - [ ] (opcional) Con Acedium y sin el addon: confirmar que crashea igual.
 - [ ] Versión equivocada: con Vivecraft 1.3 o JEG 0.14, Forge muestra el error de versión en lugar de crashear.
-- [ ] VR: arma en la mano izquierda (espejada): caras correctas, sin agujeros ni bajones de FPS.
+- [x] VR: arma en la mano izquierda (espejada): caras correctas, sin agujeros ni bajones de FPS (usuario, 2026-11-08).
 - [ ] VR: dos armas animadas distintas: recargar una y disparar otra no anima a la otra, tampoco en la hotbar (G2).
 - [ ] `guns.json`: romperlo a propósito con el juego abierto: un solo error en el log; al arreglarlo, se aplica solo.
 - [ ] `/jegvr help`: sale en el idioma del juego (inglés y español).
