@@ -35,17 +35,8 @@ import ttv.migami.jeg.network.message.C2SMessageAim;
  * foregrip and everything is mirrored.
  */
 public final class VrPrecision {
-    /** Room-scale metres (multiplied by Vivecraft's world scale): the box's nearest place along the gun's barrel. */
-    private static final double FOREGRIP_MIN_DEPTH = 0.05;
-    private static final double FOREGRIP_DOWN = 0.02;
-    private static final Vec3 FOREGRIP_HALF = new Vec3(0.08, 0.08, 0.08);
-    /** The box is drawn when the free hand is this close, and the mode ends when the hand goes farther. */
+    /** Room-scale metres: the box is drawn when the free hand is this close, and the mode ends when it goes farther. */
     private static final double SHOW_DISTANCE = 0.45;
-    /** With both hands on the gun, the hands may be this far apart (between the grip and the end of the barrel). */
-    private static final double MIN_HAND_GAP = FOREGRIP_MIN_DEPTH;
-    private static final double MAX_HAND_GAP = 0.7;
-    /** The line between the hands may turn this far from the main controller before the free hand lets go. */
-    private static final double MAX_TWIST_COS = Math.cos(Math.toRadians(50.0));
     private static final int AIMING_RETRY_TICKS = 20;
     /** Recoil deviation and kick while in precision mode. */
     public static final float RECOIL_FACTOR = 0.4F;
@@ -137,35 +128,22 @@ public final class VrPrecision {
 
     private static Vec3 foregrip(InteractionHand gunHand) {
         VR.Aim gun = VrGunHand.aim(gunHand);
-        if (gun == null || gun.dir().lengthSqr() < 1.0E-6) {
+        if (gun == null) {
             return null;
         }
-        double scale = VR.worldScale();
-        Vec3 barrel = gun.dir().normalize();
-        // Slides along the barrel to stay level with the other hand, wherever on the gun it reaches for.
         VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
-        double depth = free == null ? FOREGRIP_MIN_DEPTH * scale : free.pos().subtract(gun.pos()).dot(barrel);
-        depth = Math.max(FOREGRIP_MIN_DEPTH * scale, Math.min(MAX_HAND_GAP * scale, depth));
-        return gun.pos().add(barrel.scale(depth)).add(0.0, -FOREGRIP_DOWN * scale, 0.0);
+        return VrZones.foregrip(gun, free == null ? null : free.pos(), VR.worldScale());
     }
 
     private static AABB foregripBox(InteractionHand gunHand) {
         Vec3 center = foregrip(gunHand);
-        if (center == null) {
-            return null;
-        }
-        Vec3 h = FOREGRIP_HALF.scale(VR.worldScale());
-        return new AABB(center.subtract(h), center.add(h));
+        return center == null ? null : VrZones.foregripBox(center, VR.worldScale());
     }
 
     /** While holding the foregrip, the box sits on the free hand (the gun turns towards it). */
     private static AABB heldBox() {
         VR.Aim free = VrGunHand.aim(VrGunHand.other(hand));
-        if (free == null) {
-            return null;
-        }
-        Vec3 h = FOREGRIP_HALF.scale(VR.worldScale());
-        return new AABB(free.pos().subtract(h), free.pos().add(h));
+        return free == null ? null : VrZones.foregripBox(free.pos(), VR.worldScale());
     }
 
     private static boolean handOnForegrip(InteractionHand gunHand) {
@@ -199,17 +177,7 @@ public final class VrPrecision {
     private static Vec3 twoHandDir(InteractionHand gunHand) {
         VR.Aim gun = VrGunHand.aim(gunHand);
         VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
-        if (gun == null || free == null || gun.dir().lengthSqr() < 1.0E-6) {
-            return null;
-        }
-        Vec3 line = free.pos().subtract(gun.pos());
-        double gap = line.length();
-        double scale = VR.worldScale();
-        if (gap < MIN_HAND_GAP * scale || gap > MAX_HAND_GAP * scale) {
-            return null;
-        }
-        Vec3 dir = line.scale(1.0 / gap);
-        return dir.dot(gun.dir().normalize()) < MAX_TWIST_COS ? null : dir;
+        return gun == null || free == null ? null : VrZones.twoHandDir(gun, free.pos(), VR.worldScale());
     }
 
     private static double handDistance(InteractionHand gunHand) {

@@ -50,15 +50,6 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * alternative for custom bindings.
  */
 public final class VrGrabReload {
-    /** Room-scale metres (multiplied by Vivecraft's world scale), from the headset: down, to the side, forward. */
-    private static final Vec3 HIP = new Vec3(0.65, 0.2, 0.05);
-    /** Seated: in front of the belly, clear of the chair. */
-    private static final Vec3 FRONT = new Vec3(0.45, 0.15, 0.3);
-    private static final Vec3 POUCH_HALF = new Vec3(0.17, 0.22, 0.17);
-    private static final double MAGWELL_FORWARD = 0.1;
-    private static final double MAGWELL_DOWN = 0.08;
-    private static final Vec3 MAGWELL_HALF = new Vec3(0.1, 0.1, 0.1);
-    private static final Vec3 MAGAZINE_HALF = new Vec3(0.04, 0.07, 0.04);
     private static final int TIMEOUT_TICKS = 200;
     /** Muzzle-up kick of the gun model when a round goes in by hand. */
     private static final float ROUND_JOLT_DEGREES = 6.0F;
@@ -257,44 +248,22 @@ public final class VrGrabReload {
         if (hmd == null) {
             return null;
         }
-        Vec3 forward = new Vec3(hmd.dir().x, 0.0, hmd.dir().z);
-        if (forward.lengthSqr() < 1.0E-4) {
-            return null;
-        }
-        forward = forward.normalize();
-        Vec3 right = new Vec3(-forward.z, 0.0, forward.x);
-        Vec3 offset = VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT ? FRONT : HIP;
-        // The off hand is on the -right side (left hand) unless hands are reversed; the main hand on the other side.
-        double offSide = VR.leftHanded() ? 1.0 : -1.0;
-        double side = gunHand == InteractionHand.MAIN_HAND ? offSide : -offSide;
-        double scale = VR.worldScale();
-        Vec3 center = hmd.pos()
-                .add(0.0, -offset.x * scale, 0.0)
-                .add(right.scale(offset.y * side * scale))
-                .add(forward.scale(offset.z * scale));
-        return box(center, POUCH_HALF);
+        // The off hand is the left one unless hands are reversed; the free hand is the one without the gun.
+        boolean freeHandOnLeft = (gunHand == InteractionHand.MAIN_HAND) != VR.leftHanded();
+        return VrZones.pouch(hmd, VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT, freeHandOnLeft,
+                VR.worldScale());
     }
 
     /** Just below and ahead of the gun hand, where the magazine goes in. */
     private static AABB magwellBox(InteractionHand gunHand) {
         VR.Aim gun = VrGunHand.aim(gunHand);
-        if (gun == null || gun.dir().lengthSqr() < 1.0E-6) {
-            return null;
-        }
-        double scale = VR.worldScale();
-        Vec3 center = gun.pos().add(gun.dir().normalize().scale(MAGWELL_FORWARD * scale)).add(0.0, -MAGWELL_DOWN * scale, 0.0);
-        return box(center, MAGWELL_HALF);
+        return gun == null ? null : VrZones.magwell(gun, VR.worldScale());
     }
 
     /** The magazine held in the free hand. */
     private static AABB magazineBox(InteractionHand gunHand) {
         VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
-        return free == null ? null : box(free.pos(), MAGAZINE_HALF);
-    }
-
-    private static AABB box(Vec3 center, Vec3 half) {
-        Vec3 h = half.scale(VR.worldScale());
-        return new AABB(center.subtract(h), center.add(h));
+        return free == null ? null : VrZones.magazine(free.pos(), VR.worldScale());
     }
 
     @SubscribeEvent

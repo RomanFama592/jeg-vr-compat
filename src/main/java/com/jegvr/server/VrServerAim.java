@@ -58,27 +58,38 @@ public final class VrServerAim {
             return null;
         }
         Aim aim = map(hand).get(player.getUUID());
-        if (aim == null || player.level().getGameTime() - aim.gameTime > MAX_AGE_TICKS) {
+        if (aim == null || !fresh(aim.gameTime, player.level().getGameTime())) {
             return null;
         }
         Vec3 eye = player.getEyePosition();
-        if (aim.muzzle.distanceTo(eye) > MAX_REACH) {
+        if (!inReach(eye, aim.muzzle)) {
             return null;
         }
         // Never let the muzzle reach through a wall the player's head is not through.
         BlockHitResult wall = player.level().clip(new ClipContext(eye, aim.muzzle, ClipContext.Block.COLLIDER,
                 ClipContext.Fluid.NONE, player));
-        if (wall.getType() != HitResult.Type.MISS) {
-            Vec3 back = eye.subtract(aim.muzzle).normalize().scale(WALL_MARGIN);
-            return wall.getLocation().add(back);
-        }
-        return aim.muzzle;
+        return wall.getType() != HitResult.Type.MISS ? beforeWall(eye, aim.muzzle, wall.getLocation()) : aim.muzzle;
+    }
+
+    /** A record is used only in the tick it arrived or the next one. */
+    static boolean fresh(long recorded, long now) {
+        return now - recorded <= MAX_AGE_TICKS;
+    }
+
+    /** A muzzle farther than {@link #MAX_REACH} from the eye is not believed (anti-cheat). */
+    static boolean inReach(Vec3 eye, Vec3 muzzle) {
+        return muzzle.distanceTo(eye) <= MAX_REACH;
+    }
+
+    /** The origin for a muzzle behind a wall: where the eye-to-muzzle line meets the wall, pulled back towards the eye. */
+    static Vec3 beforeWall(Vec3 eye, Vec3 muzzle, Vec3 wallHit) {
+        return wallHit.add(eye.subtract(muzzle).normalize().scale(WALL_MARGIN));
     }
 
     /** Unit vector along the barrel of the gun in {@code hand} from a fresh record, or null without one. */
     public static Vec3 directionFor(LivingEntity shooter, InteractionHand hand) {
         Aim aim = map(hand).get(shooter.getUUID());
-        if (aim == null || shooter.level().getGameTime() - aim.gameTime > MAX_AGE_TICKS
+        if (aim == null || !fresh(aim.gameTime, shooter.level().getGameTime())
                 || aim.direction.lengthSqr() < 1.0E-6) {
             return null;
         }
@@ -89,7 +100,7 @@ public final class VrServerAim {
         return hand == InteractionHand.OFF_HAND ? OFF_HAND : MAIN_HAND;
     }
 
-    private static boolean isFinite(Vec3 v) {
+    static boolean isFinite(Vec3 v) {
         return Double.isFinite(v.x) && Double.isFinite(v.y) && Double.isFinite(v.z);
     }
 }

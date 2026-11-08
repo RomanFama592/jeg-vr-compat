@@ -37,6 +37,8 @@ The jar to use is `build/libs/jeg_vr_compat-<version>.jar`. The `-slim` one lack
 | `./gradlew runClient` | Test client (add `-PnoVivecraft` or `-Pcompat` for Embeddium and Oculus) |
 | `./gradlew runClientAudit` | Applies every mixin, logs failures and closes |
 | `./gradlew checkMixins` | Checks mixin names against the jars players have (needs Python) |
+| `./gradlew test` | Unit tests of the pure math: aim angles, reload and precision boxes, gun pose files, mirrored faces |
+| `tools/jegdiff.sh <old jar> <new jar>` | Before supporting a new JEG: which JEG classes and names the addon uses changed |
 
 More: [compatibility](COMPATIBILIDAD.md), [commands](COMANDOS.md), [two-player setup](MULTIJUGADOR.md), [plan](PLAN.md).
 

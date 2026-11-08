@@ -12,3 +12,6 @@ out/
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
 libs/
+
+# Log4j output of the unit tests
+/logs/

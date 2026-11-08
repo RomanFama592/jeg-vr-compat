@@ -1,7 +1,5 @@
 package com.jegvr.client;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.jegvr.JegVrCompat;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,8 +16,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Per-gun VR pose offsets, in two layers:
@@ -35,9 +31,7 @@ import java.util.Map;
  */
 public final class VrGunConfig {
     private static final Logger LOGGER = LogManager.getLogger(JegVrCompat.MOD_ID);
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final long RELOAD_CHECK_MS = 1000L;
-    private static final int SCHEMA = 1;
     private static final String RESOURCE = "assets/" + JegVrCompat.MOD_ID + "/gun_poses.json";
 
     /** Rotation in degrees, translation in blocks (controller frame, applied before the gun is drawn). */
@@ -76,17 +70,9 @@ public final class VrGunConfig {
         public float z;
     }
 
-    private static final class Data {
-        /** The format of the file; a later format brings its migration, and older files keep working. */
-        int schema = SCHEMA;
-        /** Null in the user layer until the user edits the defaults. */
-        Pose defaults;
-        Map<String, Pose> guns = new LinkedHashMap<>();
-    }
-
     /** One file of poses and when it was last read. */
     private static final class Layer {
-        Data data = new Data();
+        VrGunPoseFile.Data data = new VrGunPoseFile.Data();
         long lastModified = -1L;
     }
 
@@ -134,40 +120,19 @@ public final class VrGunConfig {
 
     /** Effective pose for a gun: defaults plus the gun's entry. */
     public static Pose poseFor(String gunId) {
-        Pose gun = entry(gunId);
-        Pose result = defaults().copy();
-        if (gun != null) {
-            result.pitch += gun.pitch;
-            result.yaw += gun.yaw;
-            result.roll += gun.roll;
-            result.tx += gun.tx;
-            result.ty += gun.ty;
-            result.tz += gun.tz;
-            result.scale *= gun.scale;
-            if (gun.magwell != null) {
-                result.magwell = gun.magwell;
-            }
-        }
-        return result;
+        return VrGunPoseFile.compose(defaults(), entry(gunId));
     }
 
     /** Stores {@code effective} as the final pose of a gun (its entry = effective minus defaults). */
     public static void setEffective(String gunId, Pose effective) {
         reloadIfChanged();
-        Data target = editable().data;
+        VrGunPoseFile.Data target = editable().data;
         if (gunId == null) {
-            target.defaults = rounded(effective);
+            target.defaults = VrGunPoseFile.rounded(effective);
             return;
         }
-        Pose base = defaults();
         Pose entry = target.guns.computeIfAbsent(gunId, VrGunConfig::newEntry);
-        entry.pitch = round(effective.pitch - base.pitch);
-        entry.yaw = round(effective.yaw - base.yaw);
-        entry.roll = round(effective.roll - base.roll);
-        entry.tx = round(effective.tx - base.tx);
-        entry.ty = round(effective.ty - base.ty);
-        entry.tz = round(effective.tz - base.tz);
-        entry.scale = base.scale == 0.0F ? 1.0F : round(effective.scale / base.scale);
+        VrGunPoseFile.setEntry(entry, defaults(), effective);
     }
 
     /**
@@ -194,7 +159,7 @@ public final class VrGunConfig {
         try {
             Files.createDirectories(path.getParent());
             try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-                GSON.toJson(layer.data, writer);
+                VrGunPoseFile.GSON.toJson(layer.data, writer);
                 writer.write(System.lineSeparator());
             }
             layer.lastModified = Files.getLastModifiedTime(path).toMillis();
@@ -225,24 +190,6 @@ public final class VrGunConfig {
     private static Pose newEntry(String gunId) {
         Pose builtIn = editsBuiltIn() ? null : BUILT_IN.data.guns.get(gunId);
         return builtIn == null ? new Pose() : builtIn.copy();
-    }
-
-    private static Pose rounded(Pose pose) {
-        Pose p = new Pose();
-        p.pitch = round(pose.pitch);
-        p.yaw = round(pose.yaw);
-        p.roll = round(pose.roll);
-        p.tx = round(pose.tx);
-        p.ty = round(pose.ty);
-        p.tz = round(pose.tz);
-        p.scale = round(pose.scale);
-        p.magwell = pose.magwell;
-        return p;
-    }
-
-    /** Four decimals: tenths of a millimetre, and keeps the files free of float noise like 0.19000001. */
-    private static float round(float value) {
-        return Math.round(value * 10000.0F) / 10000.0F;
     }
 
     private static void reloadIfChanged() {
@@ -276,7 +223,7 @@ public final class VrGunConfig {
                 LOGGER.error("Built-in VR gun poses {} not found in the jar", RESOURCE);
                 return;
             }
-            Data loaded = parse(new InputStreamReader(in, StandardCharsets.UTF_8));
+            VrGunPoseFile.Data loaded = VrGunPoseFile.parse(new InputStreamReader(in, StandardCharsets.UTF_8));
             if (loaded != null) {
                 BUILT_IN.data = loaded;
             }
@@ -294,7 +241,7 @@ public final class VrGunConfig {
             // Remembered first, so a broken file is reported once and tried again only when it changes.
             layer.lastModified = modified;
             try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-                Data loaded = parse(reader);
+                VrGunPoseFile.Data loaded = VrGunPoseFile.parse(reader);
                 if (loaded != null) {
                     layer.data = loaded;
                 }
@@ -303,19 +250,5 @@ public final class VrGunConfig {
         } catch (Exception e) {
             LOGGER.error("Could not read {}, keeping previous values", path, e);
         }
-    }
-
-    private static Data parse(Reader reader) {
-        Data loaded = GSON.fromJson(reader, Data.class);
-        if (loaded == null) {
-            return null;
-        }
-        if (loaded.guns == null) {
-            loaded.guns = new LinkedHashMap<>();
-        }
-        if (loaded.schema > SCHEMA) {
-            LOGGER.warn("VR gun poses in format {} are from a newer version of the addon (this one reads {})", loaded.schema, SCHEMA);
-        }
-        return loaded;
     }
 }

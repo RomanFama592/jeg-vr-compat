@@ -83,7 +83,8 @@ public final class VrAim {
         VrNetwork.CHANNEL.sendToServer(new C2SVrAim(hand, muzzle, barrel));
     }
 
-    private static float[] rotation(Vec3 dir, float drift, float climb) {
+    /** {yaw, pitch} in degrees, as Minecraft measures them, for a direction; drift adds to yaw, climb raises pitch. */
+    static float[] rotation(Vec3 dir, float drift, float climb) {
         float yaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
         float pitch = (float) Math.toDegrees(-Math.asin(Mth.clamp(dir.y, -1.0, 1.0)));
         return new float[]{yaw + drift, Mth.clamp(pitch - climb, -90.0F, 90.0F)};

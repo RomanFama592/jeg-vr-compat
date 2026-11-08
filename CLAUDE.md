@@ -59,8 +59,10 @@ src/main/java/com/jegvr/
   mixin/model/PlayerModelVRMixin.java
   client/VrGunPose.java            # corrección de orientación por arma
   client/VrGunConfig.java          # poses: assets/jeg_vr_compat/gun_poses.json (jar) + config/jeg_vr_compat/guns.json (usuario)
+  client/VrGunPoseFile.java        # formato de esos archivos y suma de capas (sin estado del juego: tiene pruebas)
   client/VrRecoil.java
   client/VrGrabReload.java
+  client/VrZones.java              # geometría de las cajas (cadera, pozo, guardamanos), sin estado del juego: tiene pruebas
   client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, zones, grabzone (ver COMANDOS.md)
   config/VrClientConfig.java       # config/jeg_vr_compat-client.toml (ForgeConfigSpec CLIENT)
 src/main/resources/
@@ -86,6 +88,10 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 - `./gradlew build` — compila (debe pasar sin warnings de mixin). Publicar `build/libs/jeg_vr_compat-<versión>.jar`, nunca el `-slim`.
 - `./gradlew runClientAudit [-Pcompat]` — aplica todos los mixins de todos los mods, loguea lo que falla y cierra (carpeta `run-audit/`, VR apagado). `-Pcompat` suma Embeddium y Oculus.
 - `./gradlew checkMixins` — revisa los nombres de los mixins `remap = false` contra los jars que tienen los jugadores (necesita Python).
+- `./gradlew test` — pruebas de la matemática pura (`src/test`). La lógica nueva que se pueda separar del juego va en una clase sin
+  estado de Vivecraft ni de Forge (como `VrZones`, `VrGunPoseFile`) y suma su prueba.
+- `tools/jegdiff.sh <jar viejo> <jar nuevo>` — antes de soportar otra versión de JEG: qué clases de JEG que usa el addon
+  faltan o cambiaron, y qué textos de `JegKeys` ya no están. Comparar jars del mismo tipo (los dos de Modrinth).
 - `./gradlew runClient` — cliente de prueba (flat).
 - `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
 - Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `MULTIJUGADOR.md`.
