@@ -27,6 +27,8 @@
   "jeg_vr_compat.config.gunHud.tooltip": "El nombre, la munición y los medidores de cada arma flotan junto a su mano, en lugar de lo que JEG muestra en la HUD.",
   "jeg_vr_compat.config.handsFollowAnimations": "Manos siguen las animaciones",
   "jeg_vr_compat.config.handsFollowAnimations.tooltip": "Las manos se sueltan de los controles durante las animaciones de las armas, y el control lleva el arma con retraso. Apagado: siempre siguen a los controles.",
+  "jeg_vr_compat.config.reloadWithBothGuns": "Recargar con un arma en cada mano",
+  "jeg_vr_compat.config.reloadWithBothGuns.tooltip": "Apagado: con un arma en cada mano no se puede recargar, porque no hay mano libre para el cargador. Guardá una primero. Al intentarlo, la mano vibra dos veces.",
   "jeg_vr_compat.config.hudExclusion": "Hotbar en la mano con armas de la lista",
   "jeg_vr_compat.config.hudExclusion.tooltip": "Con un arma de la lista en la mano secundaria, la hotbar queda en el dorso de la mano, sin importar dónde la ponga la otra opción para las demás armas.",
   "jeg_vr_compat.config.hudExcludedGuns": "Armas de la lista:",

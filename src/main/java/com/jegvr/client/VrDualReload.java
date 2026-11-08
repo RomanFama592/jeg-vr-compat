@@ -2,6 +2,7 @@ package com.jegvr.client;
 
 import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
+import com.jegvr.config.VrClientConfig;
 import com.jegvr.mixin.input.ReloadHandlerAccessor;
 import com.jegvr.network.C2SVrAttachmentsOffhand;
 import com.jegvr.network.C2SVrReloadOffhand;
@@ -43,8 +44,18 @@ public final class VrDualReload {
     /** How long the attachments screen of the off-hand gun may take to arrive from the server. */
     private static final int ATTACHMENTS_MENU_WAIT_TICKS = 40;
 
+    /** Ticks between the two pulses of the "cannot reload" buzz. */
+    private static final int BUZZ_GAP_TICKS = 3;
+    /** JEG retries its automatic reload every tick while the trigger is held: buzz at most this often. */
+    private static final int BUZZ_COOLDOWN_TICKS = 15;
+    private static final float BUZZ_SECONDS = 0.04F;
+    private static final float BUZZ_AMPLITUDE = 0.6F;
+
     private static boolean aimWasDown;
     private static int attachmentsMenuWait;
+    private static int buzzCooldown;
+    private static int secondBuzzIn;
+    private static boolean buzzMainHand;
 
     private VrDualReload() {
     }
@@ -144,6 +155,7 @@ public final class VrDualReload {
             }
         }
         aimWasDown = down;
+        tickBuzz();
         if (player != null) {
             VrHands.tick(ModSyncedDataKeys.RELOADING.getValue(player));
         }
@@ -162,8 +174,42 @@ public final class VrDualReload {
         return aim != null && aim.dir().lengthSqr() > 1.0E-6 && aim.dir().normalize().y >= UP;
     }
 
+    /**
+     * F9.25: with {@code reload.reloadWithBothGuns} off, no reload starts while each hand holds a gun (no free hand for
+     * the magazine). Unloading is not a reload and stays allowed.
+     */
+    public static boolean reloadBlocked(LocalPlayer player) {
+        return !VrClientConfig.reloadWithBothGuns() && VR.active()
+                && player.getMainHandItem().getItem() instanceof GunItem
+                && player.getOffhandItem().getItem() instanceof GunItem;
+    }
+
+    /** Short double buzz in the hand whose reload was refused. */
+    public static void refuseReload(boolean mainHand) {
+        if (buzzCooldown > 0) {
+            return;
+        }
+        buzzCooldown = BUZZ_COOLDOWN_TICKS;
+        buzzMainHand = mainHand;
+        secondBuzzIn = BUZZ_GAP_TICKS;
+        VR.haptic(mainHand, BUZZ_SECONDS, BUZZ_AMPLITUDE);
+    }
+
+    private static void tickBuzz() {
+        if (buzzCooldown > 0) {
+            buzzCooldown--;
+        }
+        if (secondBuzzIn > 0 && --secondBuzzIn == 0) {
+            VR.haptic(buzzMainHand, BUZZ_SECONDS, BUZZ_AMPLITUDE);
+        }
+    }
+
     /** What JEG's reload key does (ReloadHandler.onKeyPressed). */
     public static void reloadMainHand(LocalPlayer player) {
+        if (reloadBlocked(player)) {
+            refuseReload(true);
+            return;
+        }
         CompoundTag tag = player.getMainHandItem().getTag();
         if (tag != null) {
             tag.putBoolean(JegKeys.IS_RELOADING, true);
@@ -173,6 +219,10 @@ public final class VrDualReload {
 
     /** Reloads the off-hand gun (also JEG's automatic reload when its trigger is pulled empty). */
     public static void reloadOffhand(LocalPlayer player) {
+        if (reloadBlocked(player)) {
+            refuseReload(false);
+            return;
+        }
         ItemStack stack = player.getOffhandItem();
         GunItem gunItem = (GunItem) stack.getItem();
         Gun gun = gunItem.getModifiedGun(stack);

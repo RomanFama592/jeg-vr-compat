@@ -31,6 +31,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
+    public static final ForgeConfigSpec.BooleanValue RELOAD_WITH_BOTH_GUNS;
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
@@ -50,6 +51,10 @@ public final class VrClientConfig {
                 .comment("Show the coloured helper boxes (hip pouch, magazine well, foregrip). Off by default;",
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
+        RELOAD_WITH_BOTH_GUNS = builder
+                .comment("Allow reloading while holding a gun in each hand. Off: put one gun away first (no free hand for",
+                        "the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
+                .define("reloadWithBothGuns", true);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -172,6 +177,15 @@ public final class VrClientConfig {
     public static void setGrabZone(GrabZone zone) {
         GRAB_ZONE.set(zone);
         GRAB_ZONE.save();
+    }
+
+    public static boolean reloadWithBothGuns() {
+        return !SPEC.isLoaded() || RELOAD_WITH_BOTH_GUNS.get();
+    }
+
+    public static void setReloadWithBothGuns(boolean allow) {
+        RELOAD_WITH_BOTH_GUNS.set(allow);
+        RELOAD_WITH_BOTH_GUNS.save();
     }
 
     public static void setShowGuides(boolean show) {
