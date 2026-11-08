@@ -57,9 +57,12 @@ Estos **no se probaron** porque sus jars no estaban disponibles. La columna "Rie
 | Entity Model Features / Texture Features | Bajo | Vivecraft trae su propio mixin para EMF; revisar el brazo en tercera persona |
 | Distant Horizons | Medio | Vivecraft y Oculus tienen integración, pero depende de sus versiones; no toca al addon directamente |
 | Accelerated Rendering y similares | Medio-alto | Reemplazan el camino de vértices, justo donde está el espejo |
-| OptiFine | Alto | Vivecraft lo admite, pero Oculus es otra vía. GeckoLib con OptiFine suele dar problemas. Se recomienda no anunciarlo como soportado |
+| OptiFine | Alto | **Se anuncia como no probado** (decisión del usuario, 2026-11-08). Vivecraft lo admite, pero Oculus es otra vía y GeckoLib con OptiFine suele dar problemas |
 
 ## Protocolo de prueba (lo hace el usuario, con visor)
+
+Kit en `compat-test/` (ignorado por git, bajado de Modrinth con el hash verificado): `mods/` con Embeddium 0.3.31 y
+Oculus 1.8.0 (las versiones de `-Pcompat`), y `shaderpacks/` con BSL 10.1.8 y Complementary Reimagined r5.9.3.
 
 1. Base: Embeddium, sin shaders. Mirar arma en cada mano, mano izquierda espejada, paneles, recarga con la mano.
 2. Embeddium + Oculus, con un pack liviano (BSL) y uno pesado (Complementary Reimagined).
