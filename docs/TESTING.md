@@ -484,13 +484,13 @@ Con `/jegvr zones` para ver la caja.
 - [ ] Arma en la secundaria, mano principal vacía o con otro objeto: no se ve la cruz, ni en el mundo ni en el HUD. Sin armas en las manos, vuelve.
 - [ ] Descargar en la secundaria: reproduce "sacar el arma", como en la principal, y devuelve la munición.
 
-## F9.27 (destello y humo en los ojos)
+## F9.27 (destello y humo en los ojos) — probado por el usuario en VR (2026-11-09)
 - [x] (auto) Compila; pruebas de `VrBlindFade` (la cuenta de JEG) en verde; `checkMixins` sin problemas; `render.ShaderHelperVRMixin` y `render.GuiGraphicsVRMixin` aplican, también con `-Pcompat`. Config: `visuals.eyeFlash = "WHITE"`.
-- [ ] Granada aturdidora cerca, sin shaders: los dos ojos se ponen blancos del todo y se aclaran de a poco en los últimos 2 segundos. El panel de la HUD no queda más blanco que la vista.
-- [ ] Granada de humo, parado dentro del humo: los dos ojos se ven grises, igual que en plano.
+- [x] Granada aturdidora cerca, sin shaders: los dos ojos se ponen blancos del todo y se aclaran de a poco en los últimos 2 segundos. El panel de la HUD no queda más blanco que la vista.
+- [x] Granada de humo, parado dentro del humo: los dos ojos se ven grises, igual que en plano.
 - [ ] Lo mismo con BSL o Complementary (Oculus): el blanco tapa todo, también el cielo y el agua, y no queda un ojo distinto del otro.
 - [ ] Vista de escritorio y cámara de Vivecraft (tercera persona): no hace falta que se pongan blancas; anotar qué se ve.
-- [ ] Opción "Destello en los ojos" en Gris y en Negro: el destello se ve de ese color, con el mismo desvanecimiento. El humo sigue gris.
-- [ ] Opción en Apagado: como antes, solo el panel de la HUD se pone blanco o gris.
+- [x] Opción "Destello en los ojos" en Gris y en Negro: el destello se ve de ese color, con el mismo desvanecimiento. El humo sigue gris.
+- [x] Opción en Apagado: como antes, solo el panel de la HUD se pone blanco o gris.
 - [ ] Flat (sin VR): la pantalla se pone blanca como en JEG, sin cambios.
-- [ ] Pantalla de opciones del mod (lista de mods → Config) abierta en VR: dos columnas, todo dentro del panel, con "Listo" abajo y sin botones pisados. En plano, también con la ventana chica.
+- [x] Pantalla de opciones del mod (lista de mods → Config) abierta en VR: dos columnas, todo dentro del panel, con "Listo" abajo y sin botones pisados. En plano, también con la ventana chica. (probado por el usuario, 2026-11-09)
