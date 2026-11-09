@@ -131,11 +131,13 @@ public final class VrConfigScreen extends Screen {
                 .create(0, 0, width, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
                         (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
-        right.add(CycleButton.onOffBuilder(VrClientConfig.blindInEyes())
-                .withTooltip(inEyes -> Tooltip.create(Component.translatable("jeg_vr_compat.config.blindInEyes.tooltip")))
+        right.add(CycleButton.<VrClientConfig.EyeFlash>builder(flash -> Component.translatable(eyeFlashKey(flash)))
+                .withValues(VrClientConfig.EyeFlash.values())
+                .withInitialValue(VrClientConfig.eyeFlash())
+                .withTooltip(flash -> Tooltip.create(Component.translatable(eyeFlashKey(flash) + ".tooltip")))
                 .create(0, 0, width, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.blindInEyes"),
-                        (button, inEyes) -> VrClientConfig.setBlindInEyes(inEyes)));
+                        Component.translatable("jeg_vr_compat.config.eyeFlash"),
+                        (button, flash) -> VrClientConfig.setEyeFlash(flash)));
 
         if (!twoColumns) {
             left.addAll(right);
@@ -186,6 +188,10 @@ public final class VrConfigScreen extends Screen {
 
     private static String throwModeKey(VrClientConfig.ThrowMode mode) {
         return "jeg_vr_compat.config.throwMode." + mode.name().toLowerCase(Locale.ROOT);
+    }
+
+    private static String eyeFlashKey(VrClientConfig.EyeFlash flash) {
+        return "jeg_vr_compat.config.eyeFlash." + flash.name().toLowerCase(Locale.ROOT);
     }
 
     private static String placementKey(VrClientConfig.HudPlacement placement) {

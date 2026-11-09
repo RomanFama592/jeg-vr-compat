@@ -32,7 +32,7 @@ public final class VrBlindOverlay {
 
     /** In VR with the option on: the eyes get the overlay and JEG's HUD fill is skipped. */
     public static boolean inEyes() {
-        return VR.active() && VrClientConfig.blindInEyes();
+        return VR.active() && VrClientConfig.eyeFlash() != VrClientConfig.EyeFlash.OFF;
     }
 
     /** Draws the overlays over the eye's framebuffer, which Vivecraft has bound. */
@@ -60,11 +60,11 @@ public final class VrBlindOverlay {
         modelView.setIdentity();
         RenderSystem.applyModelViewMatrix();
 
-        // Same order as JEG: the white below, the smoke over it. Corners in clip space: the whole framebuffer.
+        // Same order as JEG: the flash below, the smoke over it. Corners in clip space: the whole framebuffer.
         BufferBuilder buffer = Tesselator.getInstance().getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         if (blind > 0) {
-            quad(buffer, VrBlindFade.argb(JegKeys.BLINDED_OVERLAY_RGB, blind));
+            quad(buffer, VrBlindFade.argb(VrClientConfig.eyeFlash().rgb(), blind));
         }
         if (smoke > 0) {
             quad(buffer, VrBlindFade.argb(JegKeys.SMOKED_OVERLAY_RGB, smoke));

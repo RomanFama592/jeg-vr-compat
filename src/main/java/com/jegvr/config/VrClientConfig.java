@@ -29,6 +29,27 @@ public final class VrClientConfig {
         FOREARM
     }
 
+    /**
+     * F9.27: the colour of the stun grenade's flash in each eye, or {@link #OFF} for JEG's own overlay on the HUD
+     * panel. Grey and black are easier on the eyes than JEG's white. JEG's smoke keeps its own grey.
+     */
+    public enum EyeFlash {
+        WHITE(0xFFFFFF),
+        GRAY(0x808080),
+        BLACK(0x000000),
+        OFF(0);
+
+        private final int rgb;
+
+        EyeFlash(int rgb) {
+            this.rgb = rgb;
+        }
+
+        public int rgb() {
+            return rgb;
+        }
+    }
+
     /** How JEG's grenades, molotov and water bomb are thrown in VR (F9.26). */
     public enum ThrowMode {
         /** Hold the trigger of the hand that holds it to pull the pin, release to throw where that hand points. */
@@ -49,7 +70,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
     public static final ForgeConfigSpec.BooleanValue GUN_HUD;
     public static final ForgeConfigSpec.BooleanValue HANDS_FOLLOW_ANIMATIONS;
-    public static final ForgeConfigSpec.BooleanValue BLIND_IN_EYES;
+    public static final ForgeConfigSpec.EnumValue<EyeFlash> EYE_FLASH;
     public static final ForgeConfigSpec.BooleanValue HUD_EXCLUSION;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HUD_EXCLUDED_GUNS;
 
@@ -99,10 +120,11 @@ public final class VrClientConfig {
                         "the gun with a delay during reloads and inspections. Off: the hands always stay with the",
                         "controllers and the gun follows them at once; the guns still play their animations.")
                 .define("handsFollowAnimations", true);
-        BLIND_IN_EYES = builder
-                .comment("JEG's stun grenade whiteness and smoke cover what each eye sees, instead of only the HUD panel.",
-                        "Off: as JEG draws them, on the HUD.")
-                .define("blindInEyes", true);
+        EYE_FLASH = builder
+                .comment("The stun grenade's flash and JEG's smoke cover what each eye sees, instead of only the HUD panel.",
+                        "The flash's colour: WHITE (as JEG), GRAY or BLACK (easier on the eyes). The smoke stays grey.",
+                        "OFF: as JEG draws them, on the HUD.")
+                .defineEnum("eyeFlash", EyeFlash.WHITE);
         HUD_EXCLUSION = builder
                 .comment("With a gun from hudExcludedGuns in the off hand, Vivecraft's hand or wrist HUD (hotbar) stays",
                         "where Vivecraft puts it, on the back of the hand, whatever hudPlacement says.")
@@ -157,13 +179,13 @@ public final class VrClientConfig {
         return !SPEC.isLoaded() || HANDS_FOLLOW_ANIMATIONS.get();
     }
 
-    public static boolean blindInEyes() {
-        return !SPEC.isLoaded() || BLIND_IN_EYES.get();
+    public static EyeFlash eyeFlash() {
+        return SPEC.isLoaded() ? EYE_FLASH.get() : EyeFlash.WHITE;
     }
 
-    public static void setBlindInEyes(boolean inEyes) {
-        BLIND_IN_EYES.set(inEyes);
-        BLIND_IN_EYES.save();
+    public static void setEyeFlash(EyeFlash flash) {
+        EYE_FLASH.set(flash);
+        EYE_FLASH.save();
     }
 
     public static void setHandsFollowAnimations(boolean follow) {

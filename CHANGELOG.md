@@ -3,7 +3,7 @@
 ## Unreleased
 
 - The stun grenade's flash and the smoke now cover what each eye sees in VR, instead of only the HUD panel.
-  New option "Flash and smoke in the eyes" (on by default).
+  New option "Stun flash in the eyes": white (default, as in JEG), grey, black (easier on the eyes) or off.
 
 ## 0.1.0 (2026-11-09)
 
