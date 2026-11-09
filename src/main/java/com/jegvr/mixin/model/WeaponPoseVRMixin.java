@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ttv.migami.jeg.client.render.pose.BazookaPose;
 import ttv.migami.jeg.client.render.pose.MiniGunPose;
@@ -30,6 +31,16 @@ public abstract class WeaponPoseVRMixin {
         if (VR.isVRPlayer(player)) {
             ci.cancel();
         }
+    }
+
+    /**
+     * The gun in the hand: JEG blends its idle and aiming item poses by the aim progress (and by the head's pitch, see
+     * {@link WeaponPosePitchVRMixin}). A VR player's gun follows the controller through the arm, so it keeps the idle
+     * pose; the aiming one would tilt it away from the hand.
+     */
+    @ModifyVariable(method = "applyHeldItemTransforms", at = @At("HEAD"), argsOnly = true, ordinal = 0, require = 0)
+    private float jegvr$noAimPose(float aimProgress, Player player) {
+        return VR.isVRPlayer(player) ? 0.0F : aimProgress;
     }
 
     @Inject(method = "applyPlayerPreRender", at = @At("HEAD"), cancellable = true)

@@ -35,6 +35,16 @@ Oculus en plano.
 - [ ] Protocolo de shaders de `COMPATIBILIDAD.md`.
 - [ ] Servidor dedicado con este jar: arranca sin clases de cliente y el cliente VR detecta el addon (arma en la secundaria).
 
+## Arma en la cámara de Vivecraft (tercera persona)
+JEG giraba el arma en tercera persona según hacia dónde mira la cabeza (el visor) y la pose de apuntado; ahora, en un
+jugador VR, el arma sigue solo al brazo, que sigue al control.
+- [ ] Con la cámara de Vivecraft (tercera persona o cámara de mixed reality): un rifle y una escopeta en la mano apuntan
+  hacia donde apunta el control, aunque mires para otro lado (arriba, abajo, a un costado).
+- [ ] Lo mismo con la minigun y el lanzacohetes.
+- [ ] Una pistola (una mano): sigue bien como antes.
+- [ ] Con un arma en cada mano: las dos siguen a su control.
+- [ ] Otro jugador en plano (`runClient2`): sus armas en tercera persona se ven como siempre, inclinándose con su cabeza.
+
 ## F9.26 — Granadas en VR
 Opción: Config del mod → "Granadas" (Gatillo por defecto, Gesto de lanzar, Como en Vivecraft).
 Prueba del usuario (2026-11-08): funcionan bien como primera versión; el gesto se mejora en G.6.
