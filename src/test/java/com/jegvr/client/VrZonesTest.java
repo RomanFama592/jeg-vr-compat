@@ -71,11 +71,11 @@ class VrZonesTest {
     void foregripSlidesAlongTheBarrelWithinLimits() {
         VR.Aim gun = new VR.Aim(Vec3.ZERO, new Vec3(0, 0, 1));
         // No free hand: nearest place.
-        assertVec(new Vec3(0, -0.02, 0.05), VrZones.foregrip(gun, null, 1.0));
+        assertVec(new Vec3(0, -0.02, VrZones.FOREGRIP_MIN_DEPTH), VrZones.foregrip(gun, null, 1.0));
         // Level with the free hand, whatever its sideways offset.
         assertVec(new Vec3(0, -0.02, 0.3), VrZones.foregrip(gun, new Vec3(0.1, 0.05, 0.3), 1.0));
         // Never behind the grip, never past the reach of two hands.
-        assertVec(new Vec3(0, -0.02, 0.05), VrZones.foregrip(gun, new Vec3(0, 0, -0.4), 1.0));
+        assertVec(new Vec3(0, -0.02, VrZones.FOREGRIP_MIN_DEPTH), VrZones.foregrip(gun, new Vec3(0, 0, -0.4), 1.0));
         assertVec(new Vec3(0, -0.02, 0.7), VrZones.foregrip(gun, new Vec3(0, 0, 3), 1.0));
     }
 

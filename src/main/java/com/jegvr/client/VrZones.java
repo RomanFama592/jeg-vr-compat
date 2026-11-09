@@ -20,7 +20,7 @@ final class VrZones {
     static final Vec3 MAGAZINE_HALF = new Vec3(0.04, 0.07, 0.04);
 
     /** The foregrip box's nearest place along the gun's barrel. */
-    static final double FOREGRIP_MIN_DEPTH = 0.05;
+    static final double FOREGRIP_MIN_DEPTH = 0.1;
     static final double FOREGRIP_DOWN = 0.02;
     static final Vec3 FOREGRIP_HALF = new Vec3(0.08, 0.08, 0.08);
     /** With both hands on the gun, the hands may be this far apart (between the grip and the end of the barrel). */
