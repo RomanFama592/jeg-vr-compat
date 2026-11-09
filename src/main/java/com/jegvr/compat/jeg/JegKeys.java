@@ -36,6 +36,9 @@ public final class JegKeys {
      */
     public static final String RENDER_ARM_WITH_GUN = "mrCrayfishGunMod$renderArmWithGun";
 
+    /** JEG's ammo box block, drawn at the hip for reloading by hand (F10.2). */
+    public static final String AMMO_BOX_BLOCK = "jeg:ammo_box";
+
     /**
      * JEG's full-screen overlays ({@code mixin.client.GameRendererMixin.updateCameraAndRender}): white while
      * {@code BLINDED} (stun grenade), grey while {@code SMOKED}. Their opacity is {@code min(duration / fade, 1) * max}

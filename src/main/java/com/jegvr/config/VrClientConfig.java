@@ -87,8 +87,9 @@ public final class VrClientConfig {
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
         SHOW_SPRITES = builder
-                .comment("A glow with rippling rings shows where the free hand can grab ammo (hip) and where the magazine",
-                        "goes in (the gun), coloured by state: blue ready, green with the hand in it, white to aim for.")
+                .comment("JEG's ammo box at the hip while a gun is held (open when ammo can be grabbed), and a glow with",
+                        "rippling rings where the free hand can grab ammo and where the magazine goes in, coloured by state:",
+                        "blue ready, green with the hand in it, white to aim for.")
                 .define("showSprites", true);
         RELOAD_WITH_BOTH_GUNS = builder
                 .comment("Allow reloading while holding a gun in each hand. Off (default): put one gun away first (no free",

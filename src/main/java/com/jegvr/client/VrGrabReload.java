@@ -38,8 +38,9 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * per grab: with this addon on the server the round goes in at once ({@code C2SVrInsertRound}), otherwise JEG's reload
  * is started and stopped after one round. JEG's reload key keeps working.
  * <p>
- * F10.1: a glow ({@link VrGlow}, option {@code showSprites}) marks the hip while a magazine can be taken (blue, green
- * with the hand in it) and the magazine well while holding one (white, green on contact).
+ * Phase 10 (option {@code showSprites}): JEG's ammo box sits at the hip while a gun is held ({@link VrAmmoBox}), its
+ * lid open when a magazine can be taken; a glow ({@link VrGlow}) rises from the open box (blue, green with the hand in
+ * it) and marks the magazine well while holding one (white, green on contact).
  * <p>
  * Guides (off by default; {@code showGuides} in the client config, {@code /jegvr zones} toggles them): the hip box is red when there is no ammo, blue when a
  * magazine can be taken and green with the hand in it; while holding, the magazine box is yellow and the
@@ -57,7 +58,7 @@ public final class VrGrabReload {
     /** Muzzle-up kick of the gun model when a round goes in by hand. */
     private static final float ROUND_JOLT_DEGREES = 6.0F;
     /** F10.1: radius of the glow at the hip, and at the magazine well while holding a magazine (metres in the room). */
-    private static final float POUCH_GLOW_RADIUS = 0.12F;
+    private static final float POUCH_GLOW_RADIUS = 0.09F;
     private static final float MAGWELL_GLOW_RADIUS = 0.07F;
 
     private enum Pouch { HIDDEN, NO_AMMO, READY }
@@ -124,6 +125,8 @@ public final class VrGrabReload {
             VrPrecision.onGripPressed();
         }
         grabWasDown = grabDown;
+        InteractionHand boxHand = player == null ? null : boxGunHand(player);
+        VrAmmoBox.tick(boxHand != null && VrGlow.enabled(), holding || pouchState(player) == Pouch.READY);
         if (player == null || !VR.active()) {
             holding = false;
             handWasInPouch = false;
@@ -193,6 +196,23 @@ public final class VrGrabReload {
         }
     }
 
+    /**
+     * F10.2: the hand whose gun the ammo box at the hip belongs to, or null when no box shows. It shows with any gun in
+     * the main hand (closed when it cannot be reloaded by hand, or the other hand is busy), or with a gun in the off
+     * hand and the main hand free.
+     */
+    private static InteractionHand boxGunHand(LocalPlayer player) {
+        if (!VR.active() || VR.seated() || VrClientConfig.grabZone() == VrClientConfig.GrabZone.OFF
+                || player.isSpectator() || Minecraft.getInstance().screen != null) {
+            return null;
+        }
+        InteractionHand hand = VrGunHand.of(player);
+        if (hand != null) {
+            return hand;
+        }
+        return player.getMainHandItem().getItem() instanceof GunItem ? InteractionHand.MAIN_HAND : null;
+    }
+
     private static boolean canGrab(LocalPlayer player) {
         return pouchState(player) == Pouch.READY;
     }
@@ -202,6 +222,9 @@ public final class VrGrabReload {
      * and ammo to load. NO_AMMO: the same without ammo. HIDDEN: anything else.
      */
     private static Pouch pouchState(LocalPlayer player) {
+        if (player == null) {
+            return Pouch.HIDDEN;
+        }
         InteractionHand gunHand = VrGunHand.of(player);
         ItemStack stack = gunHand == null ? ItemStack.EMPTY : player.getItemInHand(gunHand);
         if (!VR.active() || VR.seated() || VrClientConfig.grabZone() == VrClientConfig.GrabZone.OFF
@@ -251,13 +274,22 @@ public final class VrGrabReload {
     /** Hip (or, seated, belly) on the free hand's side, following the headset's yaw. */
     private static AABB pouchBox(InteractionHand gunHand) {
         VR.Aim hmd = VR.hmdAim();
-        if (hmd == null) {
-            return null;
-        }
-        // The off hand is the left one unless hands are reversed; the free hand is the one without the gun.
-        boolean freeHandOnLeft = (gunHand == InteractionHand.MAIN_HAND) != VR.leftHanded();
-        return VrZones.pouch(hmd, VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT, freeHandOnLeft,
-                VR.worldScale());
+        return hmd == null ? null
+                : VrZones.pouch(hmd, VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT,
+                freeHandOnLeft(gunHand), VR.worldScale());
+    }
+
+    /** Away from the body at the pouch: to the side at the hip, forward in front of the belly. */
+    private static Vec3 pouchOutward(InteractionHand gunHand) {
+        VR.Aim hmd = VR.hmdAim();
+        return hmd == null ? null
+                : VrZones.pouchOutward(hmd, VrClientConfig.grabZone() == VrClientConfig.GrabZone.FRONT,
+                freeHandOnLeft(gunHand));
+    }
+
+    /** The off hand is the left one unless hands are reversed; the free hand is the one without the gun. */
+    private static boolean freeHandOnLeft(InteractionHand gunHand) {
+        return (gunHand == InteractionHand.MAIN_HAND) != VR.leftHanded();
     }
 
     /** Just below and ahead of the gun hand, where the magazine goes in. */
@@ -291,6 +323,13 @@ public final class VrGrabReload {
         float time = player.tickCount + event.getPartialTick();
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
+        // F10.2: JEG's ammo box at the hip while a gun is held, open when a magazine can be taken.
+        InteractionHand boxHand = sprites ? boxGunHand(player) : null;
+        Vec3 boxTop = null;
+        if (boxHand != null) {
+            boxTop = VrAmmoBox.draw(pose, buffers, pouchBox(boxHand), pouchOutward(boxHand), event.getPartialTick());
+            buffers.endBatch();
+        }
         if (holding) {
             boolean touching = magazineTouchesGun(heldGunHand);
             if (sprites) {
@@ -312,8 +351,9 @@ public final class VrGrabReload {
             if (gunHand == null) {
                 state = Pouch.HIDDEN;
             }
-            if (state == Pouch.READY && sprites) {
-                VrGlow.draw(pose, buffers, center(pouchBox(gunHand)), POUCH_GLOW_RADIUS,
+            if (state == Pouch.READY && sprites && VrAmmoBox.lidOpen()) {
+                Vec3 glowAt = boxTop != null ? boxTop : center(pouchBox(gunHand));
+                VrGlow.draw(pose, buffers, glowAt, POUCH_GLOW_RADIUS,
                         handInPouch(player) ? VrGlow.GREEN : VrGlow.BLUE, time);
                 buffers.endBatch();
             }

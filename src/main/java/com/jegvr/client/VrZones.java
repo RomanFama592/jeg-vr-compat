@@ -57,6 +57,23 @@ final class VrZones {
         return box(center, POUCH_HALF, scale);
     }
 
+    /**
+     * Away from the body at the pouch, level: towards the free hand's side at the hip, forward in front of the belly.
+     * Null when the headset looks straight up or down.
+     */
+    static Vec3 pouchOutward(VR.Aim hmd, boolean front, boolean freeHandOnLeft) {
+        Vec3 forward = new Vec3(hmd.dir().x, 0.0, hmd.dir().z);
+        if (forward.lengthSqr() < MIN_LEVEL_DIR_SQR) {
+            return null;
+        }
+        forward = forward.normalize();
+        if (front) {
+            return forward;
+        }
+        Vec3 right = new Vec3(-forward.z, 0.0, forward.x);
+        return freeHandOnLeft ? right.scale(-1.0) : right;
+    }
+
     /** Just below and ahead of the gun hand, where the magazine goes in; null without a direction. */
     static AABB magwell(VR.Aim gun, double scale) {
         if (gun.dir().lengthSqr() < MIN_DIR_SQR) {

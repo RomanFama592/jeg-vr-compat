@@ -33,6 +33,19 @@ class VrZonesTest {
     }
 
     @Test
+    void pouchOutwardPointsAwayFromTheBody() {
+        // At the hip: towards the pouch's side (east is the left when looking south); seated: forward.
+        assertVec(new Vec3(1, 0, 0), VrZones.pouchOutward(LOOKING_SOUTH, false, true));
+        assertVec(new Vec3(-1, 0, 0), VrZones.pouchOutward(LOOKING_SOUTH, false, false));
+        assertVec(new Vec3(0, 0, 1), VrZones.pouchOutward(LOOKING_SOUTH, true, true));
+        VR.Aim eastDown = new VR.Aim(Vec3.ZERO, new Vec3(1, -1, 0).normalize());
+        Vec3 outward = VrZones.pouchOutward(eastDown, false, true);
+        assertEquals(0.0, outward.y, EPS);
+        assertEquals(-1.0, outward.z, EPS);
+        assertNull(VrZones.pouchOutward(new VR.Aim(Vec3.ZERO, new Vec3(0, -1, 0)), false, true));
+    }
+
+    @Test
     void pouchFollowsYawButNotPitch() {
         // Looking east and 45 degrees down: same height under the head, and "forward" is east.
         VR.Aim eastDown = new VR.Aim(Vec3.ZERO, new Vec3(1, -1, 0).normalize());

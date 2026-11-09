@@ -45,7 +45,8 @@ Revisado desmontando los jars con `javap`.
 | Láser del arco | `debugQuads`; **con shaders, `RenderType.lightning`** | Los `debugQuads` usan el programa básico del pack y podrían oscurecerse de noche | Que se vea de noche; con shaders el aspecto puede ser más brillante |
 | Cajas guía | `debugFilledBox` y `lines` | Solo depuración, apagadas por defecto | — |
 | Brillos de recarga (F10.1) | Cuadrados que miran al visor, `RenderType.entityTranslucentEmissive` con texturas propias, luz máxima y sin escribir profundidad | Pasan por el programa de entidades del pack | Que se vean igual con BSL y Complementary, de día y de noche |
-| Resto de la Fase 10 (sin hacer) | Caja de munición, munición en la mano y brillo sobre el arma | Pendiente | — |
+| Caja de munición (F10.2) | El modelo del bloque `jeg:ammo_box` con `Sheets.cutoutBlockSheet()` y la luz del lugar | Pasa por el programa de entidades del pack | Que se vea con su textura y su luz, de día y de noche |
+| Resto de la Fase 10 (sin hacer) | Munición en la mano y brillo sobre el arma | Pendiente | — |
 
 El addon no trae shaders ni `RenderType` propios, y no importa clases de Sodium, Iris ni OptiFine. Para saber si hay
 shaders usa `VR.shadersActive()`, que le pregunta a Vivecraft. Eso evita depender de esos mods.

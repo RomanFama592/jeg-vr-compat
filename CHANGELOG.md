@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-- Reloading by hand: a glow with rippling rings marks the hip while ammo can be grabbed (blue, green with the hand
-  in it) and the gun's magazine well while holding a magazine (white, green on contact). New option "Reload glows"
-  (on by default).
+- Reloading by hand: JEG's ammo box now sits at the hip while you hold a gun. Its lid opens when you can grab ammo,
+  and a glow with rippling rings rises from it (blue, green with the hand in it). While holding a magazine, another
+  glow marks the gun's magazine well (white, green on contact). New option "Reload box and glows" (on by default).
 
 ## 0.1.1 (2026-11-09)
 

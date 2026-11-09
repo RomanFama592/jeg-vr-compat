@@ -508,3 +508,17 @@ Con `/jegvr zones` para ver la caja.
 - [ ] Opción "Brillos de recarga" apagada: no hay brillos. Con "Cajas de ayuda" encendida, las cajas siguen como antes.
 - [ ] Pantalla de opciones en VR, ahora con 13 opciones: todo entra en el panel.
 - [ ] Flat: sin cambios.
+
+## F10.2 (caja de munición en la cadera)
+- [x] (auto) Compila; prueba nueva de `VrZones.pouchOutward` en verde; `checkMixins` sin problemas.
+- [ ] Con un arma en la mano: la caja de munición de JEG se ve en la cadera del lado de la mano libre, del tamaño de una caja chica, con el frente hacia afuera y las asas a los costados. Sigue al giro de la cabeza.
+- [ ] Arma sin llenar y munición en el inventario: la tapa se abre hacia el cuerpo, con un sonido corto, y del borde de arriba sale el brillo azul. Mano adentro: verde.
+- [ ] Agarrar el cargador: la caja queda abierta sin brillo; el brillo blanco pasa al pozo del arma.
+- [ ] Arma llena, sin munición, recargando o con algo en la otra mano: la caja se ve cerrada, sin brillo. Al cambiar, la tapa se cierra con su sonido.
+- [ ] Sin arma en la mano, con una pantalla abierta, en modo sentado de Vivecraft o con `grabZone = OFF`: no hay caja.
+- [ ] Arma en la secundaria con la principal libre: la caja va del otro lado.
+- [ ] Con `grabZone = FRONT`: la caja va delante de la panza, con el frente hacia adelante.
+- [ ] La caja toma la luz del lugar: oscura de noche o en una cueva, normal de día.
+- [ ] Con BSL o Complementary: se ve con su textura.
+- [ ] Opción "Caja y brillos de recarga" apagada: no hay caja ni brillos.
+- [ ] Flat: sin cambios.
