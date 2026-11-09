@@ -38,6 +38,8 @@ public final class VrPrecision {
     /** Room-scale metres: the box is drawn when the free hand is this close, and the mode ends when it goes farther. */
     private static final double SHOW_DISTANCE = 0.45;
     private static final int AIMING_RETRY_TICKS = 20;
+    /** F10.4: the gun's glow fades in over this outer part of its range. */
+    private static final double GLOW_FADE_PART = 0.3;
     /** Recoil deviation and kick while in precision mode. */
     public static final float RECOIL_FACTOR = 0.4F;
 
@@ -178,6 +180,37 @@ public final class VrPrecision {
         VR.Aim gun = VrGunHand.aim(gunHand);
         VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
         return gun == null || free == null ? null : VrZones.twoHandDir(gun, free.pos(), VR.worldScale());
+    }
+
+    /** F10.4: where a gun glows, in which colour, and how much (fading in as the free hand comes closer). */
+    public record Glow(Vec3 center, float[] rgb, float fade) {
+    }
+
+    /**
+     * F10.4: the glow of the gun drawn in {@code drawnHand}, or null. While holding it, violet at the free hand; else,
+     * for a two-handed gun with the other hand free and within {@code precisionGlowRange} of the foregrip, blue (green
+     * with the hand on it) at the foregrip, fading in over the outer part of that range.
+     */
+    public static Glow glow(InteractionHand drawnHand) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null || !VrGlow.enabled()) {
+            return null;
+        }
+        if (active) {
+            VR.Aim free = VrGunHand.aim(VrGunHand.other(hand));
+            return drawnHand == hand && free != null ? new Glow(free.pos(), VrGlow.VIOLET, 1.0F) : null;
+        }
+        if (holdableHand(player) != drawnHand) {
+            return null;
+        }
+        Vec3 center = foregrip(drawnHand);
+        double range = VrClientConfig.precisionGlowRange() * VR.worldScale();
+        double distance = handDistance(drawnHand);
+        if (center == null || range <= 0.0 || distance > range) {
+            return null;
+        }
+        float fade = (float) Math.min(1.0, (range - distance) / (range * GLOW_FADE_PART));
+        return new Glow(center, handOnForegrip(drawnHand) ? VrGlow.GREEN : VrGlow.BLUE, fade);
     }
 
     private static double handDistance(InteractionHand gunHand) {

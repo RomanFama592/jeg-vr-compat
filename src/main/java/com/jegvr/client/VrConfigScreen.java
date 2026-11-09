@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.jegvr.config.VrClientConfig;
 import com.jegvr.config.VrRules;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -135,6 +136,7 @@ public final class VrConfigScreen extends Screen {
                 .create(0, 0, width, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
                         (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
+        right.add(new GlowRangeSlider(width));
         right.add(CycleButton.<VrClientConfig.EyeFlash>builder(flash -> Component.translatable(eyeFlashKey(flash)))
                 .withValues(VrClientConfig.EyeFlash.values())
                 .withInitialValue(VrClientConfig.eyeFlash())
@@ -170,6 +172,35 @@ public final class VrConfigScreen extends Screen {
             AbstractWidget widget = column.get(i);
             widget.setPosition(x, this.top + row * i);
             addRenderableWidget(widget);
+        }
+    }
+
+    /** F10.4: how close the free hand must come for a two-handed gun to glow (10 to 100 cm, in 5 cm steps). */
+    private static final class GlowRangeSlider extends AbstractSliderButton {
+        private static final double MIN = 0.1;
+        private static final double MAX = 1.0;
+        private static final double STEP = 0.05;
+
+        GlowRangeSlider(int width) {
+            super(0, 0, width, BUTTON_HEIGHT, Component.empty(),
+                    (VrClientConfig.precisionGlowRange() - MIN) / (MAX - MIN));
+            setTooltip(Tooltip.create(Component.translatable("jeg_vr_compat.config.precisionGlowRange.tooltip")));
+            updateMessage();
+        }
+
+        private double metres() {
+            return Math.round((MIN + this.value * (MAX - MIN)) / STEP) * STEP;
+        }
+
+        @Override
+        protected void updateMessage() {
+            setMessage(Component.translatable("jeg_vr_compat.config.precisionGlowRange",
+                    Math.round(metres() * 100.0)));
+        }
+
+        @Override
+        protected void applyValue() {
+            VrClientConfig.setPrecisionGlowRange(metres());
         }
     }
 

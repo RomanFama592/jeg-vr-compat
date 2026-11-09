@@ -65,6 +65,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.BooleanValue SHOW_SPRITES;
+    public static final ForgeConfigSpec.DoubleValue PRECISION_GLOW_RANGE;
     public static final ForgeConfigSpec.BooleanValue RELOAD_WITH_BOTH_GUNS;
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
@@ -87,10 +88,15 @@ public final class VrClientConfig {
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
         SHOW_SPRITES = builder
-                .comment("JEG's ammo box at the hip while a gun is held (open when ammo can be grabbed), and a glow with",
-                        "rippling rings where the free hand can grab ammo and where the magazine goes in, coloured by state:",
-                        "blue ready, green with the hand in it, white to aim for.")
+                .comment("JEG's ammo box at the hip while a gun is held (open when ammo can be grabbed); a glow with",
+                        "rippling rings where the free hand can grab ammo and where the magazine goes in; and two-handed guns",
+                        "glowing where the free hand can hold them. Colours: blue ready, green with the hand in it, white to",
+                        "aim for, violet holding.")
                 .define("showSprites", true);
+        PRECISION_GLOW_RANGE = builder
+                .comment("How close (metres) the free hand must come to a two-handed gun for the gun to glow where it can be",
+                        "held (precision mode). Needs showSprites.")
+                .defineInRange("precisionGlowRange", 0.35, 0.1, 1.0);
         RELOAD_WITH_BOTH_GUNS = builder
                 .comment("Allow reloading while holding a gun in each hand. Off (default): put one gun away first (no free",
                         "hand for the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
@@ -161,6 +167,15 @@ public final class VrClientConfig {
 
     public static boolean showSprites() {
         return !SPEC.isLoaded() || SHOW_SPRITES.get();
+    }
+
+    public static double precisionGlowRange() {
+        return SPEC.isLoaded() ? PRECISION_GLOW_RANGE.get() : 0.35;
+    }
+
+    public static void setPrecisionGlowRange(double metres) {
+        PRECISION_GLOW_RANGE.set(metres);
+        PRECISION_GLOW_RANGE.save();
     }
 
     public static void setShowSprites(boolean show) {
