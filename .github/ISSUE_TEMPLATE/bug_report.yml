@@ -1,0 +1,76 @@
+name: Bug report
+description: Something does not work or looks wrong in VR (or changed without VR).
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! English or Spanish are both fine. / ¡Gracias! Podés escribir en inglés o en español.
+        Please check first that the bug does not happen without this addon (only Just Enough Guns and Vivecraft).
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you see, and what you expected instead. Screenshots or a short video help a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Which gun or item, which hand, what you did.
+      placeholder: |
+        1. Hold the assault rifle in the main hand
+        2. Grab a magazine from the hip
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: addon
+    attributes:
+      label: Addon version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Forge, Just Enough Guns and Vivecraft versions
+      placeholder: "Forge 47.2.0, JEG 0.13.2, Vivecraft 1.20.1-1.2.5"
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where
+      options:
+        - Singleplayer
+        - Server with this addon
+        - Server without this addon
+    validations:
+      required: true
+  - type: dropdown
+    id: vr
+    attributes:
+      label: VR mode
+      options:
+        - VR, standing
+        - VR, seated
+        - Without VR (flat)
+    validations:
+      required: true
+  - type: input
+    id: headset
+    attributes:
+      label: Headset and left-handed mode
+      placeholder: "Quest 3 via Virtual Desktop, right-handed"
+  - type: textarea
+    id: mods
+    attributes:
+      label: Shaders and other mods
+      description: Shader pack, Embeddium/Oculus/OptiFine, and any other mod that could be involved. A modpack name is fine.
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Attach `logs/latest.log` (drag the file here), or a crash report if the game crashed.

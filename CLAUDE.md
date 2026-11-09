@@ -42,7 +42,7 @@ El plan de trabajo detallado está en `notas/PLAN.md` (privado: fuera de git, ju
     interruptor. Textos para el jugador: en `en_us` y `es_es`. Claves y constantes de JEG: en `compat/jeg/JegKeys`.
 
 ## Estructura esperada
-En la raíz solo van `README.md` (inglés), `README.es.md` (español, mismo contenido), `CHANGELOG.md`, `LICENSE`, este
+En la raíz solo van `README.md` (inglés), `README.es.md` (español, mismo contenido), `CHANGELOG.md`, `LICENSE`, `.github/` (plantillas de issues), este
 archivo y lo de Gradle. Los demás documentos públicos van en `docs/`, con su índice en `docs/README.md`; las notas privadas, en `notas/`, que git ignora.
 ```
 src/main/java/com/jegvr/

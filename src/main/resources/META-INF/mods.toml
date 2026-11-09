@@ -1,11 +1,13 @@
 modLoader="javafml"
 loaderVersion="[47,)"
 license="${mod_license}"
+issueTrackerURL="https://github.com/RomanFama592/jeg-vr-compat/issues"
 
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
+displayURL="https://github.com/RomanFama592/jeg-vr-compat"
 authors="${mod_authors}"
 description='''VR support for Just Enough Guns through Vivecraft: guns follow your controllers, shots leave the barrel, and you reload by hand. Works on the client alone; also installed on the server, it adds shooting and reloading with either hand and bullets that start at the muzzle.'''
 # Optional on either side: never flag a version mismatch in the server list.

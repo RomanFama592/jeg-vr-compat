@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Just Enough Guns issues
+    url: https://github.com/MigaMiDev/Just-Enough-Guns/issues
+    about: Bugs that also happen without this addon belong to Just Enough Guns.
+  - name: Vivecraft issues
+    url: https://github.com/Vivecraft/VivecraftMod/issues
+    about: VR problems that also happen without Just Enough Guns belong to Vivecraft.

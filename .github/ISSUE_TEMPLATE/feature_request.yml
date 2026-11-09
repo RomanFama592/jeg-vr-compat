@@ -1,0 +1,19 @@
+name: Feature request
+description: An idea to make guns play better in VR.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: English or Spanish are both fine. / Podés escribir en inglés o en español.
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What you would like to do in VR, and how it should feel.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: What is awkward or missing today.
