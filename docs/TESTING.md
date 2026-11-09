@@ -492,3 +492,4 @@ Con `/jegvr zones` para ver la caja.
 - [ ] Vista de escritorio y cámara de Vivecraft (tercera persona): no hace falta que se pongan blancas; anotar qué se ve.
 - [ ] Opción "Destello y humo en los ojos" apagada: como antes, solo el panel de la HUD se pone blanco.
 - [ ] Flat (sin VR): la pantalla se pone blanca como en JEG, sin cambios.
+- [ ] Pantalla de opciones del mod (lista de mods → Config) abierta en VR: dos columnas, todo dentro del panel, con "Listo" abajo y sin botones pisados. En plano, también con la ventana chica.

@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.jegvr.config.VrClientConfig;
 import com.jegvr.config.VrRules;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -13,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -22,18 +24,21 @@ import java.util.Locale;
  * every change is saved at once, except the text field, saved when the screen closes.
  */
 public final class VrConfigScreen extends Screen {
-    private static final int BUTTON_WIDTH = 250;
+    /** Widest a button gets; narrower when two columns do not fit (Vivecraft's GUI panel is small). */
+    private static final int MAX_BUTTON_WIDTH = 250;
+    private static final int MIN_BUTTON_WIDTH = 120;
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW = 24;
-    /** Rows above the "Done" button, one of them a gap. */
-    private static final int ROWS = 13;
-    private static final int MARGIN = 28;
+    private static final int COLUMN_GAP = 10;
+    private static final int TITLE_SPACE = 24;
+    private static final int BOTTOM_SPACE = 8;
     private static final int LABEL_GAP = 6;
     private static final int LIST_MAX_LENGTH = 512;
 
     private final Screen parent;
     private EditBox excludedGuns;
     private int top;
+    private int listLabelX;
 
     private VrConfigScreen(Screen parent) {
         super(Component.translatable("jeg_vr_compat.config.title"));
@@ -48,92 +53,124 @@ public final class VrConfigScreen extends Screen {
 
     @Override
     protected void init() {
-        int x = (this.width - BUTTON_WIDTH) / 2;
-        // Rows shrink on small GUI sizes (never below the button height) so "Done" stays on screen.
-        int row = Math.max(BUTTON_HEIGHT, Math.min(ROW, (this.height - MARGIN - BUTTON_HEIGHT - 4) / ROWS));
-        this.top = Math.max(MARGIN, Math.min(this.height / 4, this.height - row * ROWS - BUTTON_HEIGHT - 4));
-        int y = this.top;
-        addRenderableWidget(CycleButton.<VrClientConfig.GrabZone>builder(VrConfigScreen::zoneName)
+        // Two columns, so everything fits in Vivecraft's GUI panel (about 6 rows high at the usual GUI scale).
+        // One column only when the screen is too narrow for two.
+        int twoColumnWidth = Math.min(MAX_BUTTON_WIDTH, (this.width - COLUMN_GAP * 3) / 2);
+        boolean twoColumns = twoColumnWidth >= MIN_BUTTON_WIDTH;
+        int width = twoColumns ? twoColumnWidth : Math.min(MAX_BUTTON_WIDTH, this.width - COLUMN_GAP * 2);
+        List<AbstractWidget> left = new ArrayList<>();
+        List<AbstractWidget> right = new ArrayList<>();
+        VrRules.Rules rules = VrRulesClient.rules();
+
+        left.add(CycleButton.<VrClientConfig.GrabZone>builder(VrConfigScreen::zoneName)
                 .withValues(VrClientConfig.GrabZone.values())
                 .withInitialValue(VrClientConfig.grabZone())
                 .withTooltip(zone -> Tooltip.create(Component.translatable(zoneKey(zone) + ".tooltip")))
-                .create(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.grabZone"),
+                .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.grabZone"),
                         (button, zone) -> VrClientConfig.setGrabZone(zone)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.showGuides())
+        left.add(CycleButton.onOffBuilder(VrClientConfig.showGuides())
                 .withTooltip(show -> Tooltip.create(Component.translatable("jeg_vr_compat.config.showGuides.tooltip")))
-                .create(x, y + row, BUTTON_WIDTH, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.showGuides"),
+                .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.showGuides"),
                         (button, show) -> VrClientConfig.setShowGuides(show)));
-        addRenderableWidget(CycleButton.<VrClientConfig.HudPlacement>builder(
-                        placement -> Component.translatable(placementKey(placement)))
-                .withValues(VrClientConfig.HudPlacement.values())
-                .withInitialValue(VrClientConfig.hudPlacement())
-                .withTooltip(placement -> Tooltip.create(Component.translatable(placementKey(placement) + ".tooltip")))
-                .create(x, y + row * 2, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.hudPlacement"),
-                        (button, placement) -> VrClientConfig.setHudPlacement(placement)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.hudExclusion())
-                .withTooltip(exclusion -> Tooltip.create(Component.translatable("jeg_vr_compat.config.hudExclusion.tooltip")))
-                .create(x, y + row * 3, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.hudExclusion"),
-                        (button, exclusion) -> VrClientConfig.setHudExclusion(exclusion)));
-        Component listLabel = Component.translatable("jeg_vr_compat.config.hudExcludedGuns");
-        int labelWidth = this.font.width(listLabel) + LABEL_GAP;
-        this.excludedGuns = new EditBox(this.font, x + labelWidth, y + row * 4, BUTTON_WIDTH - labelWidth, BUTTON_HEIGHT, listLabel);
-        this.excludedGuns.setMaxLength(LIST_MAX_LENGTH);
-        this.excludedGuns.setValue(String.join(", ", VrClientConfig.hudExcludedGuns()));
-        this.excludedGuns.setTooltip(Tooltip.create(Component.translatable("jeg_vr_compat.config.hudExcludedGuns.tooltip")));
-        addRenderableWidget(this.excludedGuns);
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.mirrorLeftHand())
-                .withTooltip(mirror -> Tooltip.create(Component.translatable("jeg_vr_compat.config.mirrorLeftHand.tooltip")))
-                .create(x, y + row * 5, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.mirrorLeftHand"),
-                        (button, mirror) -> VrClientConfig.setMirrorLeftHand(mirror)));
-        VrRules.Rules rules = VrRulesClient.rules();
-        boolean laserDecided = rules.bowLaser() != VrRules.Toggle.PLAYER;
-        serverDecides(addRenderableWidget(CycleButton.onOffBuilder(
-                        laserDecided ? VrClientConfig.bowLaser() : VrClientConfig.ownBowLaser())
-                .withTooltip(laser -> tooltip("jeg_vr_compat.config.bowLaser.tooltip", laserDecided))
-                .create(x, y + row * 6, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.bowLaser"),
-                        (button, laser) -> VrClientConfig.setBowLaser(laser))), laserDecided);
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.gunHud())
-                .withTooltip(hud -> Tooltip.create(Component.translatable("jeg_vr_compat.config.gunHud.tooltip")))
-                .create(x, y + row * 7, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.gunHud"),
-                        (button, hud) -> VrClientConfig.setGunHud(hud)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.handsFollowAnimations())
-                .withTooltip(follow -> Tooltip.create(Component.translatable("jeg_vr_compat.config.handsFollowAnimations.tooltip")))
-                .create(x, y + row * 8, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
-                        (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.blindInEyes())
-                .withTooltip(inEyes -> Tooltip.create(Component.translatable("jeg_vr_compat.config.blindInEyes.tooltip")))
-                .create(x, y + row * 9, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        Component.translatable("jeg_vr_compat.config.blindInEyes"),
-                        (button, inEyes) -> VrClientConfig.setBlindInEyes(inEyes)));
         boolean reloadDecided = rules.reloadWithBothGuns() != VrRules.Toggle.PLAYER;
-        serverDecides(addRenderableWidget(CycleButton.onOffBuilder(
+        left.add(serverDecides(CycleButton.onOffBuilder(
                         reloadDecided ? VrClientConfig.reloadWithBothGuns() : VrClientConfig.ownReloadWithBothGuns())
                 .withTooltip(allow -> tooltip("jeg_vr_compat.config.reloadWithBothGuns.tooltip", reloadDecided))
-                .create(x, y + row * 10, BUTTON_WIDTH, BUTTON_HEIGHT,
+                .create(0, 0, width, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.reloadWithBothGuns"),
-                        (button, allow) -> VrClientConfig.setReloadWithBothGuns(allow))), reloadDecided);
+                        (button, allow) -> VrClientConfig.setReloadWithBothGuns(allow)), reloadDecided));
         boolean throwDecided = rules.throwMode() != VrRules.Throw.PLAYER;
-        serverDecides(addRenderableWidget(CycleButton.<VrClientConfig.ThrowMode>builder(
+        left.add(serverDecides(CycleButton.<VrClientConfig.ThrowMode>builder(
                         mode -> Component.translatable(throwModeKey(mode)))
                 .withValues(VrClientConfig.ThrowMode.values())
                 .withInitialValue(throwDecided ? VrClientConfig.throwMode() : VrClientConfig.ownThrowMode())
                 .withTooltip(mode -> tooltip(throwModeKey(mode) + ".tooltip", throwDecided))
-                .create(x, y + row * 11, BUTTON_WIDTH, BUTTON_HEIGHT,
+                .create(0, 0, width, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.throwMode"),
-                        (button, mode) -> VrClientConfig.setThrowMode(mode))), throwDecided);
+                        (button, mode) -> VrClientConfig.setThrowMode(mode)), throwDecided));
+        left.add(CycleButton.onOffBuilder(VrClientConfig.mirrorLeftHand())
+                .withTooltip(mirror -> Tooltip.create(Component.translatable("jeg_vr_compat.config.mirrorLeftHand.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.mirrorLeftHand"),
+                        (button, mirror) -> VrClientConfig.setMirrorLeftHand(mirror)));
+        boolean laserDecided = rules.bowLaser() != VrRules.Toggle.PLAYER;
+        left.add(serverDecides(CycleButton.onOffBuilder(
+                        laserDecided ? VrClientConfig.bowLaser() : VrClientConfig.ownBowLaser())
+                .withTooltip(laser -> tooltip("jeg_vr_compat.config.bowLaser.tooltip", laserDecided))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.bowLaser"),
+                        (button, laser) -> VrClientConfig.setBowLaser(laser)), laserDecided));
+
+        right.add(CycleButton.<VrClientConfig.HudPlacement>builder(
+                        placement -> Component.translatable(placementKey(placement)))
+                .withValues(VrClientConfig.HudPlacement.values())
+                .withInitialValue(VrClientConfig.hudPlacement())
+                .withTooltip(placement -> Tooltip.create(Component.translatable(placementKey(placement) + ".tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.hudPlacement"),
+                        (button, placement) -> VrClientConfig.setHudPlacement(placement)));
+        right.add(CycleButton.onOffBuilder(VrClientConfig.hudExclusion())
+                .withTooltip(exclusion -> Tooltip.create(Component.translatable("jeg_vr_compat.config.hudExclusion.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.hudExclusion"),
+                        (button, exclusion) -> VrClientConfig.setHudExclusion(exclusion)));
+        Component listLabel = Component.translatable("jeg_vr_compat.config.hudExcludedGuns");
+        int labelWidth = this.font.width(listLabel) + LABEL_GAP;
+        this.excludedGuns = new EditBox(this.font, 0, 0, width - labelWidth, BUTTON_HEIGHT, listLabel);
+        this.excludedGuns.setMaxLength(LIST_MAX_LENGTH);
+        this.excludedGuns.setValue(String.join(", ", VrClientConfig.hudExcludedGuns()));
+        this.excludedGuns.setTooltip(Tooltip.create(Component.translatable("jeg_vr_compat.config.hudExcludedGuns.tooltip")));
+        right.add(this.excludedGuns);
+        right.add(CycleButton.onOffBuilder(VrClientConfig.gunHud())
+                .withTooltip(hud -> Tooltip.create(Component.translatable("jeg_vr_compat.config.gunHud.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.gunHud"),
+                        (button, hud) -> VrClientConfig.setGunHud(hud)));
+        right.add(CycleButton.onOffBuilder(VrClientConfig.handsFollowAnimations())
+                .withTooltip(follow -> Tooltip.create(Component.translatable("jeg_vr_compat.config.handsFollowAnimations.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
+                        (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
+        right.add(CycleButton.onOffBuilder(VrClientConfig.blindInEyes())
+                .withTooltip(inEyes -> Tooltip.create(Component.translatable("jeg_vr_compat.config.blindInEyes.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.blindInEyes"),
+                        (button, inEyes) -> VrClientConfig.setBlindInEyes(inEyes)));
+
+        if (!twoColumns) {
+            left.addAll(right);
+            right.clear();
+        }
+        int rows = Math.max(left.size(), right.size());
+        // Rows shrink on short screens (never below the button height); "Done" goes one row below the last.
+        int row = Math.max(BUTTON_HEIGHT,
+                Math.min(ROW, (this.height - TITLE_SPACE - BOTTOM_SPACE - BUTTON_HEIGHT) / (rows + 1)));
+        int contentHeight = row * rows + BUTTON_HEIGHT;
+        this.top = Math.max(TITLE_SPACE, Math.min(this.height / 6, (this.height - contentHeight) / 2));
+        int totalWidth = twoColumns ? width * 2 + COLUMN_GAP : width;
+        int leftX = (this.width - totalWidth) / 2;
+        place(left, leftX, row);
+        place(right, leftX + width + COLUMN_GAP, row);
+        // The list's label is drawn to the left of its text field (render).
+        this.listLabelX = this.excludedGuns.getX();
+        this.excludedGuns.setX(this.excludedGuns.getX() + labelWidth);
+
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
-                .bounds(x, y + row * ROWS, BUTTON_WIDTH, BUTTON_HEIGHT).build());
+                .bounds((this.width - width) / 2, this.top + row * rows, width, BUTTON_HEIGHT).build());
+    }
+
+    private void place(List<AbstractWidget> column, int x, int row) {
+        for (int i = 0; i < column.size(); i++) {
+            AbstractWidget widget = column.get(i);
+            widget.setPosition(x, this.top + row * i);
+            addRenderableWidget(widget);
+        }
     }
 
     /** S.8: an option the server decides shows the server's value and cannot be changed here. */
-    private static void serverDecides(CycleButton<?> button, boolean decided) {
+    private static <T> CycleButton<T> serverDecides(CycleButton<T> button, boolean decided) {
         button.active = !decided;
+        return button;
     }
 
     private static Tooltip tooltip(String key, boolean decided) {
@@ -163,7 +200,7 @@ public final class VrConfigScreen extends Screen {
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         renderBackground(graphics);
         graphics.drawCenteredString(this.font, this.title, this.width / 2, this.top - 16, 0xFFFFFF);
-        graphics.drawString(this.font, this.excludedGuns.getMessage(), (this.width - BUTTON_WIDTH) / 2,
+        graphics.drawString(this.font, this.excludedGuns.getMessage(), this.listLabelX,
                 this.excludedGuns.getY() + (BUTTON_HEIGHT - this.font.lineHeight) / 2, 0xFFFFFF);
         super.render(graphics, mouseX, mouseY, partialTick);
     }
