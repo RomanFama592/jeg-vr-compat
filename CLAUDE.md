@@ -100,6 +100,8 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
   estado de Vivecraft ni de Forge (como `VrZones`, `VrGunPoseFile`) y suma su prueba.
 - `tools/jegdiff.sh <jar viejo> <jar nuevo>` — antes de soportar otra versión de JEG: qué clases de JEG que usa el addon
   faltan o cambiaron, y qué textos de `JegKeys` ya no están. Comparar jars del mismo tipo (los dos de Modrinth).
+- Publicar: subir `mod_version`, pasar `## Unreleased` del `CHANGELOG.md` a `## X.Y.Z (fecha)`, commit y etiqueta `vX.Y.Z`;
+  `.github/workflows/release.yml` sube a CurseForge y crea el release de GitHub (ver `docs/PUBLICAR.md`).
 - `./gradlew runClient` — cliente de prueba (flat).
 - `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
 - Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `docs/MULTIJUGADOR.md`.
