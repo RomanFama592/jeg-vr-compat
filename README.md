@@ -14,6 +14,9 @@ Unofficial Forge 1.20.1 addon that makes [Just Enough Guns](https://modrinth.com
 Install it on the client. Also installed on the server, it adds off-hand guns and bullets that start at the muzzle,
 and lets the server decide some VR options (`serverconfig/jeg_vr_compat-server.toml` in the world folder).
 
+Tested with a Meta Quest 3 through SteamVR. Other headsets and runtimes should work through Vivecraft, but are untested:
+reports are welcome.
+
 ## Using it
 
 - **Shoot:** the trigger of the hand holding the gun.

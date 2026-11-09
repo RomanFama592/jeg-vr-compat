@@ -62,8 +62,8 @@ body:
   - type: input
     id: headset
     attributes:
-      label: Headset and left-handed mode
-      placeholder: "Quest 3 via Virtual Desktop, right-handed"
+      label: Headset, VR runtime and left-handed mode
+      placeholder: "Meta Quest 3 through SteamVR, right-handed"
   - type: textarea
     id: mods
     attributes:

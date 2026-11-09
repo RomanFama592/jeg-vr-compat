@@ -3,6 +3,9 @@
 Estado al 2026-11-07, con JEG 0.13.2 y Vivecraft 1.20.1-1.2.5. "Mixins OK" significa que todos los mixins aplicaron juntos
 sin errores, no que se vea bien en VR.
 
+Las pruebas con visor se hicieron con unas **Meta Quest 3 a través de SteamVR**. Otros visores y runtimes no están
+probados.
+
 ## Problemas conocidos
 
 | Problema | Causa | Qué hacer |

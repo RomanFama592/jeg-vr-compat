@@ -15,6 +15,9 @@ Se instala en el cliente. También en el servidor, suma las armas en la mano lib
 arma, y deja que el servidor decida algunas opciones de VR (`serverconfig/jeg_vr_compat-server.toml` en la carpeta del
 mundo).
 
+Probado con unas Meta Quest 3 a través de SteamVR. Otros visores y runtimes deberían andar a través de Vivecraft,
+pero no están probados: se agradecen los reportes.
+
 ## Cómo se usa
 
 - **Disparar:** el gatillo de la mano que tiene el arma.
