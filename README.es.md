@@ -1,3 +1,5 @@
+<p align="center"><img src="src/main/resources/logo.png" width="180" alt="Logo de Just Enough Guns VR"></p>
+
 # Just Enough Guns VR (JEG x Vivecraft)
 
 [English](README.md) · **Español**
