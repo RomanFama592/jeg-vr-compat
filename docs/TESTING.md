@@ -1,11 +1,11 @@
 # Checklist de pruebas
 
-Completar una sección por fase de `PLAN.md`. Las pruebas en VR las hace el usuario manualmente.
+Completar una sección por fase de [PLAN.md](PLAN.md). Las pruebas en VR las hace el usuario manualmente.
 
 ## Pendientes con servidor (el usuario las deja para más adelante)
 **Decisión (2026-11-08):** la alpha sale sin estas pruebas; la página avisa que el servidor no se probó en un servidor
 dedicado. Quedan para cuando alguien reporte o el usuario decida correrlas.
-Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arman con `MULTIJUGADOR.md`.
+Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arman con [MULTIJUGADOR.md](MULTIJUGADOR.md).
 - [ ] Matriz de servidores F8.3 / S.6: solo JEG | JEG + Vivecraft | JEG + Vivecraft + addon, con cliente VR y flat.
 - [ ] Servidor dedicado solo con JEG: balas desde el controlador (F6.3), cliente VR entra sin errores (Fase S), gatillo de la mano libre teletransporta (S.5/S.5b), recarga con la mano y modo precisión funcionan (Fase 7, S.7), cartuchos con la recarga de JEG cortada (F7.8).
 - [ ] `runServer -PnoVivecraft`: el addon funciona sin Vivecraft en el servidor (Fase S).
@@ -25,7 +25,7 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 ## Auditoría, revisión 4 (rama `refactor/auditoria-publicacion`)
 Verificado automáticamente: build, pruebas de `VrGunMirror`, `tools/check_mixins.py` y `runClientAudit` con Embeddium y
 Oculus en plano.
-- [x] **Jar real**: probado por el usuario con visor en su modpack, con Complementary Reimagined (ver `COMPATIBILIDAD.md`).
+- [x] **Jar real**: probado por el usuario con visor en su modpack, con Complementary Reimagined (ver [COMPATIBILIDAD.md](COMPATIBILIDAD.md)).
 - [x] Con shaders, cajas guía (`/jegvr zones`): se ven en el mismo lugar con cada ojo (usuario, 2026-11-07).
 - [x] Con shaders, láser del arco compuesto: se ve bien (usuario, 2026-11-07).
 - [x] Crash de Acedium: sin Acedium, apagar y prender shaders en un mundo no crashea (usuario, 2026-11-07).
@@ -35,7 +35,7 @@ Oculus en plano.
 - [ ] VR: dos armas animadas distintas: recargar una y disparar otra no anima a la otra, tampoco en la hotbar (G2).
 - [ ] `guns.json`: romperlo a propósito con el juego abierto: un solo error en el log; al arreglarlo, se aplica solo.
 - [ ] `/jegvr help`: sale en el idioma del juego (inglés y español).
-- [ ] Protocolo de shaders de `COMPATIBILIDAD.md`.
+- [ ] Protocolo de shaders de [COMPATIBILIDAD.md](COMPATIBILIDAD.md).
 - [ ] Servidor dedicado con este jar: arranca sin clases de cliente y el cliente VR detecta el addon (arma en la secundaria).
 
 ## S.8 — Reglas del servidor
@@ -331,7 +331,7 @@ Probado por el usuario en VR (2026-11-08): funciona.
 - [x] Usarla (gatillo de usar): suena y lanza las notas como antes.
 - [x] Flat: se ve como siempre.
 
-## Comandos (`COMANDOS.md`)
+## Comandos ([COMANDOS.md](COMANDOS.md))
 - [ ] `/jegvr help` muestra el resumen en el chat.
 - [ ] `/jegvr move 0 0.02 0` con un arma en la mano: sube 2 cm; `/jegvr show` muestra el valor.
 - [ ] `/jegvr reset` con la trompeta en la mano: vuelve a la pose de fábrica de la trompeta (no a la de las armas).

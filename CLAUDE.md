@@ -1,8 +1,8 @@
-﻿# JEG x Vivecraft — Addon de compatibilidad VR
+# JEG x Vivecraft — Addon de compatibilidad VR
 
 Addon de Forge 1.20.1 (`jeg_vr_compat`) que hace compatible **Just Enough Guns 0.13.2**
 (https://github.com/MigaMiDev/Just-Enough-Guns) con **Vivecraft** sin modificar ninguno de los dos.
-El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá las tareas a medida que se completen.
+El plan de trabajo detallado está en `docs/PLAN.md`. Leelo antes de empezar y marcá las tareas a medida que se completen.
 
 ## Stack
 - Minecraft 1.20.1, Forge 47.2.x, ForgeGradle 6, Java 17, mappings oficiales (Mojang).
@@ -34,7 +34,7 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
 8. **Nombres de mixin en producción.** En un mixin `remap = false`, un método de JEG que sobrescribe uno vanilla se nombra
    con los dos nombres (`{"renderByItem", "m_108829_"}`). Después de tocar mixins, correr `./gradlew checkMixins`.
 9. **Otros mods y shaders.** Lo que solo cambia cómo se ve lleva `require = 0`. Nada de shaders ni `RenderType` propios sin
-   revisar `COMPATIBILIDAD.md`. Para saber si hay shaders, `VR.shadersActive()`; nunca importar Sodium, Iris ni OptiFine. Lo que se dibuja en el mundo se vacía con `buffers.endBatch()`, nunca con `endBatch(RenderType)`: con Oculus esa no hace nada y el dibujo sale en la pasada del otro ojo.
+   revisar `docs/COMPATIBILIDAD.md`. Para saber si hay shaders, `VR.shadersActive()`; nunca importar Sodium, Iris ni OptiFine. Lo que se dibuja en el mundo se vacía con `buffers.endBatch()`, nunca con `endBatch(RenderType)`: con Oculus esa no hace nada y el dibujo sale en la pasada del otro ojo.
 10. **Contrato entre versiones del addon.** Red: un ID de paquete solo se agrega y un paquete no cambia de formato; lo nuevo
     sube `VrNetwork.PROTOCOL` y se envía según `serverProtocol`. Configuración: el TOML solo suma opciones, con el
     comportamiento actual por defecto; `guns.json` lleva `schema`. No se renombran teclas `key.jeg_vr_compat.*` ni
@@ -42,6 +42,8 @@ El plan de trabajo detallado está en `PLAN.md`. Leelo antes de empezar y marcá
     interruptor. Textos para el jugador: en `en_us` y `es_es`. Claves y constantes de JEG: en `compat/jeg/JegKeys`.
 
 ## Estructura esperada
+En la raíz solo van `README.md` (inglés), `README.es.md` (español, mismo contenido), `CHANGELOG.md`, `LICENSE`, este
+archivo y lo de Gradle. Los demás documentos van en `docs/`, con su índice en `docs/README.md`.
 ```
 src/main/java/com/jegvr/
   JegVrCompat.java                 # @Mod("jeg_vr_compat")
@@ -65,7 +67,7 @@ src/main/java/com/jegvr/
   client/VrZones.java              # geometría de las cajas (cadera, pozo, guardamanos), sin estado del juego: tiene pruebas
   client/VrThrow.java              # granadas, molotov y bomba de agua: gatillo o gesto (F9.26); VrThrowMotion, el gesto
   server/VrServerThrow.java        # la granada sale de la mano (mixin.server.ThrowableItemVRMixin)
-  client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, zones, grabzone (ver COMANDOS.md)
+  client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, zones, grabzone (ver docs/COMANDOS.md)
   config/VrClientConfig.java       # config/jeg_vr_compat-client.toml (ForgeConfigSpec CLIENT); getters = lo que rige
   config/VrServerConfig.java       # <mundo>/serverconfig/jeg_vr_compat-server.toml (SERVER): reglas S.8
   config/VrRules.java              # reglas del servidor y cómo se combinan con la opción del jugador (tiene pruebas)
@@ -100,13 +102,13 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
   faltan o cambiaron, y qué textos de `JegKeys` ya no están. Comparar jars del mismo tipo (los dos de Modrinth).
 - `./gradlew runClient` — cliente de prueba (flat).
 - `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
-- Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `MULTIJUGADOR.md`.
+- Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `docs/MULTIJUGADOR.md`.
 - Logs de mixin: añadir `-Dmixin.debug.export=true -Dmixin.debug.verbose=true` en el run config si un inject no aplica.
-- El usuario prueba VR manualmente; tras cada fase dejá un checklist de prueba en `TESTING.md`.
+- El usuario prueba VR manualmente; tras cada fase dejá un checklist de prueba en `docs/TESTING.md`.
 
 ## Convenciones
 - Código y comentarios en inglés; documentación y mensajes al usuario en español.
-- Commits pequeños, uno por tarea de `PLAN.md`, con el ID de la tarea (ej. `F2.3: skip flat transforms in VR`).
+- Commits pequeños, uno por tarea de `docs/PLAN.md`, con el ID de la tarea (ej. `F2.3: skip flat transforms in VR`).
 - Si una firma de JEG o de la API de Vivecraft no coincide con lo descrito aquí, no inventes: inspeccioná el jar,
   corregí el código y actualizá este archivo.
 
@@ -128,4 +130,4 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 
 ## Poses de armas (no van en el código)
 - Toda pose/rotación/escala de armas va en `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (capa interna, va en el jar), nunca como constante en Java. `config/jeg_vr_compat/guns.json` es la capa del usuario (una entrada del usuario reemplaza la interna de esa arma).
-- En desarrollo (`FMLLoader.isProduction()` falso y el archivo fuente existe al lado de `run/`), `/jegvr ...` y `/jegvr save` editan el archivo fuente y se ignora `guns.json`. Comandos documentados en `COMANDOS.md`.
+- En desarrollo (`FMLLoader.isProduction()` falso y el archivo fuente existe al lado de `run/`), `/jegvr ...` y `/jegvr save` editan el archivo fuente y se ignora `guns.json`. Comandos documentados en `docs/COMANDOS.md`.

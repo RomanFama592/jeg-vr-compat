@@ -31,7 +31,7 @@ minecraft {
                 jvmArg '-XX:+UseZGC'
             }
         }
-        // Second client for multiplayer tests (see MULTIJUGADOR.md): its own folder, name and Vivecraft settings
+        // Second client for multiplayer tests (see docs/MULTIJUGADOR.md): its own folder, name and Vivecraft settings
         // (starts with VR off), so it can run next to runClient. ./gradlew runClient2 [-PnoVivecraft]
         client2 {
             parent runs.client
@@ -114,7 +114,7 @@ dependencies {
     if (!project.hasProperty('noVivecraft')) {
         runtimeOnly fg.deobf("maven.modrinth:vivecraft:${vivecraft_version}")
     }
-    // ./gradlew runClient -Pcompat  -> with Embeddium and Oculus (see COMPATIBILIDAD.md)
+    // ./gradlew runClient -Pcompat  -> with Embeddium and Oculus (see docs/COMPATIBILIDAD.md)
     if (project.hasProperty('compat')) {
         runtimeOnly fg.deobf("maven.modrinth:embeddium:${embeddium_version}")
         runtimeOnly fg.deobf("maven.modrinth:oculus:${oculus_version}")
