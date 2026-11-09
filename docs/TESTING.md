@@ -483,3 +483,12 @@ Con `/jegvr zones` para ver la caja.
 - [ ] Linterna en la mano: se ve en el puño, apuntando adelante, en las dos manos. La luz sale hacia donde apunta. Si la pose no convence, `/jegvr` la ajusta como a un arma.
 - [ ] Arma en la secundaria, mano principal vacía o con otro objeto: no se ve la cruz, ni en el mundo ni en el HUD. Sin armas en las manos, vuelve.
 - [ ] Descargar en la secundaria: reproduce "sacar el arma", como en la principal, y devuelve la munición.
+
+## F9.27 (destello y humo en los ojos)
+- [x] (auto) Compila; pruebas de `VrBlindFade` (la cuenta de JEG) en verde; `checkMixins` sin problemas; `render.ShaderHelperVRMixin` y `render.GuiGraphicsVRMixin` aplican, también con `-Pcompat`. Config: `visuals.blindInEyes = true`.
+- [ ] Granada aturdidora cerca, sin shaders: los dos ojos se ponen blancos del todo y se aclaran de a poco en los últimos 2 segundos. El panel de la HUD no queda más blanco que la vista.
+- [ ] Granada de humo, parado dentro del humo: los dos ojos se ven grises, igual que en plano.
+- [ ] Lo mismo con BSL o Complementary (Oculus): el blanco tapa todo, también el cielo y el agua, y no queda un ojo distinto del otro.
+- [ ] Vista de escritorio y cámara de Vivecraft (tercera persona): no hace falta que se pongan blancas; anotar qué se ve.
+- [ ] Opción "Destello y humo en los ojos" apagada: como antes, solo el panel de la HUD se pone blanco.
+- [ ] Flat (sin VR): la pantalla se pone blanca como en JEG, sin cambios.

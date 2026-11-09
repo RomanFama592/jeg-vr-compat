@@ -26,6 +26,8 @@
   "jeg_vr_compat.config.gunHud": "Ammo beside each hand",
   "jeg_vr_compat.config.gunHud.tooltip": "Each gun's name, ammo and meters float beside its hand, instead of JEG's overlay on the HUD.",
   "jeg_vr_compat.config.handsFollowAnimations": "Hands follow animations",
+  "jeg_vr_compat.config.blindInEyes": "Flash and smoke in the eyes",
+  "jeg_vr_compat.config.blindInEyes.tooltip": "The stun grenade's whiteness and the smoke cover what each eye sees. Off: only the HUD panel, as JEG draws them.",
   "jeg_vr_compat.config.handsFollowAnimations.tooltip": "The hands let go of the controllers during the guns' animations, and the controller carries the gun with a delay. Off: they always stay with the controllers.",
   "jeg_vr_compat.config.reloadWithBothGuns": "Reload with a gun in each hand",
   "jeg_vr_compat.config.reloadWithBothGuns.tooltip": "Off: with a gun in each hand you cannot reload, as there is no free hand for the magazine. Put one away first. Trying it gives a short double buzz.",

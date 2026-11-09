@@ -26,7 +26,7 @@ public final class VrConfigScreen extends Screen {
     private static final int BUTTON_HEIGHT = 20;
     private static final int ROW = 24;
     /** Rows above the "Done" button, one of them a gap. */
-    private static final int ROWS = 12;
+    private static final int ROWS = 13;
     private static final int MARGIN = 28;
     private static final int LABEL_GAP = 6;
     private static final int LIST_MAX_LENGTH = 512;
@@ -106,11 +106,16 @@ public final class VrConfigScreen extends Screen {
                 .create(x, y + row * 8, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
                         (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
+        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.blindInEyes())
+                .withTooltip(inEyes -> Tooltip.create(Component.translatable("jeg_vr_compat.config.blindInEyes.tooltip")))
+                .create(x, y + row * 9, BUTTON_WIDTH, BUTTON_HEIGHT,
+                        Component.translatable("jeg_vr_compat.config.blindInEyes"),
+                        (button, inEyes) -> VrClientConfig.setBlindInEyes(inEyes)));
         boolean reloadDecided = rules.reloadWithBothGuns() != VrRules.Toggle.PLAYER;
         serverDecides(addRenderableWidget(CycleButton.onOffBuilder(
                         reloadDecided ? VrClientConfig.reloadWithBothGuns() : VrClientConfig.ownReloadWithBothGuns())
                 .withTooltip(allow -> tooltip("jeg_vr_compat.config.reloadWithBothGuns.tooltip", reloadDecided))
-                .create(x, y + row * 9, BUTTON_WIDTH, BUTTON_HEIGHT,
+                .create(x, y + row * 10, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.reloadWithBothGuns"),
                         (button, allow) -> VrClientConfig.setReloadWithBothGuns(allow))), reloadDecided);
         boolean throwDecided = rules.throwMode() != VrRules.Throw.PLAYER;
@@ -119,7 +124,7 @@ public final class VrConfigScreen extends Screen {
                 .withValues(VrClientConfig.ThrowMode.values())
                 .withInitialValue(throwDecided ? VrClientConfig.throwMode() : VrClientConfig.ownThrowMode())
                 .withTooltip(mode -> tooltip(throwModeKey(mode) + ".tooltip", throwDecided))
-                .create(x, y + row * 10, BUTTON_WIDTH, BUTTON_HEIGHT,
+                .create(x, y + row * 11, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.throwMode"),
                         (button, mode) -> VrClientConfig.setThrowMode(mode))), throwDecided);
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())

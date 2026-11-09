@@ -49,6 +49,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
     public static final ForgeConfigSpec.BooleanValue GUN_HUD;
     public static final ForgeConfigSpec.BooleanValue HANDS_FOLLOW_ANIMATIONS;
+    public static final ForgeConfigSpec.BooleanValue BLIND_IN_EYES;
     public static final ForgeConfigSpec.BooleanValue HUD_EXCLUSION;
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>> HUD_EXCLUDED_GUNS;
 
@@ -98,6 +99,10 @@ public final class VrClientConfig {
                         "the gun with a delay during reloads and inspections. Off: the hands always stay with the",
                         "controllers and the gun follows them at once; the guns still play their animations.")
                 .define("handsFollowAnimations", true);
+        BLIND_IN_EYES = builder
+                .comment("JEG's stun grenade whiteness and smoke cover what each eye sees, instead of only the HUD panel.",
+                        "Off: as JEG draws them, on the HUD.")
+                .define("blindInEyes", true);
         HUD_EXCLUSION = builder
                 .comment("With a gun from hudExcludedGuns in the off hand, Vivecraft's hand or wrist HUD (hotbar) stays",
                         "where Vivecraft puts it, on the back of the hand, whatever hudPlacement says.")
@@ -150,6 +155,15 @@ public final class VrClientConfig {
 
     public static boolean handsFollowAnimations() {
         return !SPEC.isLoaded() || HANDS_FOLLOW_ANIMATIONS.get();
+    }
+
+    public static boolean blindInEyes() {
+        return !SPEC.isLoaded() || BLIND_IN_EYES.get();
+    }
+
+    public static void setBlindInEyes(boolean inEyes) {
+        BLIND_IN_EYES.set(inEyes);
+        BLIND_IN_EYES.save();
     }
 
     public static void setHandsFollowAnimations(boolean follow) {

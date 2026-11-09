@@ -36,6 +36,19 @@ public final class JegKeys {
      */
     public static final String RENDER_ARM_WITH_GUN = "mrCrayfishGunMod$renderArmWithGun";
 
+    /**
+     * JEG's full-screen overlays ({@code mixin.client.GameRendererMixin.updateCameraAndRender}): white while
+     * {@code BLINDED} (stun grenade), grey while {@code SMOKED}. Their opacity is {@code min(duration / fade, 1) * max}
+     * rounded, with {@code fade} = {@code Config.SERVER.alphaFadeThreshold} for both, and {@code max} =
+     * {@code Config.SERVER.alphaOverlay} when blinded or the fixed 248 when smoked. The defaults are used when JEG's
+     * server config cannot be read.
+     */
+    public static final int BLINDED_OVERLAY_RGB = 0xFFFFFF;
+    public static final int SMOKED_OVERLAY_RGB = 0x7C7670;
+    public static final int SMOKED_OVERLAY_ALPHA = 248;
+    public static final int DEFAULT_ALPHA_OVERLAY = 255;
+    public static final int DEFAULT_ALPHA_FADE_THRESHOLD = 40;
+
     private JegKeys() {
     }
 }
