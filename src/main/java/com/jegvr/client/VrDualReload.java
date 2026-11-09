@@ -92,6 +92,10 @@ public final class VrDualReload {
     /** JEG's inspect key. The animation is the client's: JEG's server only sets a tag that says to play it. */
     public static boolean onInspectKey(int action) {
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && action == GLFW.GLFW_PRESS && KeyBinds.KEY_INSPECT.isDown() && VR.active()) {
+            // Inspecting drops a held magazine or stops the reload a grab started; then the gun is inspected as usual.
+            VrGrabReload.cancelHandReload();
+        }
         if (player == null || action != GLFW.GLFW_PRESS || !KeyBinds.KEY_INSPECT.isDown() || !actsOnOffhand(player)) {
             return false;
         }

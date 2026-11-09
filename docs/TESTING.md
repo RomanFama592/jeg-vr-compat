@@ -522,3 +522,5 @@ Con `/jegvr zones` para ver la caja.
 - [ ] Con BSL o Complementary: se ve con su textura.
 - [ ] Opción "Caja y brillos de recarga" apagada: no hay caja ni brillos.
 - [ ] Flat: sin cambios.
+- [ ] (corrección) El brillo de la caja abierta se ve entero, sin que la caja lo corte: queda un poco por delante, hacia el visor.
+- [ ] Recarga a mano cancelable: con el cargador en la mano, el grip de esa mano o la tecla de inspeccionar lo devuelven. Después de tocar el arma, mientras corre la recarga de JEG, el grip de la mano libre o inspeccionar la cortan (vibra la mano del arma) y el arma queda con las balas que tenía. Inspeccionar después sigue inspeccionando. En las dos manos.

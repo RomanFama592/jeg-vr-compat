@@ -60,6 +60,13 @@ public final class VrGrabReload {
     /** F10.1: radius of the glow at the hip, and at the magazine well while holding a magazine (metres in the room). */
     private static final float POUCH_GLOW_RADIUS = 0.09F;
     private static final float MAGWELL_GLOW_RADIUS = 0.07F;
+    /**
+     * The hip glow is drawn this far towards the headset from the top of the open box (metres in the room), so the box
+     * never cuts it: the glow is a flat square facing the eyes, and the box would hide whatever part of it lies inside.
+     */
+    private static final float BOX_GLOW_FORWARD = 0.14F;
+    /** Ticks to wait before trusting JEG's reloading flag after a grab started a reload. */
+    private static final int HAND_RELOAD_GRACE_TICKS = 2;
 
     private enum Pouch { HIDDEN, NO_AMMO, READY }
 
@@ -72,6 +79,9 @@ public final class VrGrabReload {
     private static boolean handWasInPouch;
     /** MANUAL reload started by a grab: stop it once the gun has more rounds than this. */
     private static int singleRoundFrom = -1;
+    /** The hand whose JEG reload a grab started, while it runs: the grip or the inspect key cancels it. */
+    private static InteractionHand handReload;
+    private static int handReloadTicks;
 
     private VrGrabReload() {
     }
@@ -89,10 +99,8 @@ public final class VrGrabReload {
      */
     public static boolean onGripPressed() {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (holding) {
-            // A second press puts the magazine back.
-            holding = false;
-            VrGunHand.haptic(VrGunHand.other(heldGunHand), 0.03F, 0.3F);
+        if (cancelHandReload()) {
+            // A second press puts the magazine back, or stops the reload the grab started.
             return true;
         }
         if (player == null || pouchState(player) != Pouch.READY || !handInPouch(player)) {
@@ -104,6 +112,34 @@ public final class VrGrabReload {
         slot = player.getInventory().selected;
         VrGunHand.haptic(VrGunHand.other(heldGunHand), 0.05F, 0.6F);
         player.playSound(SoundEvents.ARMOR_EQUIP_GENERIC, 0.6F, 1.3F);
+        return true;
+    }
+
+    /**
+     * Cancels what a grab started: puts the held magazine back, or stops the JEG reload that touching the gun started
+     * (JEG's {@code setReloading(false)}, which also ends an off-hand reload on the server). Returns true when there was
+     * something to cancel. Called by the free hand's grip and by JEG's inspect key ({@link VrDualReload}).
+     */
+    public static boolean cancelHandReload() {
+        if (holding) {
+            holding = false;
+            VrGunHand.haptic(VrGunHand.other(heldGunHand), 0.03F, 0.3F);
+            return true;
+        }
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (handReload == null || player == null || !ModSyncedDataKeys.RELOADING.getValue(player)) {
+            return false;
+        }
+        InteractionHand gunHand = handReload;
+        handReload = null;
+        singleRoundFrom = -1;
+        // The reload animation follows this tag, which the grab set; the server corrects it with the item anyway.
+        CompoundTag tag = player.getItemInHand(gunHand).getTag();
+        if (tag != null) {
+            tag.putBoolean(JegKeys.IS_RELOADING, false);
+        }
+        ReloadHandler.get().setReloading(false);
+        VrGunHand.haptic(gunHand, 0.03F, 0.3F);
         return true;
     }
 
@@ -131,7 +167,12 @@ public final class VrGrabReload {
             holding = false;
             handWasInPouch = false;
             singleRoundFrom = -1;
+            handReload = null;
             return;
+        }
+        if (handReload != null && ++handReloadTicks > HAND_RELOAD_GRACE_TICKS
+                && !ModSyncedDataKeys.RELOADING.getValue(player)) {
+            handReload = null;
         }
         tickSingleRound(player);
         if (holding) {
@@ -175,6 +216,8 @@ public final class VrGrabReload {
             // JEG-only server: start JEG's reload and stop it after one round (slower).
             singleRoundFrom = ammo(stack);
         }
+        handReload = heldGunHand;
+        handReloadTicks = 0;
         if (main) {
             VrDualReload.reloadMainHand(player);
         } else {
@@ -352,7 +395,7 @@ public final class VrGrabReload {
                 state = Pouch.HIDDEN;
             }
             if (state == Pouch.READY && sprites && VrAmmoBox.lidOpen()) {
-                Vec3 glowAt = boxTop != null ? boxTop : center(pouchBox(gunHand));
+                Vec3 glowAt = boxTop != null ? towardsHeadset(boxTop, BOX_GLOW_FORWARD) : center(pouchBox(gunHand));
                 VrGlow.draw(pose, buffers, glowAt, POUCH_GLOW_RADIUS,
                         handInPouch(player) ? VrGlow.GREEN : VrGlow.BLUE, time);
                 buffers.endBatch();
@@ -371,6 +414,12 @@ public final class VrGrabReload {
             }
         }
         pose.popPose();
+    }
+
+    private static Vec3 towardsHeadset(Vec3 point, float metres) {
+        VR.Aim hmd = VR.hmdAim();
+        Vec3 toEye = hmd == null ? Vec3.ZERO : hmd.pos().subtract(point);
+        return toEye.lengthSqr() < 1.0E-6 ? point : point.add(toEye.normalize().scale(metres * VR.worldScale()));
     }
 
     private static Vec3 center(AABB box) {
