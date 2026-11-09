@@ -7,6 +7,8 @@
 Unofficial Forge 1.20.1 addon that makes [Just Enough Guns](https://modrinth.com/mod/just-enough-guns) playable in VR with
 [Vivecraft](https://modrinth.com/mod/vivecraft), without changing either mod. Nothing changes for players without VR.
 
+[![Watch the showcase video on YouTube](https://img.youtube.com/vi/S7p8F--T0jE/hqdefault.jpg)](https://youtu.be/S7p8F--T0jE)
+
 ## Requirements
 
 - Minecraft 1.20.1, Forge 47.2+
