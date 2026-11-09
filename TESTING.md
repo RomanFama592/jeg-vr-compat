@@ -66,7 +66,7 @@ jugador VR, el arma sigue solo al brazo, que sigue al control.
 - [ ] Otro jugador en plano (`runClient2`): sus armas en tercera persona se ven como siempre, inclinándose con su cabeza.
 
 ## F9.26 — Granadas en VR
-Opción: Config del mod → "Granadas" (Gatillo por defecto, Gesto de lanzar, Como en Vivecraft).
+Opción: Config del mod → "Granadas" (Gatillo, Gesto de lanzar por defecto, Como en Vivecraft).
 Prueba del usuario (2026-11-08): funcionan bien como primera versión; el gesto se mejora en G.6.
 - [ ] Al elegir una granada en la hotbar se ve en la mano principal, de pie sobre la mano y de un tamaño razonable
   (no en la secundaria ni enorme). Igual la de humo, la aturdidora, la molotov y la bomba de agua.

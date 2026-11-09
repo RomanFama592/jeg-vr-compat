@@ -74,7 +74,7 @@ public final class VrClientConfig {
                         "that holds it, release to throw where it points), GESTURE (hold the trigger, swing and release:",
                         "direction and strength from the hand's motion; strength needs this mod on the server too),",
                         "VIVECRAFT (like a bow, drawn with the other hand).")
-                .defineEnum("throwMode", ThrowMode.TRIGGER);
+                .defineEnum("throwMode", ThrowMode.GESTURE);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -212,7 +212,7 @@ public final class VrClientConfig {
 
     /** The player's own option, whatever the server decides. */
     public static ThrowMode ownThrowMode() {
-        return SPEC.isLoaded() ? THROW_MODE.get() : ThrowMode.TRIGGER;
+        return SPEC.isLoaded() ? THROW_MODE.get() : ThrowMode.GESTURE;
     }
 
     public static void setThrowMode(ThrowMode mode) {
