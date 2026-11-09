@@ -1,5 +1,6 @@
 package com.jegvr.server;
 
+import com.jegvr.config.VrRules;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -37,7 +38,8 @@ public final class VrServerThrow {
     }
 
     public static void update(ServerPlayer player, InteractionHand hand, float speed) {
-        if (!Float.isFinite(speed)) {
+        // S.8: a server that sets another throw mode ignores the strength of a gesture.
+        if (!Float.isFinite(speed) || !VrRules.acceptsGestureSpeed(VrServerRules.rules())) {
             return;
         }
         SPEEDS.put(player.getUUID(), new Speed(hand, clampSpeed(speed), player.level().getGameTime()));
@@ -54,7 +56,8 @@ public final class VrServerThrow {
 
     /** Called by JEG's throw right before the grenade enters the world. */
     public static void aim(LivingEntity shooter, Entity entity) {
-        if (!(entity instanceof Projectile projectile) || !shooter.isUsingItem()) {
+        if (!(entity instanceof Projectile projectile) || !shooter.isUsingItem()
+                || !VrRules.aimsThrowFromHand(VrServerRules.rules())) {
             return;
         }
         InteractionHand hand = shooter.getUsedItemHand();

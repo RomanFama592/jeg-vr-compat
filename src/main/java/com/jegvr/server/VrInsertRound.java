@@ -1,6 +1,7 @@
 package com.jegvr.server;
 
 import com.jegvr.compat.jeg.JegKeys;
+import com.jegvr.config.VrRules;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -36,11 +37,17 @@ public final class VrInsertRound {
     private VrInsertRound() {
     }
 
+    private static InteractionHand other(InteractionHand hand) {
+        return hand == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+    }
+
     public static void insert(ServerPlayer player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if ((hand == InteractionHand.OFF_HAND && !VrOffhand.canDualWield(stack)) || player.isSpectator()
                 || !(stack.getItem() instanceof GunItem gunItem)
-                || ModSyncedDataKeys.RELOADING.getValue(player)) {
+                || ModSyncedDataKeys.RELOADING.getValue(player)
+                || VrRules.deniesBothGunReload(VrServerRules.rules())
+                && player.getItemInHand(other(hand)).getItem() instanceof GunItem) {
             return;
         }
         Gun gun = gunItem.getModifiedGun(stack);

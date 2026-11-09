@@ -47,6 +47,16 @@ public abstract class ReloadTrackerVRMixin {
         return selectedOrOffhand(inventory, original);
     }
 
+    /**
+     * S.8: a reload the server forbids (gun in each hand, {@code reloadWithBothGuns = DENY}) ends the way JEG ends one
+     * whose gun was swapped: tracker removed, RELOADING cleared and synced to the client.
+     */
+    @WrapOperation(method = ON_TICK, at = @At(value = "INVOKE",
+            target = "Lttv/migami/jeg/common/ReloadTracker;isSameWeapon(Lnet/minecraft/world/entity/player/Player;)Z"))
+    private static boolean jegvr$denyBothGunReload(ReloadTracker tracker, Player player, Operation<Boolean> original) {
+        return !VrOffhand.reloadDenied(player) && original.call(tracker, player);
+    }
+
     private static ItemStack mainOrOffhand(Player player, Operation<ItemStack> original) {
         return VrOffhand.reloading(player) ? player.getOffhandItem() : original.call(player);
     }

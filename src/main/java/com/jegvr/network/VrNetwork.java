@@ -24,7 +24,9 @@ public final class VrNetwork {
     private static final int BASE_PROTOCOL = 6;
     /** Adds {@link C2SVrThrow} (F9.26). */
     public static final int THROW_PROTOCOL = 7;
-    public static final int PROTOCOL = THROW_PROTOCOL;
+    /** Adds {@link C2SVrHello} and {@link S2CVrRules} (S.8, server rules). */
+    public static final int RULES_PROTOCOL = 8;
+    public static final int PROTOCOL = RULES_PROTOCOL;
 
     private static final ResourceLocation NAME = new ResourceLocation(JegVrCompat.MOD_ID, "main");
 
@@ -82,6 +84,16 @@ public final class VrNetwork {
                 .encoder(C2SVrThrow::encode)
                 .decoder(C2SVrThrow::decode)
                 .consumerMainThread(C2SVrThrow::handle)
+                .add();
+        CHANNEL.messageBuilder(C2SVrHello.class, 9, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrHello::encode)
+                .decoder(C2SVrHello::decode)
+                .consumerMainThread(C2SVrHello::handle)
+                .add();
+        CHANNEL.messageBuilder(S2CVrRules.class, 10, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CVrRules::encode)
+                .decoder(S2CVrRules::decode)
+                .consumerNetworkThread(S2CVrRules::handle)
                 .add();
     }
 

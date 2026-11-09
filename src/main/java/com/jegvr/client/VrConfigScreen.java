@@ -1,6 +1,7 @@
 package com.jegvr.client;
 
 import com.jegvr.config.VrClientConfig;
+import com.jegvr.config.VrRules;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -87,11 +88,14 @@ public final class VrConfigScreen extends Screen {
                 .create(x, y + row * 5, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.mirrorLeftHand"),
                         (button, mirror) -> VrClientConfig.setMirrorLeftHand(mirror)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.bowLaser())
-                .withTooltip(laser -> Tooltip.create(Component.translatable("jeg_vr_compat.config.bowLaser.tooltip")))
+        VrRules.Rules rules = VrRulesClient.rules();
+        boolean laserDecided = rules.bowLaser() != VrRules.Toggle.PLAYER;
+        serverDecides(addRenderableWidget(CycleButton.onOffBuilder(
+                        laserDecided ? VrClientConfig.bowLaser() : VrClientConfig.ownBowLaser())
+                .withTooltip(laser -> tooltip("jeg_vr_compat.config.bowLaser.tooltip", laserDecided))
                 .create(x, y + row * 6, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.bowLaser"),
-                        (button, laser) -> VrClientConfig.setBowLaser(laser)));
+                        (button, laser) -> VrClientConfig.setBowLaser(laser))), laserDecided);
         addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.gunHud())
                 .withTooltip(hud -> Tooltip.create(Component.translatable("jeg_vr_compat.config.gunHud.tooltip")))
                 .create(x, y + row * 7, BUTTON_WIDTH, BUTTON_HEIGHT,
@@ -102,21 +106,36 @@ public final class VrConfigScreen extends Screen {
                 .create(x, y + row * 8, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
                         (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
-        addRenderableWidget(CycleButton.onOffBuilder(VrClientConfig.reloadWithBothGuns())
-                .withTooltip(allow -> Tooltip.create(Component.translatable("jeg_vr_compat.config.reloadWithBothGuns.tooltip")))
+        boolean reloadDecided = rules.reloadWithBothGuns() != VrRules.Toggle.PLAYER;
+        serverDecides(addRenderableWidget(CycleButton.onOffBuilder(
+                        reloadDecided ? VrClientConfig.reloadWithBothGuns() : VrClientConfig.ownReloadWithBothGuns())
+                .withTooltip(allow -> tooltip("jeg_vr_compat.config.reloadWithBothGuns.tooltip", reloadDecided))
                 .create(x, y + row * 9, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.reloadWithBothGuns"),
-                        (button, allow) -> VrClientConfig.setReloadWithBothGuns(allow)));
-        addRenderableWidget(CycleButton.<VrClientConfig.ThrowMode>builder(
+                        (button, allow) -> VrClientConfig.setReloadWithBothGuns(allow))), reloadDecided);
+        boolean throwDecided = rules.throwMode() != VrRules.Throw.PLAYER;
+        serverDecides(addRenderableWidget(CycleButton.<VrClientConfig.ThrowMode>builder(
                         mode -> Component.translatable(throwModeKey(mode)))
                 .withValues(VrClientConfig.ThrowMode.values())
-                .withInitialValue(VrClientConfig.throwMode())
-                .withTooltip(mode -> Tooltip.create(Component.translatable(throwModeKey(mode) + ".tooltip")))
+                .withInitialValue(throwDecided ? VrClientConfig.throwMode() : VrClientConfig.ownThrowMode())
+                .withTooltip(mode -> tooltip(throwModeKey(mode) + ".tooltip", throwDecided))
                 .create(x, y + row * 10, BUTTON_WIDTH, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.throwMode"),
-                        (button, mode) -> VrClientConfig.setThrowMode(mode)));
+                        (button, mode) -> VrClientConfig.setThrowMode(mode))), throwDecided);
         addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> onClose())
                 .bounds(x, y + row * ROWS, BUTTON_WIDTH, BUTTON_HEIGHT).build());
+    }
+
+    /** S.8: an option the server decides shows the server's value and cannot be changed here. */
+    private static void serverDecides(CycleButton<?> button, boolean decided) {
+        button.active = !decided;
+    }
+
+    private static Tooltip tooltip(String key, boolean decided) {
+        Component text = Component.translatable(key);
+        return Tooltip.create(decided
+                ? Component.translatable("jeg_vr_compat.rules.decided").append("\n").append(text)
+                : text);
     }
 
     private static Component zoneName(VrClientConfig.GrabZone zone) {

@@ -11,7 +11,8 @@ Unofficial Forge 1.20.1 addon that makes [Just Enough Guns](https://modrinth.com
 - Just Enough Guns 0.13.2, with Framework and GeckoLib
 - Vivecraft 1.20.1-1.2.5
 
-Install it on the client. Also installed on the server, it adds off-hand guns and bullets that start at the muzzle.
+Install it on the client. Also installed on the server, it adds off-hand guns and bullets that start at the muzzle,
+and lets the server decide some VR options (`serverconfig/jeg_vr_compat-server.toml` in the world folder).
 
 ## Using it
 

@@ -1,6 +1,7 @@
 package com.jegvr.server;
 
 import com.jegvr.compat.jeg.JegKeys;
+import com.jegvr.config.VrRules;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -152,10 +153,22 @@ public final class VrOffhand {
         return OFF_HAND_TRACKERS.computeIfAbsent(player.getUUID(), id -> new ShootTracker());
     }
 
+    /**
+     * S.8: the server forbids reloading with a gun in each hand and {@code player} holds two. Only VR players are held
+     * to it (in JEG a flat player reloads whatever the off hand holds); only a VR client reloads the off-hand gun.
+     */
+    public static boolean reloadDenied(Player player) {
+        return VrRules.deniesBothGunReload(VrServerRules.rules())
+                && player.getMainHandItem().getItem() instanceof GunItem
+                && player.getOffhandItem().getItem() instanceof GunItem
+                && (VrServerRules.isVr(player) || reloading(player));
+    }
+
     /** Starts a JEG reload of the off-hand gun; it ends when JEG clears its RELOADING flag. */
     public static void startReload(ServerPlayer player) {
         ItemStack stack = player.getOffhandItem();
-        if (player.isSpectator() || !canDualWield(stack) || ModSyncedDataKeys.RELOADING.getValue(player)) {
+        if (player.isSpectator() || !canDualWield(stack) || ModSyncedDataKeys.RELOADING.getValue(player)
+                || VrRules.deniesBothGunReload(VrServerRules.rules()) && player.getMainHandItem().getItem() instanceof GunItem) {
             return;
         }
         Gun gun = ((GunItem) stack.getItem()).getModifiedGun(stack);

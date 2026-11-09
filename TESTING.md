@@ -17,6 +17,9 @@ Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arma
 - [ ] Granadas (F9.26) en un servidor solo-JEG: salen hacia donde apunta la mano (desde la cabeza). Con el addon en el
   servidor: salen desde la mano, y con el gesto la fuerza cambia. Un cliente con addon viejo (protocolo 6) en un servidor
   nuevo y al revés: lanzan sin errores.
+- [ ] Reglas del servidor (S.8) en un servidor dedicado: `world/serverconfig/jeg_vr_compat-server.toml` con `DENY` y
+  `TRIGGER`; un cliente VR con el addon las recibe, uno con el addon viejo (protocolo 7) entra y juega con sus opciones,
+  y uno sin el addon entra normal.
 - [ ] Servidor dedicado con este `.jar` nuevo (la versión del canal subió a 4: cliente y servidor tienen que tener la misma versión del addon): disparo y medidores de la mano secundaria; el otro jugador escucha la preparación del lanzacohetes en esa mano.
 
 ## Auditoría, revisión 4 (rama `refactor/auditoria-publicacion`)
@@ -35,7 +38,24 @@ Oculus en plano.
 - [ ] Protocolo de shaders de `COMPATIBILIDAD.md`.
 - [ ] Servidor dedicado con este jar: arranca sin clases de cliente y el cliente VR detecta el addon (arma en la secundaria).
 
-## Arma en la cámara de Vivecraft (tercera persona)
+## S.8 — Reglas del servidor
+Se prueban en un jugador: el archivo es `run/saves/<mundo>/serverconfig/jeg_vr_compat-server.toml` (o
+`saves/<mundo>/serverconfig/` en un Minecraft normal). Se crea al abrir el mundo; editalo con el mundo abierto y se
+aplica solo (el log dice `VR server rules reloaded`).
+- [ ] Sin tocar el archivo (todo en `PLAYER`): las tres opciones se cambian en la pantalla como antes y no aparece ningún
+  aviso en el chat.
+- [ ] `reloadWithBothGuns = "DENY"` con tu opción encendida: con un arma en cada mano no recarga (doble vibración) ni
+  con la tecla ni agarrando el cargador. En la pantalla de opciones la fila está gris, en "No", y el tooltip dice "Lo
+  define el servidor".
+- [ ] `reloadWithBothGuns = "ALLOW"` con tu opción apagada: recarga con un arma en cada mano.
+- [ ] `throwMode = "TRIGGER"` con tu opción en "Gesto": las granadas se lanzan con el gatillo, hacia donde apunta la mano.
+  `throwMode = "VIVECRAFT"`: como arco de Vivecraft.
+- [ ] `bowLaser = "DENY"`: el arco compuesto no muestra el láser aunque tu opción esté encendida.
+- [ ] Con algo distinto de `PLAYER` y el VR prendido, al entrar al mundo sale una vez el aviso "Este servidor define
+  algunas opciones de VR por vos".
+- [ ] Al salir del mundo y entrar a otro sin cambios, vuelven tus opciones.
+- [ ] En plano (VR apagado), con `DENY`: un arma en cada mano recarga como en JEG.
+
 JEG giraba el arma en tercera persona según hacia dónde mira la cabeza (el visor) y la pose de apuntado; ahora, en un
 jugador VR, el arma sigue solo al brazo, que sigue al control.
 - [ ] Con la cámara de Vivecraft (tercera persona o cámara de mixed reality): un rifle y una escopeta en la mano apuntan

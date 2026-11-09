@@ -66,7 +66,11 @@ src/main/java/com/jegvr/
   client/VrThrow.java              # granadas, molotov y bomba de agua: gatillo o gesto (F9.26); VrThrowMotion, el gesto
   server/VrServerThrow.java        # la granada sale de la mano (mixin.server.ThrowableItemVRMixin)
   client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, zones, grabzone (ver COMANDOS.md)
-  config/VrClientConfig.java       # config/jeg_vr_compat-client.toml (ForgeConfigSpec CLIENT)
+  config/VrClientConfig.java       # config/jeg_vr_compat-client.toml (ForgeConfigSpec CLIENT); getters = lo que rige
+  config/VrServerConfig.java       # <mundo>/serverconfig/jeg_vr_compat-server.toml (SERVER): reglas S.8
+  config/VrRules.java              # reglas del servidor y cómo se combinan con la opción del jugador (tiene pruebas)
+  server/VrServerRules.java        # C2SVrHello -> S2CVrRules; quién juega en VR; reenvío al editar el archivo
+  client/VrRulesClient.java        # reglas recibidas; se borran al salir
 src/main/resources/
   META-INF/mods.toml
   jeg_vr_compat.mixins.json

@@ -1,5 +1,6 @@
 package com.jegvr.config;
 
+import com.jegvr.client.VrRulesClient;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
@@ -133,7 +134,13 @@ public final class VrClientConfig {
         return !SPEC.isLoaded() || MIRROR_LEFT_HAND.get();
     }
 
+    /** In effect: the server's rule when it decides (S.8), the player's own option otherwise. */
     public static boolean bowLaser() {
+        return VrRules.resolve(VrRulesClient.rules().bowLaser(), ownBowLaser());
+    }
+
+    /** The player's own option, whatever the server decides. */
+    public static boolean ownBowLaser() {
         return !SPEC.isLoaded() || BOW_LASER.get();
     }
 
@@ -198,7 +205,13 @@ public final class VrClientConfig {
         GRAB_ZONE.save();
     }
 
+    /** In effect: the server's rule when it decides (S.8), the player's own option otherwise. */
     public static ThrowMode throwMode() {
+        return ThrowMode.valueOf(VrRules.resolve(VrRulesClient.rules().throwMode(), ownThrowMode().name()));
+    }
+
+    /** The player's own option, whatever the server decides. */
+    public static ThrowMode ownThrowMode() {
         return SPEC.isLoaded() ? THROW_MODE.get() : ThrowMode.TRIGGER;
     }
 
@@ -207,7 +220,13 @@ public final class VrClientConfig {
         THROW_MODE.save();
     }
 
+    /** In effect: the server's rule when it decides (S.8), the player's own option otherwise. */
     public static boolean reloadWithBothGuns() {
+        return VrRules.resolve(VrRulesClient.rules().reloadWithBothGuns(), ownReloadWithBothGuns());
+    }
+
+    /** The player's own option, whatever the server decides. */
+    public static boolean ownReloadWithBothGuns() {
         return SPEC.isLoaded() && RELOAD_WITH_BOTH_GUNS.get();
     }
 

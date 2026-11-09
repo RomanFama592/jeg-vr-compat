@@ -2,6 +2,8 @@ package com.jegvr;
 
 import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
+import com.jegvr.config.VrServerConfig;
+import com.jegvr.client.VrRulesClient;
 import com.jegvr.client.VrConfigScreen;
 import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrGunConfig;
@@ -18,6 +20,7 @@ import com.jegvr.network.VrNetwork;
 import com.jegvr.server.VrInsertRound;
 import com.jegvr.server.VrOffhand;
 import com.jegvr.server.VrServerAim;
+import com.jegvr.server.VrServerRules;
 import com.jegvr.server.VrServerThrow;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -46,7 +49,10 @@ public class JegVrCompat {
             modBus.addListener(VrKeys::onRegister);
         }
         // Common to both sides: the optional server component (phase S).
+        VrServerConfig.register();
+        modBus.addListener(VrServerRules::onConfigReload);
         VrNetwork.init();
+        MinecraftForge.EVENT_BUS.register(VrServerRules.class);
         MinecraftForge.EVENT_BUS.register(VrServerAim.class);
         MinecraftForge.EVENT_BUS.register(VrServerThrow.class);
         if (ModList.get().isLoaded("jeg")) {
@@ -58,6 +64,7 @@ public class JegVrCompat {
     private void onClientSetup(FMLClientSetupEvent event) {
         // Client-only classes: register here, never in the constructor (dedicated servers also load this mod).
         MinecraftForge.EVENT_BUS.register(VrDiag.class);
+        MinecraftForge.EVENT_BUS.register(VrRulesClient.class);
         // Read the gun poses now (built-in file, then the user's), so a broken file shows up in the log at startup.
         VrGunConfig.load();
         if (ModList.get().isLoaded("jeg")) {

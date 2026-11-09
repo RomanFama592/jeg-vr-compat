@@ -59,5 +59,7 @@
   "jeg_vr_compat.command.pose.defaults": "the general pose",
   "jeg_vr_compat.command.reset.user": "%s reset to the addon's pose",
   "jeg_vr_compat.command.reset.builtin.defaults": "%s reset to what the built-in file has saved",
-  "jeg_vr_compat.command.reset.builtin.gun": "%s reset: no pose of its own (only the general pose)"
+  "jeg_vr_compat.command.reset.builtin.gun": "%s reset: no pose of its own (only the general pose)",
+  "jeg_vr_compat.rules.notice": "This server sets some VR options for you (Mods → JEG x Vivecraft → Config shows which).",
+  "jeg_vr_compat.rules.decided": "Set by the server."
 }
