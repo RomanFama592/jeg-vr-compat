@@ -64,6 +64,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<ThrowMode> THROW_MODE;
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
+    public static final ForgeConfigSpec.BooleanValue SHOW_SPRITES;
     public static final ForgeConfigSpec.BooleanValue RELOAD_WITH_BOTH_GUNS;
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
@@ -85,6 +86,10 @@ public final class VrClientConfig {
                 .comment("Show the coloured helper boxes (hip pouch, magazine well, foregrip). Off by default;",
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
+        SHOW_SPRITES = builder
+                .comment("A glow with rippling rings shows where the free hand can grab ammo (hip) and where the magazine",
+                        "goes in (the gun), coloured by state: blue ready, green with the hand in it, white to aim for.")
+                .define("showSprites", true);
         RELOAD_WITH_BOTH_GUNS = builder
                 .comment("Allow reloading while holding a gun in each hand. Off (default): put one gun away first (no free",
                         "hand for the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
@@ -151,6 +156,15 @@ public final class VrClientConfig {
 
     public static boolean showGuides() {
         return SPEC.isLoaded() && SHOW_GUIDES.get();
+    }
+
+    public static boolean showSprites() {
+        return !SPEC.isLoaded() || SHOW_SPRITES.get();
+    }
+
+    public static void setShowSprites(boolean show) {
+        SHOW_SPRITES.set(show);
+        SHOW_SPRITES.save();
     }
 
     public static HudPlacement hudPlacement() {

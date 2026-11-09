@@ -167,7 +167,8 @@ public final class VrGunHud {
     }
 
     /** Maps X to the panel's right, Y to its up and Z towards the headset; "up" follows the headset's. */
-    private static Quaternionf facing(Vec3 toHmd, Vec3 hmdUp) {
+    /** A rotation whose +z points along {@code toHmd} (towards the headset), with +y as close to the headset's up. */
+    static Quaternionf facing(Vec3 toHmd, Vec3 hmdUp) {
         Vec3 z = toHmd.normalize();
         Vec3 x = hmdUp.cross(z).normalize();
         Vec3 y = z.cross(x);

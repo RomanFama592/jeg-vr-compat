@@ -72,6 +72,10 @@ public final class VrConfigScreen extends Screen {
                 .withTooltip(show -> Tooltip.create(Component.translatable("jeg_vr_compat.config.showGuides.tooltip")))
                 .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.showGuides"),
                         (button, show) -> VrClientConfig.setShowGuides(show)));
+        left.add(CycleButton.onOffBuilder(VrClientConfig.showSprites())
+                .withTooltip(show -> Tooltip.create(Component.translatable("jeg_vr_compat.config.showSprites.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.showSprites"),
+                        (button, show) -> VrClientConfig.setShowSprites(show)));
         boolean reloadDecided = rules.reloadWithBothGuns() != VrRules.Toggle.PLAYER;
         left.add(serverDecides(CycleButton.onOffBuilder(
                         reloadDecided ? VrClientConfig.reloadWithBothGuns() : VrClientConfig.ownReloadWithBothGuns())

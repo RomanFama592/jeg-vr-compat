@@ -10,6 +10,8 @@
   "jeg_vr_compat.config.grabZone.front.tooltip": "For playing seated with tracked controllers: take the magazine in front of the belly, on the free hand's side.",
   "jeg_vr_compat.config.grabZone.off": "Off",
   "jeg_vr_compat.config.grabZone.off.tooltip": "No reloading by hand. The reload key and the secondary button still reload.",
+  "jeg_vr_compat.config.showSprites": "Reload glows",
+  "jeg_vr_compat.config.showSprites.tooltip": "A glow with rippling rings shows where to grab ammo at the hip (blue, green with the hand in it) and where the magazine goes in (white, green on contact).",
   "jeg_vr_compat.config.showGuides": "Helper boxes",
   "jeg_vr_compat.config.showGuides.tooltip": "Shows the coloured boxes of the hip, the magazine and the foregrip. Also: /jegvr zones.",
   "jeg_vr_compat.config.hudPlacement": "Hotbar with an off-hand gun",

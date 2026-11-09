@@ -38,6 +38,9 @@ import ttv.migami.jeg.util.GunModifierHelper;
  * per grab: with this addon on the server the round goes in at once ({@code C2SVrInsertRound}), otherwise JEG's reload
  * is started and stopped after one round. JEG's reload key keeps working.
  * <p>
+ * F10.1: a glow ({@link VrGlow}, option {@code showSprites}) marks the hip while a magazine can be taken (blue, green
+ * with the hand in it) and the magazine well while holding one (white, green on contact).
+ * <p>
  * Guides (off by default; {@code showGuides} in the client config, {@code /jegvr zones} toggles them): the hip box is red when there is no ammo, blue when a
  * magazine can be taken and green with the hand in it; while holding, the magazine box is yellow and the
  * magazine-well box turns green on contact.
@@ -53,6 +56,9 @@ public final class VrGrabReload {
     private static final int TIMEOUT_TICKS = 200;
     /** Muzzle-up kick of the gun model when a round goes in by hand. */
     private static final float ROUND_JOLT_DEGREES = 6.0F;
+    /** F10.1: radius of the glow at the hip, and at the magazine well while holding a magazine (metres in the room). */
+    private static final float POUCH_GLOW_RADIUS = 0.12F;
+    private static final float MAGWELL_GLOW_RADIUS = 0.07F;
 
     private enum Pouch { HIDDEN, NO_AMMO, READY }
 
@@ -268,7 +274,9 @@ public final class VrGrabReload {
 
     @SubscribeEvent
     public static void onRenderLevel(RenderLevelStageEvent event) {
-        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !VrClientConfig.showGuides()
+        boolean guides = VrClientConfig.showGuides();
+        boolean sprites = VrGlow.enabled();
+        if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES || !(guides || sprites)
                 || !VR.isEyePass()) {
             return;
         }
@@ -280,20 +288,36 @@ public final class VrGrabReload {
         PoseStack pose = event.getPoseStack();
         Vec3 cam = event.getCamera().getPosition();
         MultiBufferSource.BufferSource buffers = mc.renderBuffers().bufferSource();
+        float time = player.tickCount + event.getPartialTick();
         pose.pushPose();
         pose.translate(-cam.x, -cam.y, -cam.z);
         if (holding) {
             boolean touching = magazineTouchesGun(heldGunHand);
-            drawBox(pose, buffers, magazineBox(heldGunHand), 1.0F, 0.85F, 0.2F);
-            if (touching) {
-                drawBox(pose, buffers, magwellBox(heldGunHand), 0.2F, 1.0F, 0.3F);
-            } else {
-                drawBox(pose, buffers, magwellBox(heldGunHand), 1.0F, 1.0F, 1.0F);
+            if (sprites) {
+                VrGlow.draw(pose, buffers, center(magwellBox(heldGunHand)), MAGWELL_GLOW_RADIUS,
+                        touching ? VrGlow.GREEN : VrGlow.WHITE, time);
+                buffers.endBatch();
+            }
+            if (guides) {
+                drawBox(pose, buffers, magazineBox(heldGunHand), 1.0F, 0.85F, 0.2F);
+                if (touching) {
+                    drawBox(pose, buffers, magwellBox(heldGunHand), 0.2F, 1.0F, 0.3F);
+                } else {
+                    drawBox(pose, buffers, magwellBox(heldGunHand), 1.0F, 1.0F, 1.0F);
+                }
             }
         } else {
             Pouch state = pouchState(player);
             InteractionHand gunHand = VrGunHand.of(player);
             if (gunHand == null) {
+                state = Pouch.HIDDEN;
+            }
+            if (state == Pouch.READY && sprites) {
+                VrGlow.draw(pose, buffers, center(pouchBox(gunHand)), POUCH_GLOW_RADIUS,
+                        handInPouch(player) ? VrGlow.GREEN : VrGlow.BLUE, time);
+                buffers.endBatch();
+            }
+            if (!guides) {
                 state = Pouch.HIDDEN;
             }
             if (state == Pouch.NO_AMMO) {
@@ -307,6 +331,10 @@ public final class VrGrabReload {
             }
         }
         pose.popPose();
+    }
+
+    private static Vec3 center(AABB box) {
+        return box == null ? null : box.getCenter();
     }
 
     /** A see-through box with its outline, in world coordinates (the pose is already moved by -camera). */

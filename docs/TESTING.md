@@ -494,3 +494,17 @@ Con `/jegvr zones` para ver la caja.
 - [x] Opción en Apagado: como antes, solo el panel de la HUD se pone blanco o gris.
 - [ ] Flat (sin VR): la pantalla se pone blanca como en JEG, sin cambios.
 - [x] Pantalla de opciones del mod (lista de mods → Config) abierta en VR: dos columnas, todo dentro del panel, con "Listo" abajo y sin botones pisados. En plano, también con la ventana chica. (probado por el usuario, 2026-11-09)
+
+## F10.1 (brillos de recarga)
+- [x] (auto) Compila; pruebas de `VrGlow` (fase, tamaño y opacidad de los anillos) en verde; `checkMixins` sin problemas. Config: `reload.showSprites = true`. Texturas generadas con `tools/make_glow_textures.py`.
+- [ ] Arma sin llenar en la mano y munición en el inventario: en la cadera del lado de la mano libre hay un brillo azul con anillos que salen del centro, mirando siempre al visor. Con las cajas de ayuda apagadas.
+- [ ] Meter la mano libre en esa zona: el brillo se pone verde. Sacarla: vuelve a azul.
+- [ ] Agarrar el cargador: desaparece el brillo de la cadera y aparece uno blanco, más chico, en el pozo del arma. Al tocarlo con la mano se pone verde y recarga.
+- [ ] Arma llena, sin munición o recargando: no hay brillo.
+- [ ] El brillo no tapa el arma ni la mano al pasar por delante o por detrás.
+- [ ] Tamaño y velocidad de la onda: anotar si conviene más grande, más chico, más rápido o más lento.
+- [ ] Con la escala de mundo de Vivecraft cambiada: el brillo acompaña el tamaño.
+- [ ] Con BSL o Complementary: se ve, de día y de noche.
+- [ ] Opción "Brillos de recarga" apagada: no hay brillos. Con "Cajas de ayuda" encendida, las cajas siguen como antes.
+- [ ] Pantalla de opciones en VR, ahora con 13 opciones: todo entra en el panel.
+- [ ] Flat: sin cambios.

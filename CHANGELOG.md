@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Reloading by hand: a glow with rippling rings marks the hip while ammo can be grabbed (blue, green with the hand
+  in it) and the gun's magazine well while holding a magazine (white, green on contact). New option "Reload glows"
+  (on by default).
+
 ## 0.1.1 (2026-11-09)
 
 - The stun grenade's flash and the smoke now cover what each eye sees in VR, instead of only the HUD panel.

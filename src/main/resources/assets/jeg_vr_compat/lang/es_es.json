@@ -10,6 +10,8 @@
   "jeg_vr_compat.config.grabZone.front.tooltip": "Para jugar sentado con los controles: el cargador se agarra delante de la panza, del lado de la mano libre.",
   "jeg_vr_compat.config.grabZone.off": "Apagado",
   "jeg_vr_compat.config.grabZone.off.tooltip": "Sin recarga con la mano. La tecla de recarga y el botón secundario siguen recargando.",
+  "jeg_vr_compat.config.showSprites": "Brillos de recarga",
+  "jeg_vr_compat.config.showSprites.tooltip": "Un brillo con ondas marca dónde agarrar munición en la cadera (azul, verde con la mano adentro) y dónde entra el cargador (blanco, verde al tocarlo).",
   "jeg_vr_compat.config.showGuides": "Cajas de ayuda",
   "jeg_vr_compat.config.showGuides.tooltip": "Muestra las cajas de colores de la cadera, el cargador y el guardamanos. También: /jegvr zones.",
   "jeg_vr_compat.config.hudPlacement": "Hotbar con arma en la secundaria",
