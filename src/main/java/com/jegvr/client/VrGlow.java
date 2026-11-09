@@ -39,7 +39,7 @@ public final class VrGlow {
     static final float GUN_RING_WIDTH = 0.045F;
     /** The steady glow right where the hand holds, and its strength. */
     static final float GUN_CORE = 0.05F;
-    static final float GUN_CORE_STRENGTH = 0.5F;
+    static final float GUN_CORE_STRENGTH = 0.6F;
 
     private VrGlow() {
     }

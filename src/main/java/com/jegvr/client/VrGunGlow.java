@@ -16,7 +16,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,7 +37,7 @@ public final class VrGunGlow {
     private static final float CELL = 0.015F;
     private static final int MAX_CUTS = 16;
     /** How much colour the layer adds at full strength (0–1). */
-    private static final float STRENGTH = 0.65F;
+    private static final float STRENGTH = 0.85F;
     /** The copies sit this fraction closer to the eye than the gun, so they never fight its depth. */
     private static final float DEPTH_PULL = 0.002F;
     /** Values kept per copied vertex: position, colour, uv, normal. */
@@ -50,6 +52,9 @@ public final class VrGunGlow {
     private static MultiBufferSource target;
 
     private static final Map<RenderType, ResourceLocation> TEXTURES = new IdentityHashMap<>();
+    /** Each wrapper class's {@code unwrap()} (null when it has none). */
+    private static final Map<Class<?>, Method> UNWRAP = new HashMap<>();
+    private static final int MAX_UNWRAP = 4;
     private static final ResourceLocation NO_TEXTURE = new ResourceLocation("jeg_vr_compat", "none");
     private static final Map<ResourceLocation, float[]> COPIES = new LinkedHashMap<>();
     private static final Map<ResourceLocation, Integer> COPY_SIZES = new LinkedHashMap<>();
@@ -118,10 +123,26 @@ public final class VrGunGlow {
         }
     }
 
-    /** The texture of a render type, or null for untextured types and glints (their texture is not the gun's). */
+    /**
+     * The texture of a render type, or null for untextured types and glints (their texture is not the gun's). Shader
+     * mods wrap render types (Oculus tags each entity's types, and wraps them again at times): those are unwrapped by
+     * their {@code unwrap()} method, found by reflection so this addon never imports them. Only Minecraft's own types are
+     * remembered; wrappers may be new objects every frame.
+     */
     private static ResourceLocation texture(RenderType type) {
-        ResourceLocation texture = TEXTURES.computeIfAbsent(type, key -> {
-            if (!(key instanceof CompositeRenderTypeAccessor composite) || key.toString().contains("glint")) {
+        RenderType inner = type;
+        for (int depth = 0; depth < MAX_UNWRAP && !(inner instanceof CompositeRenderTypeAccessor); depth++) {
+            inner = unwrap(inner);
+            if (inner == null) {
+                return null;
+            }
+        }
+        if (!(inner instanceof CompositeRenderTypeAccessor)) {
+            return null;
+        }
+        ResourceLocation texture = TEXTURES.computeIfAbsent(inner, key -> {
+            CompositeRenderTypeAccessor composite = (CompositeRenderTypeAccessor) key;
+            if (key.toString().contains("glint")) {
                 return NO_TEXTURE;
             }
             Optional<ResourceLocation> found = ((TextureStateShardAccessor) ((CompositeStateAccessor) (Object)
@@ -129,6 +150,26 @@ public final class VrGunGlow {
             return found.orElse(NO_TEXTURE);
         });
         return texture == NO_TEXTURE ? null : texture;
+    }
+
+    /** {@code type.unwrap()} when its class has that method (a shader mod's wrapper), or null. */
+    private static RenderType unwrap(RenderType type) {
+        Method method = UNWRAP.computeIfAbsent(type.getClass(), cls -> {
+            try {
+                Method found = cls.getMethod("unwrap");
+                return RenderType.class.isAssignableFrom(found.getReturnType()) ? found : null;
+            } catch (NoSuchMethodException | SecurityException e) {
+                return null;
+            }
+        });
+        if (method == null) {
+            return null;
+        }
+        try {
+            return (RenderType) method.invoke(type);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return null;
+        }
     }
 
     /** Cuts one face (corners in drawing order) into pieces and keeps them, coloured by the wave. */
