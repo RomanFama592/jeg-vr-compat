@@ -2,7 +2,7 @@
 
 Addon de Forge 1.20.1 (`jeg_vr_compat`) que hace compatible **Just Enough Guns 0.13.2**
 (https://github.com/MigaMiDev/Just-Enough-Guns) con **Vivecraft** sin modificar ninguno de los dos.
-El plan de trabajo detallado está en `docs/PLAN.md`. Leelo antes de empezar y marcá las tareas a medida que se completen.
+El plan de trabajo detallado está en `notas/PLAN.md` (privado: fuera de git, junto con `notas/AUDITORIA.md` y `notas/PUBLICACION.md`). Leelo antes de empezar y marcá las tareas a medida que se completen.
 
 ## Stack
 - Minecraft 1.20.1, Forge 47.2.x, ForgeGradle 6, Java 17, mappings oficiales (Mojang).
@@ -43,7 +43,7 @@ El plan de trabajo detallado está en `docs/PLAN.md`. Leelo antes de empezar y m
 
 ## Estructura esperada
 En la raíz solo van `README.md` (inglés), `README.es.md` (español, mismo contenido), `CHANGELOG.md`, `LICENSE`, este
-archivo y lo de Gradle. Los demás documentos van en `docs/`, con su índice en `docs/README.md`.
+archivo y lo de Gradle. Los demás documentos públicos van en `docs/`, con su índice en `docs/README.md`; las notas privadas, en `notas/`, que git ignora.
 ```
 src/main/java/com/jegvr/
   JegVrCompat.java                 # @Mod("jeg_vr_compat")
@@ -108,7 +108,7 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 
 ## Convenciones
 - Código y comentarios en inglés; documentación y mensajes al usuario en español.
-- Commits pequeños, uno por tarea de `docs/PLAN.md`, con el ID de la tarea (ej. `F2.3: skip flat transforms in VR`).
+- Commits pequeños, uno por tarea de `notas/PLAN.md`, con el ID de la tarea (ej. `F2.3: skip flat transforms in VR`).
 - Si una firma de JEG o de la API de Vivecraft no coincide con lo descrito aquí, no inventes: inspeccioná el jar,
   corregí el código y actualizá este archivo.
 

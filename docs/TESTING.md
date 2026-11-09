@@ -1,6 +1,6 @@
 # Checklist de pruebas
 
-Completar una sección por fase de [PLAN.md](PLAN.md). Las pruebas en VR las hace el usuario manualmente.
+Una sección por fase del plan de trabajo. Las pruebas en VR las hace el usuario manualmente.
 
 ## Pendientes con servidor (el usuario las deja para más adelante)
 **Decisión (2026-11-08):** la alpha sale sin estas pruebas; la página avisa que el servidor no se probó en un servidor

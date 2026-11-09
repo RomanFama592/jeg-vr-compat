@@ -16,3 +16,6 @@ libs/
 # Log4j output of the unit tests
 /logs/
 /compat-test/
+
+# Private notes (plan, audit, publication): kept locally, never published
+/notas/

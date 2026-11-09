@@ -41,7 +41,7 @@ Revisado desmontando los jars con `javap`.
 | Paneles de munición | `RenderType.text` con luz máxima y `glDepthRange` | El rango se restaura siempre | Que queden por encima del arma y no generen halos |
 | Láser del arco | `debugQuads`; **con shaders, `RenderType.lightning`** | Los `debugQuads` usan el programa básico del pack y podrían oscurecerse de noche | Que se vea de noche; con shaders el aspecto puede ser más brillante |
 | Cajas guía | `debugFilledBox` y `lines` | Solo depuración, apagadas por defecto | — |
-| Fase 10 (sin hacer) | Sprites y brillo sobre el arma | Ver la nota de F10.4 en [PLAN.md](PLAN.md) | — |
+| Fase 10 (sin hacer) | Sprites y brillo sobre el arma | Pendiente | — |
 
 El addon no trae shaders ni `RenderType` propios, y no importa clases de Sodium, Iris ni OptiFine. Para saber si hay
 shaders usa `VR.shadersActive()`, que le pregunta a Vivecraft. Eso evita depender de esos mods.

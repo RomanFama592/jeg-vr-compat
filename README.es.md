@@ -45,8 +45,8 @@ El jar que se usa es `build/libs/jeg_vr_compat-<versión>.jar`. El `-slim` no tr
 ## Documentación
 
 Los documentos del proyecto están en [`docs/`](docs/README.md): [compatibilidad](docs/COMPATIBILIDAD.md),
-[comandos](docs/COMANDOS.md), [dos jugadores](docs/MULTIJUGADOR.md), [pruebas](docs/TESTING.md) y
-[plan](docs/PLAN.md). Los cambios de cada versión están en el [changelog](CHANGELOG.md).
+[comandos](docs/COMANDOS.md), [dos jugadores](docs/MULTIJUGADOR.md) y [pruebas](docs/TESTING.md).
+Los cambios de cada versión están en el [changelog](CHANGELOG.md).
 
 ## Licencia
 
