@@ -535,6 +535,7 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Arma clásica a dos manos, si hay: la mano va unos 22 cm delante del gatillo.
 - [ ] Arma en la secundaria (espejada): la mano fantasma sale de la principal y va al lado correcto.
 - [ ] Después de las demostraciones: al acercar la mano libre a menos de 35 cm aparecen partículas azules suaves en el agarre; con la mano en la zona, verdes, y la mano vibra suave y continuo. Al agarrar: una vibración fuerte y deja de vibrar.
+- [ ] (cambio) En cada sesión (al entrar al mundo), las partículas con la mano cerca salen siempre, también con la opción de partículas del juego en "Reducidas". Después de 5 agarres dejan de salir al acercar la mano y solo hay un golpe corto de partículas al agarrar (verdes) y al soltar (azules). Salir y volver a entrar al mundo: vuelven a salir con la mano cerca.
 - [ ] "Aviso de agarre a dos manos" en "Solo vibración": sin partículas, con vibración. En "Apagado": ni una ni otra. La distancia de las partículas cambia con el deslizador.
 - [ ] Con shaders (BSL o Complementary): se ven la mano fantasma y las partículas.
 - [ ] (corrección) `/jegvr grip ghost` con un arma a dos manos: al cerrar el chat, medio segundo después aparece la demostración, sin gastar las veces. Antes no aparecía (el chat abierto la cancelaba).

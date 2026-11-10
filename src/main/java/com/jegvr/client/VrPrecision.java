@@ -72,6 +72,7 @@ public final class VrPrecision {
         }
         active = true;
         hand = gunHand;
+        VrGripHint.onGrab(gunHand);
         slot = player.getInventory().selected;
         sendAiming(player, true);
         // F10.4: a firm buzz ends the light one of being on the foregrip ({@link VrGripHint}).
@@ -104,6 +105,7 @@ public final class VrPrecision {
 
     private static void stop(LocalPlayer player) {
         active = false;
+        VrGripHint.onRelease(hand);
         sendAiming(player, false);
     }
 

@@ -31,8 +31,9 @@ import java.nio.file.Path;
  *   <li>The first times a two-handed gun is taken and held for 3 seconds without changing it ({@code gripGhostShowsLeft},
  *   2 by default), a see-through copy of the free hand leaves it and goes to the grip, twice, showing where and how to
  *   hold the gun.</li>
- *   <li>After that, soft particles mark the grip while the free hand is near, and the free hand buzzes lightly while it
- *   is on the foregrip, until it grabs (then a firm buzz, from {@link VrPrecision}). Option {@code gripHint}.</li>
+ *   <li>After that, soft particles mark the grip while the free hand is near, for the first 5 grabs of each session
+ *   (joining a world); then they only burst when grabbing and letting go. The free hand buzzes lightly while it is on
+ *   the foregrip, until it grabs (then a firm buzz, from {@link VrPrecision}). Option {@code gripHint}.</li>
  * </ul>
  * Where the grip is, for each gun: the one taken with {@code /jegvr grip capture} (saved with the gun's pose, see
  * {@link VrGripPose}); else the free hand with its fingertips on the gun model's support arm, as JEG holds it; else a
@@ -51,6 +52,9 @@ public final class VrGripHint {
     private static final float[] GHOST_TINT = {0.65F, 0.85F, 1.0F};
 
     private static final int PARTICLE_EVERY_TICKS = 3;
+    /** Per session (from joining a world): after this many grabs, particles only burst when grabbing and letting go. */
+    private static final int GRABS_BEFORE_QUIET = 5;
+    private static final int BURST_PARTICLES = 8;
     private static final double PARTICLE_SPREAD = 0.025;
     private static final float PARTICLE_SIZE = 0.35F;
     private static final float BUZZ_SECONDS = 0.06F;
@@ -75,6 +79,8 @@ public final class VrGripHint {
     private static Vec3 gripWorld;
     private static int captureTicksLeft = -1;
     private static int ticks;
+    /** Successful grabs since joining the world. */
+    private static int grabsThisSession;
 
     private VrGripHint() {
     }
@@ -86,6 +92,9 @@ public final class VrGripHint {
         }
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
+        if (player == null) {
+            grabsThisSession = 0;
+        }
         if (player == null || !VR.active()) {
             lastHoldable = null;
             demoStart = -1;
@@ -128,10 +137,12 @@ public final class VrGripHint {
         if (hint != VrClientConfig.GripHint.OFF && onGrip) {
             VrGunHand.haptic(VrGunHand.other(gunHand), BUZZ_SECONDS, BUZZ_AMPLITUDE);
         }
-        if (hint == VrClientConfig.GripHint.PARTICLES_AND_BUZZ && demoStart < 0
+        // The first grabs of each session: particles whenever the free hand is near. After that, only bursts.
+        if (hint == VrClientConfig.GripHint.PARTICLES_AND_BUZZ && demoStart < 0 && grabsThisSession < GRABS_BEFORE_QUIET
                 && ++ticks % PARTICLE_EVERY_TICKS == 0
                 && VrPrecision.handDistance(gunHand) <= VrClientConfig.gripHintRange() * VR.worldScale()) {
-            spawnParticle(mc, gunHand, onGrip);
+            Vec3 at = gripWorld != null ? gripWorld : VrPrecision.foregrip(gunHand);
+            spawnParticle(mc, at, onGrip ? VrGlow.GREEN : VrGlow.BLUE);
         }
     }
 
@@ -151,14 +162,35 @@ public final class VrGripHint {
         }
     }
 
-    private static void spawnParticle(Minecraft mc, InteractionHand gunHand, boolean onGrip) {
-        Vec3 at = gripWorld != null ? gripWorld : VrPrecision.foregrip(gunHand);
+    /** The free hand took the foregrip ({@link VrPrecision}): counts it, and a short burst of particles. */
+    static void onGrab(InteractionHand gunHand) {
+        grabsThisSession++;
+        burst(gunHand, VrGlow.GREEN);
+    }
+
+    /** The free hand let go of the foregrip: a short burst of particles. */
+    static void onRelease(InteractionHand gunHand) {
+        burst(gunHand, VrGlow.BLUE);
+    }
+
+    private static void burst(InteractionHand gunHand, float[] rgb) {
+        Minecraft mc = Minecraft.getInstance();
+        VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
+        if (free == null || VrClientConfig.gripHint() != VrClientConfig.GripHint.PARTICLES_AND_BUZZ) {
+            return;
+        }
+        for (int i = 0; i < BURST_PARTICLES; i++) {
+            spawnParticle(mc, free.pos(), rgb);
+        }
+    }
+
+    private static void spawnParticle(Minecraft mc, Vec3 at, float[] rgb) {
         if (at == null || mc.level == null) {
             return;
         }
         double spread = PARTICLE_SPREAD * VR.worldScale();
-        float[] rgb = onGrip ? VrGlow.GREEN : VrGlow.BLUE;
-        mc.level.addParticle(new DustParticleOptions(new Vector3f(rgb[0], rgb[1], rgb[2]), PARTICLE_SIZE),
+        // Forced: with the game's "Decreased" particles, Minecraft would drop some at random.
+        mc.level.addParticle(new DustParticleOptions(new Vector3f(rgb[0], rgb[1], rgb[2]), PARTICLE_SIZE), true,
                 at.x + (mc.level.random.nextDouble() - 0.5) * 2.0 * spread,
                 at.y + (mc.level.random.nextDouble() - 0.5) * 2.0 * spread,
                 at.z + (mc.level.random.nextDouble() - 0.5) * 2.0 * spread, 0.0, 0.0, 0.0);
