@@ -542,3 +542,12 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] `/jegvr grip capture`: con un arma en la mano, poner la mano libre donde la agarrarías; a los 5 s (una vibración por segundo) dice que guardó el agarre. `/jegvr grip ghost`: la mano fantasma va a ese lugar. `/jegvr grip reset`: vuelve al automático.
 - [ ] Desde el proyecto: la captura queda en `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (campo `grip` del arma). La tecla de depuración captura al instante.
 - [ ] Flat: sin cambios.
+
+## Hotbar bloqueada en el modo precisión
+- [x] (auto) Compila; `checkMixins` sin problemas; con `runClientAudit -Pcompat` aplican `input.InteractTrackerVRMixin`, `input.BackpackTrackerVRMixin` e `input.MCVRVRMixin`. Config: `reload.lockHotbarInPrecision = true`.
+- [ ] Agarrando un rifle con las dos manos: tocar un slot de la hotbar de la muñeca con la otra mano no cambia de objeto, y tocar el slot de la mano secundaria no intercambia las manos. El agarre sigue.
+- [ ] Lo mismo con los botones de la hotbar (siguiente / anterior, deslizar) y llevando la mano del arma por encima del hombro.
+- [ ] La tecla de cambiar de mano (si está asignada) no mueve el arma: solo una vibración corta.
+- [ ] Al soltar el agarre (grip de la mano libre), la hotbar y el cambio de manos vuelven a funcionar.
+- [ ] Opción "Bloquear hotbar al agarrar a dos manos" apagada: como antes, cualquiera de esas acciones cambia el objeto y suelta el agarre.
+- [ ] Sin agarrar a dos manos: la hotbar funciona como siempre.

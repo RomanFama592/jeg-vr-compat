@@ -12,6 +12,9 @@
   grabbing and letting go), and it buzzes while it is there until it grabs, with a firm buzz when it does. New
   options "Two-handed grip hint" (particles and buzz, buzz only, off) and "Grip hint range" (35 cm by default). The
   grip comes from each gun's model; `/jegvr grip capture` takes it from your own hand for guns where it looks wrong.
+- While holding a gun with both hands (precision mode), Vivecraft's hotbar (touching a slot, the hotbar buttons,
+  reaching over the shoulder) and the swap-hands key do nothing, so the grip is not ended by accident. New option
+  "Lock hotbar while gripping with both hands" (on by default).
 
 ## 0.1.1 (2026-11-09)
 

@@ -75,6 +75,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.BooleanValue SHOW_SPRITES;
     public static final ForgeConfigSpec.EnumValue<GripHint> GRIP_HINT;
+    public static final ForgeConfigSpec.BooleanValue LOCK_HOTBAR_IN_PRECISION;
     public static final ForgeConfigSpec.DoubleValue GRIP_HINT_RANGE;
     public static final ForgeConfigSpec.IntValue GRIP_GHOST_SHOWS_LEFT;
     public static final ForgeConfigSpec.BooleanValue RELOAD_WITH_BOTH_GUNS;
@@ -108,6 +109,11 @@ public final class VrClientConfig {
                         "hold the gun when it comes close, and buzzes while the hand is there until it grabs; BUZZ only",
                         "buzzes; OFF neither.")
                 .defineEnum("gripHint", GripHint.PARTICLES_AND_BUZZ);
+        LOCK_HOTBAR_IN_PRECISION = builder
+                .comment("While holding a gun with both hands (precision mode), Vivecraft's hotbar (touching a slot, the",
+                        "hotbar buttons, reaching over the shoulder) and the swap-hands key do nothing, so the grip is not",
+                        "ended by accident.")
+                .define("lockHotbarInPrecision", true);
         GRIP_HINT_RANGE = builder
                 .comment("How close (metres) the free hand must come to a two-handed gun for the particles to show.")
                 .defineInRange("gripHintRange", 0.35, 0.1, 1.0);
@@ -194,6 +200,15 @@ public final class VrClientConfig {
     public static void setGripHint(GripHint hint) {
         GRIP_HINT.set(hint);
         GRIP_HINT.save();
+    }
+
+    public static boolean lockHotbarInPrecision() {
+        return !SPEC.isLoaded() || LOCK_HOTBAR_IN_PRECISION.get();
+    }
+
+    public static void setLockHotbarInPrecision(boolean lock) {
+        LOCK_HOTBAR_IN_PRECISION.set(lock);
+        LOCK_HOTBAR_IN_PRECISION.save();
     }
 
     public static double gripHintRange() {

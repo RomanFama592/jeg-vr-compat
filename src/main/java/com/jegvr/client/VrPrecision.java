@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -82,8 +83,24 @@ public final class VrPrecision {
         return true;
     }
 
+    /**
+     * While holding a gun with both hands, with {@code lockHotbarInPrecision} on: Vivecraft's hotbar (touch, buttons,
+     * shoulder) and the swap-hands key do nothing, so nothing ends the grip by accident ({@code InteractTrackerVRMixin},
+     * {@code MCVRVRMixin}, {@code BackpackTrackerVRMixin}).
+     */
+    public static boolean locksHotbar() {
+        return active && VrClientConfig.lockHotbarInPrecision();
+    }
+
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.START && locksHotbar()) {
+            // Before Minecraft handles the keys this tick: the swap-hands key would move the gun to the other hand.
+            KeyMapping swap = Minecraft.getInstance().options.keySwapOffhand;
+            while (swap.consumeClick()) {
+                VrGunHand.haptic(VrGunHand.other(hand), 0.02F, 0.2F);
+            }
+        }
         if (event.phase != TickEvent.Phase.END || !active) {
             return;
         }
