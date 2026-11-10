@@ -32,7 +32,7 @@ public final class VrServerConfig {
                 .comment("Laser sight on JEG's compound bow: PLAYER, ALLOW or DENY. Only drawn by the player's game.")
                 .defineEnum("bowLaser", VrRules.Toggle.PLAYER);
         SELF_DAMAGE = builder
-                .comment("Whether a VR player's own bullets can hit them (fired from the gun's muzzle; a headshot kills):",
+                .comment("Whether a VR player's own bullets can hit their head (it kills) or their other hand:",
                         "PLAYER (each player's own option, off by default), ALLOW or DENY. Minecraft still spares",
                         "players on a server with pvp off, or in a team without friendly fire.")
                 .defineEnum("selfDamage", VrRules.Toggle.PLAYER);

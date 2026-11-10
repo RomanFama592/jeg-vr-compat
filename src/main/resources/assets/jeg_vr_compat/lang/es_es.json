@@ -16,7 +16,7 @@
   "jeg_vr_compat.config.lockHotbarInPrecision": "Bloquear hotbar al agarrar a dos manos",
   "jeg_vr_compat.config.lockHotbarInPrecision.tooltip": "Mientras agarrás un arma con las dos manos, tocar la hotbar, sus botones, llevar la mano por encima del hombro y la tecla de cambiar de mano no hacen nada, así no se suelta el agarre sin querer.",
   "jeg_vr_compat.config.selfDamage": "Daño propio",
-  "jeg_vr_compat.config.selfDamage.tooltip": "Tus propias balas pueden pegarte (por ejemplo, el arma de una mano apuntando a la otra mano o a tus pies) y un tiro en tu propia cabeza te mata. Necesita este mod en el servidor. Apagado por defecto.",
+  "jeg_vr_compat.config.selfDamage.tooltip": "Tus propias balas pueden pegarte en la cabeza (un tiro ahí te mata) o en la otra mano (el daño normal del arma). No en la mano libre mientras agarrás un arma con las dos manos. Necesita este mod en el servidor. Apagado por defecto.",
   "jeg_vr_compat.config.gripHint": "Aviso de agarre a dos manos",
   "jeg_vr_compat.config.gripHint.particles_and_buzz": "Partículas y vibración",
   "jeg_vr_compat.config.gripHint.particles_and_buzz.tooltip": "Al acercar la mano libre a un arma a dos manos, unas partículas suaves muestran dónde agarrarla, y la mano vibra mientras está ahí, hasta que agarra.",

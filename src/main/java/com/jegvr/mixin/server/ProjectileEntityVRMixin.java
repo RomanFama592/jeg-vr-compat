@@ -11,10 +11,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,18 +20,21 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.entity.projectile.ProjectileEntity;
 import ttv.migami.jeg.item.GunItem;
+
+import java.util.List;
 
 /**
  * JEG places every new projectile at the shooter's eye. For VR players that told us where their gun is, start it at
  * the muzzle instead; the direction (player rotation from the shoot message, plus spread) is left to JEG.
  * <p>
- * F9.8: such a bullet may also hit its own shooter, when {@link VrSelfDamage#allows} says so. JEG skips the shooter
- * when looking for targets; everything after that (hit test, damage, effects) is JEG's own, with three exceptions for
- * the shooter only: the box is the current one (JEG rewinds other players' boxes by their ping), it does not grow
- * (JEG's {@code growBoundingBoxAmount}, meant to help aiming at others), and a headshot kills.
+ * F9.8: such a bullet may also hit its own shooter's head or other hand, when {@link VrSelfDamage#allows} says so.
+ * JEG skips the shooter when looking for targets; the shooter is added to what JEG found, as spheres around the
+ * headset and the hand (not Minecraft's box, which a gun held in VR is almost always inside). What follows (damage,
+ * effects, hit marker) is JEG's own, except that a headshot kills.
  */
 @Mixin(value = ProjectileEntity.class, remap = false)
 public abstract class ProjectileEntityVRMixin {
@@ -46,6 +47,8 @@ public abstract class ProjectileEntityVRMixin {
     /** F9.8: set at spawn; only for a bullet that started at a VR muzzle. */
     @Unique
     private boolean jegvr$hitsShooter;
+    @Unique
+    private InteractionHand jegvr$firingHand = InteractionHand.MAIN_HAND;
 
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lttv/migami/jeg/item/GunItem;Lttv/migami/jeg/common/Gun;)V",
             at = @At("RETURN"))
@@ -65,6 +68,7 @@ public abstract class ProjectileEntityVRMixin {
         self.yo = muzzle.y;
         self.zo = muzzle.z;
         this.jegvr$hitsShooter = VrSelfDamage.allows(shooter);
+        this.jegvr$firingHand = hand;
     }
 
     /**
@@ -77,29 +81,35 @@ public abstract class ProjectileEntityVRMixin {
         return weapon == null || weapon.isEmpty() ? original.call(shooter) : weapon;
     }
 
-    /** F9.8: JEG's {@code entity.equals(shooter)} skip, in both target searches (single hit and piercing). */
-    @WrapOperation(method = {"findEntityOnPath", "findEntitiesOnPath"}, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/entity/Entity;equals(Ljava/lang/Object;)Z"))
-    private boolean jegvr$shooterIsTarget(Entity candidate, Object other, Operation<Boolean> original) {
-        if (this.jegvr$hitsShooter && candidate == this.shooter) {
-            return false;
+    /** F9.8: JEG's single-target search (no Collateral): the shooter's head or other hand, if it comes first. */
+    @Inject(method = "findEntityOnPath", at = @At("RETURN"), cancellable = true)
+    private void jegvr$shooterFirst(Vec3 start, Vec3 end, CallbackInfoReturnable<ProjectileEntity.EntityResult> cir) {
+        VrSelfDamage.Hit hit = jegvr$selfHit(start, end);
+        if (hit == null) {
+            return;
         }
-        return original.call(candidate, other);
+        ProjectileEntity.EntityResult found = cir.getReturnValue();
+        if (found == null || start.distanceToSqr(hit.point()) < start.distanceToSqr(found.getHitPos())) {
+            cir.setReturnValue(new ProjectileEntity.EntityResult(this.shooter, hit.point(), hit.head()));
+        }
     }
 
-    /** F9.8: the shooter's own box as it is now, not rewound by the shooter's ping. */
-    @WrapOperation(method = "getHitResult", at = @At(value = "INVOKE",
-            target = "Lttv/migami/jeg/common/BoundingBoxManager;getBoundingBox(Lnet/minecraft/world/entity/player/Player;I)Lnet/minecraft/world/phys/AABB;"))
-    private AABB jegvr$shooterBoxNow(Player player, int ticksAgo, Operation<AABB> original) {
-        return player == this.shooter ? player.getBoundingBox() : original.call(player, ticksAgo);
+    /** F9.8: JEG's piercing search (Collateral): the shooter joins the targets. */
+    @Inject(method = "findEntitiesOnPath", at = @At("RETURN"))
+    private void jegvr$shooterToo(Vec3 start, Vec3 end,
+                                  CallbackInfoReturnable<List<ProjectileEntity.EntityResult>> cir) {
+        VrSelfDamage.Hit hit = jegvr$selfHit(start, end);
+        if (hit != null) {
+            cir.getReturnValue().add(new ProjectileEntity.EntityResult(this.shooter, hit.point(), hit.head()));
+        }
     }
 
-    /** F9.8: the shooter's body and head boxes do not grow. */
-    @WrapOperation(method = "getHitResult", at = @At(value = "INVOKE", remap = true,
-            target = "Lnet/minecraft/world/phys/AABB;inflate(DDD)Lnet/minecraft/world/phys/AABB;"))
-    private AABB jegvr$shooterBoxNotGrown(AABB box, double x, double y, double z, Operation<AABB> original,
-                                          @Local(argsOnly = true) Entity entity) {
-        return entity == this.shooter ? box : original.call(box, x, y, z);
+    @Unique
+    private VrSelfDamage.Hit jegvr$selfHit(Vec3 start, Vec3 end) {
+        if (!this.jegvr$hitsShooter || this.shooter == null || !this.shooter.isAlive()) {
+            return null;
+        }
+        return VrSelfDamage.hit(this.shooter, this.jegvr$firingHand, start, end);
     }
 
     /** F9.8: a bullet that hit its own shooter in the head kills. */

@@ -138,9 +138,9 @@ public final class VrClientConfig {
         builder.pop();
         builder.push("combat");
         SELF_DAMAGE = builder
-                .comment("Your own bullets can hit you (for example, the gun in one hand aimed at the other hand or at",
-                        "your feet), and a shot to your own head kills. Only bullets fired in VR. Needs this mod on the",
-                        "server, whose selfDamage rule may decide it instead.")
+                .comment("Your own bullets can hit your head (a shot there kills) or your other hand (the gun's normal",
+                        "damage). Only bullets fired in VR, and not the free hand while holding a gun with both hands.",
+                        "Needs this mod on the server, whose selfDamage rule may decide it instead.")
                 .define("selfDamage", false);
         builder.pop();
         builder.push("visuals");

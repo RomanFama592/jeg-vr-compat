@@ -1,10 +1,8 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
-import com.jegvr.config.VrClientConfig;
 import com.jegvr.config.VrRules;
 import com.jegvr.network.C2SVrHello;
-import com.jegvr.network.C2SVrSelfDamage;
 import com.jegvr.network.VrNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -26,8 +24,6 @@ public final class VrRulesClient {
     /** F9.8: apart from {@link #rules}, in its own packet. */
     private static volatile VrRules.Toggle selfDamageRule = VrRules.Toggle.PLAYER;
     private static WeakReference<Connection> helloSentTo = new WeakReference<>(null);
-    private static WeakReference<Connection> selfDamageSentTo = new WeakReference<>(null);
-    private static boolean selfDamageSent;
     private static boolean helloVr;
     private static boolean noticeShown;
 
@@ -81,15 +77,6 @@ public final class VrRulesClient {
             helloVr = vr;
             VrNetwork.CHANNEL.sendToServer(new C2SVrHello(VrNetwork.PROTOCOL, vr));
         }
-        // F9.8: the server decides bullet hits, so it needs the player's own option.
-        if (VrNetwork.serverProtocol(connection) >= VrNetwork.SELF_DAMAGE_PROTOCOL) {
-            boolean selfDamage = VrClientConfig.ownSelfDamage();
-            if (selfDamageSentTo.get() != connection || selfDamageSent != selfDamage) {
-                selfDamageSentTo = new WeakReference<>(connection);
-                selfDamageSent = selfDamage;
-                VrNetwork.CHANNEL.sendToServer(new C2SVrSelfDamage(selfDamage));
-            }
-        }
     }
 
     @SubscribeEvent
@@ -97,7 +84,6 @@ public final class VrRulesClient {
         rules = VrRules.Rules.PLAYER_CHOICE;
         selfDamageRule = VrRules.Toggle.PLAYER;
         helloSentTo = new WeakReference<>(null);
-        selfDamageSentTo = new WeakReference<>(null);
         noticeShown = false;
     }
 }

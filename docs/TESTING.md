@@ -555,19 +555,22 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Sin agarrar a dos manos: la hotbar funciona como siempre.
 
 ## F9.8 — Daño propio
-- [x] (auto) Compila; pruebas de `VrSelfDamage`; `checkMixins` sin problemas; con `runClientAudit -Pcompat` entran en
-  `ProjectileEntity` los cuatro enganches nuevos (búsqueda de objetivos en `findEntityOnPath` y `findEntitiesOnPath`, caja
-  del tirador en `getHitResult`, daño en `onHitEntity`). Config: `combat.selfDamage = false`; servidor `rules.selfDamage = "PLAYER"`.
-- [ ] En **supervivencia** (en creativo no se recibe daño), opción "Daño propio" apagada: apuntarte con el arma de la otra
-  mano o a los pies y disparar no te hace nada (como JEG).
-- [ ] Opción encendida: un tiro al pie o al cuerpo te hace el daño normal del arma, con el sonido y la marca de impacto
-  de JEG. El mensaje de muerte dice que te mató tu propia arma.
-- [ ] Un tiro en tu propia cabeza (apuntando el arma de una mano a tu cara, desde unos 40 cm) te mata, aun con casco.
-- [ ] Disparar normalmente hacia adelante, con la pistola pegada al pecho, corriendo, saltando y con dos armas cruzadas:
-  ninguna bala te pega.
-- [ ] Con la boca del arma apoyada sobre el cuerpo (adentro de tu caja), la bala no te pega: la prueba de impacto de
-  Minecraft solo cuenta las cajas en las que la bala entra.
-- [ ] Escopeta (varios perdigones): apuntando a tus pies, te pegan los que te alcanzan.
+- [x] (auto) Compila; pruebas de `VrSelfDamage` (esferas de cabeza y mano); `checkMixins` sin problemas; con
+  `runClientAudit -Pcompat` entran en `ProjectileEntity` los enganches de `findEntityOnPath`, `findEntitiesOnPath` y
+  `onHitEntity`. Config: `combat.selfDamage = false`; servidor `rules.selfDamage = "PLAYER"`.
+- Primera prueba del usuario (2026-11-10): no funcionaba. Usaba la caja del jugador de Minecraft, y en VR el arma casi
+  siempre está adentro de esa caja. Ahora los blancos son la cabeza (el visor) y la otra mano (el control).
+- [ ] En **supervivencia** (en creativo no se recibe daño), opción "Daño propio" apagada: apuntarte a la cabeza o a la otra
+  mano y disparar no te hace nada (como JEG).
+- [ ] Opción encendida, con un arma en una mano y la otra vacía: un tiro a la palma de la otra mano te hace el daño normal
+  del arma, con el sonido y la marca de impacto de JEG.
+- [ ] Con un arma en cada mano: el disparo de una que pasa por la otra mano te pega (también con el arma de la secundaria).
+- [ ] Un tiro en tu propia cabeza te mata, aun con casco: desde unos 40 cm, y también con la boca apoyada en la cabeza
+  apuntando hacia adentro. El mensaje de muerte dice que te mató tu propia arma.
+- [ ] Disparar normalmente no te pega nunca: apuntando con mira (el arma pegada a la cara), con la pistola al lado de la
+  cara apuntando hacia arriba, con la otra mano cerca del arma pero sin cruzar el disparo, corriendo y saltando.
+- [ ] Agarrando un rifle con las dos manos (modo precisión): la mano del guardamanos nunca recibe el disparo.
+- [ ] Escopeta (varios perdigones): apuntando a la otra mano, te pegan los que la alcanzan.
 - [ ] En plano (VR apagado) con la opción encendida: no te podés pegar (como JEG).
 - [ ] En un servidor solo JEG con la opción encendida: no te podés pegar (la decisión es del servidor).
 - [ ] En un servidor con `pvp=false` en `server.properties` no te podés pegar: Minecraft no deja que un jugador se lastime

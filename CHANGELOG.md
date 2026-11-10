@@ -2,10 +2,10 @@
 
 ## Unreleased
 
-- New option "Self-damage" (off by default): your own bullets can hit you, for example the gun in one hand aimed at
-  the other hand or at your feet, and a shot to your own head kills. Only bullets fired in VR, from the gun's
-  muzzle, so firing never hits the shooter. Needs this mod on the server, whose new `selfDamage` rule may decide it
-  for everyone.
+- New option "Self-damage" (off by default): your own bullets can hit your head, which kills, or your other hand,
+  with the gun's normal damage. The head and hands are where the headset and controllers are, so it works without
+  seeing your body. Not the free hand while holding a gun with both hands. Only bullets fired in VR. Needs this mod
+  on the server, whose new `selfDamage` rule may decide it for everyone.
 - Reloading by hand: the magazine (or the shotgun shell) you grab from the ammo box is now in your free hand until
   it goes into the gun, taken from your inventory. Part of the "Reload box and glows" option.
 
