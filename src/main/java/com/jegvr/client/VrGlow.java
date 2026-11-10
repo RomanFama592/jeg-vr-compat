@@ -32,14 +32,6 @@ public final class VrGlow {
     public static final float[] BLUE = {0.25F, 0.55F, 1.0F};
     public static final float[] GREEN = {0.2F, 1.0F, 0.3F};
     public static final float[] WHITE = {1.0F, 1.0F, 1.0F};
-    public static final float[] VIOLET = {0.8F, 0.3F, 1.0F};
-
-    /** F10.4, the wave over the gun: how far a ring travels from where the hand holds, and how soft it is (metres). */
-    static final float GUN_WAVE_REACH = 0.3F;
-    static final float GUN_RING_WIDTH = 0.045F;
-    /** The steady glow right where the hand holds, and its strength. */
-    static final float GUN_CORE = 0.05F;
-    static final float GUN_CORE_STRENGTH = 0.6F;
 
     private VrGlow() {
     }
@@ -77,23 +69,6 @@ public final class VrGlow {
     static float ringPhase(float time, int index) {
         float t = time / PERIOD_TICKS + (float) index / RINGS;
         return t - (float) Math.floor(t);
-    }
-
-    /**
-     * F10.4: how strongly a point of the gun this far from the held point (metres in the room) glows, 0–1, at this
-     * time in ticks: a steady core plus soft rings travelling outward (wider and more diffuse than the sprite's).
-     */
-    static float gunWave(float distance, float time) {
-        float glow = GUN_CORE_STRENGTH * gauss(distance / GUN_CORE);
-        for (int i = 0; i < RINGS; i++) {
-            float phase = ringPhase(time, i);
-            glow += ringAlpha(phase) * gauss((distance - phase * GUN_WAVE_REACH) / GUN_RING_WIDTH);
-        }
-        return Math.min(glow, 1.0F);
-    }
-
-    private static float gauss(float x) {
-        return (float) Math.exp(-x * x);
     }
 
     /** A ring's size along its growth: from a dot to the full radius, fast at first. */

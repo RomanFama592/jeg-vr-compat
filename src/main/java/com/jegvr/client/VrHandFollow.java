@@ -78,6 +78,7 @@ public final class VrHandFollow {
     private static final class Hand {
         // Measured while drawing the current view.
         boolean hasHand;
+        boolean hasController;
         final Matrix4f controller = new Matrix4f();
         final Matrix4f pose = new Matrix4f();
         final Matrix3f normal = new Matrix3f();
@@ -134,6 +135,7 @@ public final class VrHandFollow {
 
     private static void clearView(Hand hand) {
         hand.hasHand = false;
+        hand.hasController = false;
         hand.hasGrip = false;
         hand.hasSupport = false;
     }
@@ -249,6 +251,7 @@ public final class VrHandFollow {
             poseStack.last().pose().mul(hand.heavyOffset);
         }
         hand.controller.set(poseStack.last().pose());
+        hand.hasController = true;
     }
 
     /** What a hand holds as Vivecraft draws it: a hand away following the animation holds nothing but its gun. */
@@ -308,6 +311,66 @@ public final class VrHandFollow {
             remember(MAIN);
             remember(OFF);
         }
+    }
+
+    // F10.4: the ghost hand of {@link VrGripHint} uses the frames measured while drawing the current view.
+
+    /** A hand's controller frame in the view being drawn (Vivecraft's pose stack), or null before it is set up. */
+    static Matrix4f controllerFrame(boolean main) {
+        Hand hand = hand(main);
+        return hand.hasController ? new Matrix4f(hand.controller) : null;
+    }
+
+    /** Where Vivecraft draws a hand's model in this view, or null when it does not (or the hand follows an animation). */
+    static Matrix4f handFrame(boolean main) {
+        Hand hand = hand(main);
+        return hand.hasHand && hand.follow <= 0.0F ? new Matrix4f(hand.pose) : null;
+    }
+
+    /** The hand's model in its controller's frame (constant for a player), or null when not measured in this view. */
+    static Matrix4f handInController(boolean main) {
+        Hand hand = hand(main);
+        return hand.hasHand && hand.hasController ? new Matrix4f(hand.controller).invert().mul(hand.pose) : null;
+    }
+
+    /** The free hand's model with its fingertips on the gun's support arm (JEG's {@code left_arm} bone), or null. */
+    static Matrix4f handOnSupport(boolean gunMain, boolean freeMain) {
+        Hand gun = hand(gunMain);
+        Hand free = hand(freeMain);
+        return gun.hasSupport && free.hasHand ? fingertipsOnBone(free, gun.support, false) : null;
+    }
+
+    /** Draws a hand's model at {@code pose} through {@code buffers}; the caller ends the batch. */
+    static void drawHandModel(boolean main, PoseStack poseStack, Matrix4f pose, MultiBufferSource buffers) {
+        Hand hand = hand(main);
+        if (!hand.hasHand) {
+            return;
+        }
+        poseStack.pushPose();
+        poseStack.last().pose().set(pose);
+        poseStack.last().normal().set(hand.normal);
+        drawing = true;
+        try {
+            if (hand.rightModel) {
+                hand.renderer.renderRightHand(poseStack, buffers, hand.light, hand.player);
+            } else {
+                hand.renderer.renderLeftHand(poseStack, buffers, hand.light, hand.player);
+            }
+        } finally {
+            drawing = false;
+        }
+        poseStack.popPose();
+    }
+
+    /** The player whose hand Vivecraft drew (for its skin), or null. */
+    static AbstractClientPlayer handPlayer(boolean main) {
+        Hand hand = hand(main);
+        return hand.hasHand ? hand.player : null;
+    }
+
+    /** From one frame to another, eased, keeping the first one's scale. */
+    static Matrix4f between(Matrix4f from, Matrix4f to, float amount) {
+        return blend(from, to, amount);
     }
 
     private static void remember(Hand hand) {

@@ -3,6 +3,7 @@ package com.jegvr.client;
 import com.jegvr.config.VrClientConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.client.Minecraft;
@@ -21,7 +22,8 @@ import java.util.Locale;
  */
 public final class VrDebugCommands {
     private static final String KEY = "jeg_vr_compat.command.";
-    private static final int HELP_LINES = 7;
+    private static final int CAPTURE_SECONDS = 5;
+    private static final int HELP_LINES = 8;
 
     private VrDebugCommands() {
     }
@@ -85,6 +87,17 @@ public final class VrDebugCommands {
             }));
         }
         root.then(grabZone);
+        // F10.4: the two-handed grip of the held gun.
+        root.then(Commands.literal("grip")
+                .then(Commands.literal("capture")
+                        .executes(c -> startCapture(c, CAPTURE_SECONDS))
+                        .then(Commands.argument("seconds", IntegerArgumentType.integer(1, 30))
+                                .executes(c -> startCapture(c, IntegerArgumentType.getInteger(c, "seconds")))))
+                .then(Commands.literal("reset").executes(c -> reply(c, VrGripHint.resetGrip())))
+                .then(Commands.literal("ghost").executes(c -> {
+                    VrGripHint.showGhost(0);
+                    return reply(c, Component.translatable(KEY + "grip.ghost"));
+                })));
         root.then(Commands.literal("help").executes(c -> {
             for (int line = 0; line < HELP_LINES; line++) {
                 reply(c, Component.translatable(KEY + "help." + line));
@@ -108,6 +121,11 @@ public final class VrDebugCommands {
             return reply(c, Component.translatable(KEY + (id == null ? "reset.builtin.defaults" : "reset.builtin.gun"), what));
         }));
         d.register(root);
+    }
+
+    private static int startCapture(CommandContext<CommandSourceStack> c, int seconds) {
+        VrGripHint.startCapture(seconds);
+        return reply(c, Component.translatable(KEY + "grip.countdown", seconds));
     }
 
     private static Component poseName(String gunId) {

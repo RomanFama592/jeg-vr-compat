@@ -13,6 +13,7 @@ import com.jegvr.client.VrBowLaser;
 import com.jegvr.client.VrGrabReload;
 import com.jegvr.client.VrKeys;
 import com.jegvr.client.VrOffhandShooting;
+import com.jegvr.client.VrGripHint;
 import com.jegvr.client.VrPrecision;
 import com.jegvr.client.VrThrow;
 import com.jegvr.client.VrRecoil;
@@ -76,6 +77,7 @@ public class JegVrCompat {
             MinecraftForge.EVENT_BUS.register(VrDualReload.class);
             MinecraftForge.EVENT_BUS.register(VrGrabReload.class);
             MinecraftForge.EVENT_BUS.register(VrPrecision.class);
+            MinecraftForge.EVENT_BUS.register(VrGripHint.class);
             MinecraftForge.EVENT_BUS.register(VrBowLaser.class);
             MinecraftForge.EVENT_BUS.register(VrThrow.class);
         }

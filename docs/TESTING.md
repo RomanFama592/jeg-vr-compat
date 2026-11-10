@@ -525,20 +525,18 @@ Con `/jegvr zones` para ver la caja.
 - [ ] (corrección) El brillo de la caja abierta se ve entero, sin que la caja lo corte: queda un poco por delante, hacia el visor.
 - [ ] Recarga a mano cancelable: con el cargador en la mano, el grip de esa mano o la tecla de inspeccionar lo devuelven. Después de tocar el arma, mientras corre la recarga de JEG, el grip de la mano libre o inspeccionar la cortan (vibra la mano del arma) y el arma queda con las balas que tenía. Inspeccionar después sigue inspeccionando. En las dos manos.
 
-## F10.4 (brillo del agarre a dos manos sobre el arma)
-- [x] (auto) Compila; prueba de `VrGlow.gunWave` en verde; `checkMixins` sin problemas; con `runClientAudit -Pcompat` aplican `CompositeRenderTypeAccessor`, `CompositeStateAccessor`, `TextureStateShardAccessor` y el cambio de `ItemInHandRendererVRMixin`. Config: `reload.precisionGlowRange = 0.35`.
-- [ ] Arma a dos manos en la principal, otra mano vacía: al acercar la mano libre a menos de 35 cm del cañón, el arma se ilumina en azul con su propia textura donde se la agarra, y salen aros suaves y difuminados a lo largo del arma. Se enciende de a poco al acercarse.
-- [ ] Mano sobre la zona de agarre: verde. Agarrar (grip): violeta, en el punto donde está la mano. Soltar: vuelve.
-- [ ] Más lejos que la distancia: no brilla. Cambiar "Distancia del brillo de agarre" en las opciones (10 a 100 cm): cambia desde dónde aparece.
-- [ ] Arma de una mano, otra mano ocupada o recargando: no brilla.
-- [ ] El color no parpadea ni se ve corrido respecto del arma; sigue a la animación, al retroceso y a la recarga.
-- [ ] Arma en la secundaria (espejada): brilla igual y en el lado correcto.
-- [ ] Arma animada (rifle) y arma clásica (Holy Shotgun, si es a dos manos): las dos brillan.
-- [ ] Con BSL o Complementary: anotar cómo se ve.
-- [ ] (corrección) Con shaders el brillo no aparecía. Ahora, con shaders, el arma se tiñe en sus propios vértices (color hacia el del estado y luz al máximo donde pasa la onda) en vez de la capa aditiva. Probar con BSL o Complementary: se ve la onda azul / verde / violeta sobre el arma y sigue apareciendo después de agarrar un rato. Si no se ve, mandar `logs/latest.log` (líneas `Gun glow:`).
-- [ ] (corrección) Disparar con el brillo encendido: el fogonazo del arma conserva su color, sin el tinte.
-- [ ] Sin shaders: igual que antes (capa aditiva).
-- [ ] (ajuste) Más intenso que la primera versión.
-- [ ] Calibrar con el visor: cuánto color suma, ancho y velocidad de los aros (constantes en `VrGlow` y `VrGunGlow`).
-- [ ] "Indicadores en VR" apagado: no brilla. Pantalla de opciones con 14 opciones: entra en el panel.
+## F10.4 (cómo agarrar un arma a dos manos: mano fantasma, partículas y vibración)
+Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y no se veía con shaders).
+- [x] (auto) Compila; pruebas de `VrGripPose` (captura y vuelta, metros con cualquier escala, espejo) y del campo `grip` de las poses en verde; `checkMixins` sin problemas; `runClientAudit -Pcompat` sin errores. Config: `reload.gripHint = "PARTICLES_AND_BUZZ"`, `reload.gripHintRange = 0.35`, `reload.gripGhostShowsLeft = 2`.
+- [ ] Tomar un arma a dos manos con la otra mano vacía: medio segundo después, una mano celeste y transparente sale de tu mano libre, va al lugar del agarre, se queda un momento y se desvanece. Lo hace dos veces.
+- [ ] La segunda vez que tomás un arma a dos manos pasa lo mismo; la tercera ya no (`gripGhostShowsLeft` llega a 0).
+- [ ] El lugar del agarre tiene sentido en un rifle, una escopeta y una ametralladora (sale del brazo de apoyo de cada modelo). Anotar las armas donde queda mal para capturarlas.
+- [ ] Arma clásica a dos manos, si hay: la mano va unos 22 cm delante del gatillo.
+- [ ] Arma en la secundaria (espejada): la mano fantasma sale de la principal y va al lado correcto.
+- [ ] Después de las demostraciones: al acercar la mano libre a menos de 35 cm aparecen partículas azules suaves en el agarre; con la mano en la zona, verdes, y la mano vibra suave y continuo. Al agarrar: una vibración fuerte y deja de vibrar.
+- [ ] "Aviso de agarre a dos manos" en "Solo vibración": sin partículas, con vibración. En "Apagado": ni una ni otra. La distancia de las partículas cambia con el deslizador.
+- [ ] Con shaders (BSL o Complementary): se ven la mano fantasma y las partículas.
+- [ ] `/jegvr grip ghost`: muestra la demostración sin gastar las veces.
+- [ ] `/jegvr grip capture`: con un arma en la mano, poner la mano libre donde la agarrarías; a los 5 s (una vibración por segundo) dice que guardó el agarre. `/jegvr grip ghost`: la mano fantasma va a ese lugar. `/jegvr grip reset`: vuelve al automático.
+- [ ] Desde el proyecto: la captura queda en `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (campo `grip` del arma). La tecla de depuración captura al instante.
 - [ ] Flat: sin cambios.

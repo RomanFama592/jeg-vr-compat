@@ -49,6 +49,17 @@ class VrGunPoseFileTest {
         assertSame(gun.magwell, VrGunPoseFile.compose(defaults, gun).magwell);
     }
 
+    @Test
+    void gunGripReplacesTheDefaultOneAndSurvivesRounding() {
+        Pose defaults = new Pose();
+        Pose gun = new Pose();
+        assertSame(null, VrGunPoseFile.compose(defaults, gun).grip);
+        gun.grip = new VrGunConfig.Grip();
+        assertSame(gun.grip, VrGunPoseFile.compose(defaults, gun).grip);
+        assertSame(gun.grip, VrGunPoseFile.rounded(gun).grip);
+        assertSame(gun.grip, gun.copy().grip);
+    }
+
     /** Saving a calibrated pose stores the difference from the defaults; reading it back gives the same pose. */
     @Test
     void savedEntryGivesBackTheCalibratedPose() {

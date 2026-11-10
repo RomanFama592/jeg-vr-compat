@@ -50,6 +50,15 @@ public final class VrClientConfig {
         }
     }
 
+    /** F10.4: how a two-handed gun says where the free hand can hold it, once the ghost hand's lessons are over. */
+    public enum GripHint {
+        /** Soft particles at the grip, and a buzz while the free hand is on it. */
+        PARTICLES_AND_BUZZ,
+        /** Only the buzz. */
+        BUZZ,
+        OFF
+    }
+
     /** How JEG's grenades, molotov and water bomb are thrown in VR (F9.26). */
     public enum ThrowMode {
         /** Hold the trigger of the hand that holds it to pull the pin, release to throw where that hand points. */
@@ -65,7 +74,9 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.BooleanValue SHOW_SPRITES;
-    public static final ForgeConfigSpec.DoubleValue PRECISION_GLOW_RANGE;
+    public static final ForgeConfigSpec.EnumValue<GripHint> GRIP_HINT;
+    public static final ForgeConfigSpec.DoubleValue GRIP_HINT_RANGE;
+    public static final ForgeConfigSpec.IntValue GRIP_GHOST_SHOWS_LEFT;
     public static final ForgeConfigSpec.BooleanValue RELOAD_WITH_BOTH_GUNS;
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
@@ -88,15 +99,22 @@ public final class VrClientConfig {
                         "/jegvr zones toggles it.")
                 .define("showGuides", false);
         SHOW_SPRITES = builder
-                .comment("JEG's ammo box at the hip while a gun is held (open when ammo can be grabbed); a glow with",
-                        "rippling rings where the free hand can grab ammo and where the magazine goes in; and two-handed guns",
-                        "glowing where the free hand can hold them. Colours: blue ready, green with the hand in it, white to",
-                        "aim for, violet holding.")
+                .comment("JEG's ammo box at the hip while a gun is held (open when ammo can be grabbed), and a glow with",
+                        "rippling rings where the free hand can grab ammo and where the magazine goes in. Colours: blue",
+                        "ready, green with the hand in it, white to aim for.")
                 .define("showSprites", true);
-        PRECISION_GLOW_RANGE = builder
-                .comment("How close (metres) the free hand must come to a two-handed gun for the gun to glow where it can be",
-                        "held (precision mode). Needs showSprites.")
-                .defineInRange("precisionGlowRange", 0.35, 0.1, 1.0);
+        GRIP_HINT = builder
+                .comment("Two-handed guns (precision mode): PARTICLES_AND_BUZZ shows soft particles where the free hand can",
+                        "hold the gun when it comes close, and buzzes while the hand is there until it grabs; BUZZ only",
+                        "buzzes; OFF neither.")
+                .defineEnum("gripHint", GripHint.PARTICLES_AND_BUZZ);
+        GRIP_HINT_RANGE = builder
+                .comment("How close (metres) the free hand must come to a two-handed gun for the particles to show.")
+                .defineInRange("gripHintRange", 0.35, 0.1, 1.0);
+        GRIP_GHOST_SHOWS_LEFT = builder
+                .comment("How many more times a ghost hand shows how to hold a two-handed gun when one is taken (it",
+                        "counts down; set it back to see the lesson again). /jegvr grip ghost shows it at any time.")
+                .defineInRange("gripGhostShowsLeft", 2, 0, 100);
         RELOAD_WITH_BOTH_GUNS = builder
                 .comment("Allow reloading while holding a gun in each hand. Off (default): put one gun away first (no free",
                         "hand for the magazine); trying to reload gives a short double buzz in that hand. Unloading still works.")
@@ -169,13 +187,31 @@ public final class VrClientConfig {
         return !SPEC.isLoaded() || SHOW_SPRITES.get();
     }
 
-    public static double precisionGlowRange() {
-        return SPEC.isLoaded() ? PRECISION_GLOW_RANGE.get() : 0.35;
+    public static GripHint gripHint() {
+        return SPEC.isLoaded() ? GRIP_HINT.get() : GripHint.PARTICLES_AND_BUZZ;
     }
 
-    public static void setPrecisionGlowRange(double metres) {
-        PRECISION_GLOW_RANGE.set(metres);
-        PRECISION_GLOW_RANGE.save();
+    public static void setGripHint(GripHint hint) {
+        GRIP_HINT.set(hint);
+        GRIP_HINT.save();
+    }
+
+    public static double gripHintRange() {
+        return SPEC.isLoaded() ? GRIP_HINT_RANGE.get() : 0.35;
+    }
+
+    public static void setGripHintRange(double metres) {
+        GRIP_HINT_RANGE.set(metres);
+        GRIP_HINT_RANGE.save();
+    }
+
+    public static int gripGhostShowsLeft() {
+        return SPEC.isLoaded() ? GRIP_GHOST_SHOWS_LEFT.get() : 0;
+    }
+
+    public static void setGripGhostShowsLeft(int shows) {
+        GRIP_GHOST_SHOWS_LEFT.set(shows);
+        GRIP_GHOST_SHOWS_LEFT.save();
     }
 
     public static void setShowSprites(boolean show) {

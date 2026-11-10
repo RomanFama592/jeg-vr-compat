@@ -48,7 +48,7 @@ final class VrGunPoseFile {
         return loaded;
     }
 
-    /** Effective pose: angles and offsets add, scales multiply, and the gun's magwell replaces the default one. */
+    /** Effective pose: angles and offsets add, scales multiply, and the gun's magwell and grip replace the defaults'. */
     static Pose compose(Pose defaults, Pose gun) {
         Pose result = defaults.copy();
         if (gun != null) {
@@ -61,6 +61,9 @@ final class VrGunPoseFile {
             result.scale *= gun.scale;
             if (gun.magwell != null) {
                 result.magwell = gun.magwell;
+            }
+            if (gun.grip != null) {
+                result.grip = gun.grip;
             }
         }
         return result;
@@ -87,6 +90,7 @@ final class VrGunPoseFile {
         p.tz = round(pose.tz);
         p.scale = round(pose.scale);
         p.magwell = pose.magwell;
+        p.grip = pose.grip;
         return p;
     }
 

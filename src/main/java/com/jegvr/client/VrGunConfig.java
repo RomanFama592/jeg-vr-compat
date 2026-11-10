@@ -45,11 +45,17 @@ public final class VrGunConfig {
         public float scale = 1.0F;
         /** Where the free hand drops a magazine (used by grab-to-reload); optional. */
         public Magwell magwell;
+        /**
+         * F10.4: where the free hand's controller holds the gun (two-handed grip), relative to the gun's controller;
+         * optional (without it, the gun model's support arm decides). Taken with {@code /jegvr grip capture}.
+         */
+        public Grip grip;
 
         public Pose copy() {
             Pose p = new Pose();
             p.set(this);
             p.magwell = magwell;
+            p.grip = grip;
             return p;
         }
 
@@ -62,6 +68,17 @@ public final class VrGunConfig {
             tz = o.tz;
             scale = o.scale;
         }
+    }
+
+    /** Position in room metres and rotation (quaternion), in the gun controller's frame, for a right-hand gun. */
+    public static final class Grip {
+        public float x;
+        public float y;
+        public float z;
+        public float qx;
+        public float qy;
+        public float qz;
+        public float qw = 1.0F;
     }
 
     public static final class Magwell {
@@ -133,6 +150,20 @@ public final class VrGunConfig {
         }
         Pose entry = target.guns.computeIfAbsent(gunId, VrGunConfig::newEntry);
         VrGunPoseFile.setEntry(entry, defaults(), effective);
+    }
+
+    /** F10.4: stores (or, with null, removes) the two-handed grip of a gun in the layer the commands edit. */
+    public static void setGrip(String gunId, Grip grip) {
+        reloadIfChanged();
+        VrGunPoseFile.Data target = editable().data;
+        if (grip == null) {
+            Pose entry = target.guns.get(gunId);
+            if (entry != null) {
+                entry.grip = null;
+            }
+            return;
+        }
+        target.guns.computeIfAbsent(gunId, VrGunConfig::newEntry).grip = grip;
     }
 
     /**

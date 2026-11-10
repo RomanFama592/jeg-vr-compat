@@ -38,8 +38,6 @@ public final class VrPrecision {
     /** Room-scale metres: the box is drawn when the free hand is this close, and the mode ends when it goes farther. */
     private static final double SHOW_DISTANCE = 0.45;
     private static final int AIMING_RETRY_TICKS = 20;
-    /** F10.4: the gun's glow fades in over this outer part of its range. */
-    private static final double GLOW_FADE_PART = 0.3;
     /** Recoil deviation and kick while in precision mode. */
     public static final float RECOIL_FACTOR = 0.4F;
 
@@ -76,8 +74,9 @@ public final class VrPrecision {
         hand = gunHand;
         slot = player.getInventory().selected;
         sendAiming(player, true);
-        VrGunHand.haptic(VrGunHand.other(hand), 0.05F, 0.5F);
-        VrGunHand.haptic(hand, 0.05F, 0.3F);
+        // F10.4: a firm buzz ends the light one of being on the foregrip ({@link VrGripHint}).
+        VrGunHand.haptic(VrGunHand.other(hand), 0.1F, 1.0F);
+        VrGunHand.haptic(hand, 0.06F, 0.4F);
         player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER, 0.5F, 1.4F);
         return true;
     }
@@ -117,7 +116,7 @@ public final class VrPrecision {
      * VR with tracked hands, a two-handed gun in one hand ({@link VrGunHand}), the other hand free and no reload going
      * on: the hand with the gun, or null.
      */
-    private static InteractionHand holdableHand(LocalPlayer player) {
+    static InteractionHand holdableHand(LocalPlayer player) {
         if (!VR.active() || VR.seated() || player.isSpectator() || Minecraft.getInstance().screen != null
                 || ModSyncedDataKeys.RELOADING.getValue(player)) {
             return null;
@@ -128,7 +127,7 @@ public final class VrPrecision {
                 && !GripType.ONE_HANDED.equals(gunItem.getModifiedGun(stack).getGeneral().getGripType()) ? gunHand : null;
     }
 
-    private static Vec3 foregrip(InteractionHand gunHand) {
+    static Vec3 foregrip(InteractionHand gunHand) {
         VR.Aim gun = VrGunHand.aim(gunHand);
         if (gun == null) {
             return null;
@@ -148,7 +147,7 @@ public final class VrPrecision {
         return free == null ? null : VrZones.foregripBox(free.pos(), VR.worldScale());
     }
 
-    private static boolean handOnForegrip(InteractionHand gunHand) {
+    static boolean handOnForegrip(InteractionHand gunHand) {
         AABB box = foregripBox(gunHand);
         VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
         return box != null && free != null && box.contains(free.pos());
@@ -182,38 +181,7 @@ public final class VrPrecision {
         return gun == null || free == null ? null : VrZones.twoHandDir(gun, free.pos(), VR.worldScale());
     }
 
-    /** F10.4: where a gun glows, in which colour, and how much (fading in as the free hand comes closer). */
-    public record Glow(Vec3 center, float[] rgb, float fade) {
-    }
-
-    /**
-     * F10.4: the glow of the gun drawn in {@code drawnHand}, or null. While holding it, violet at the free hand; else,
-     * for a two-handed gun with the other hand free and within {@code precisionGlowRange} of the foregrip, blue (green
-     * with the hand on it) at the foregrip, fading in over the outer part of that range.
-     */
-    public static Glow glow(InteractionHand drawnHand) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || !VrGlow.enabled()) {
-            return null;
-        }
-        if (active) {
-            VR.Aim free = VrGunHand.aim(VrGunHand.other(hand));
-            return drawnHand == hand && free != null ? new Glow(free.pos(), VrGlow.VIOLET, 1.0F) : null;
-        }
-        if (holdableHand(player) != drawnHand) {
-            return null;
-        }
-        Vec3 center = foregrip(drawnHand);
-        double range = VrClientConfig.precisionGlowRange() * VR.worldScale();
-        double distance = handDistance(drawnHand);
-        if (center == null || range <= 0.0 || distance > range) {
-            return null;
-        }
-        float fade = (float) Math.min(1.0, (range - distance) / (range * GLOW_FADE_PART));
-        return new Glow(center, handOnForegrip(drawnHand) ? VrGlow.GREEN : VrGlow.BLUE, fade);
-    }
-
-    private static double handDistance(InteractionHand gunHand) {
+    static double handDistance(InteractionHand gunHand) {
         Vec3 center = foregrip(gunHand);
         VR.Aim free = VrGunHand.aim(VrGunHand.other(gunHand));
         return center == null || free == null ? Double.MAX_VALUE : free.pos().distanceTo(center);

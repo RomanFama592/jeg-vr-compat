@@ -61,6 +61,25 @@ Cada comando responde con los valores finales, por ejemplo
 `jeg:holy_shotgun: pitch=0.0 yaw=0.0 roll=15.0 | t=(0.000, 0.020, 0.000) | scale=0.60`.
 Con el `.jar`, esa línea sirve para compartir una pose y que se agregue a las poses del addon.
 
+## Agarre a dos manos de cada arma
+
+La mano fantasma y las partículas del modo precisión muestran dónde va la mano libre. Ese lugar sale solo del modelo del
+arma (el brazo de apoyo que JEG le dibuja), y las armas sin ese brazo usan un lugar fijo delante del gatillo. Si en
+alguna arma queda mal, se puede tomar de tu propia mano:
+
+| Comando | Qué hace |
+|---|---|
+| `/jegvr grip capture [segundos]` | Cuenta 5 segundos (o los que digas), con una vibración por segundo en la mano libre. Al terminar guarda dónde está tu control libre respecto del control del arma, como agarre de esa arma. Se guarda solo, en el mismo archivo que las poses (desde el proyecto, en el del `.jar`). |
+| `/jegvr grip reset` | El arma en la mano vuelve al agarre automático. |
+| `/jegvr grip ghost` | Muestra la mano fantasma ahora (sirve para ver cómo quedó un agarre). |
+
+En el entorno de desarrollo también hay una tecla, "Capturar agarre a dos manos (VR, depuración)", que captura al
+instante; se asigna a un botón del control en los controles de Vivecraft / SteamVR. En el `.jar` publicado no aparece.
+
+El agarre se guarda en la entrada del arma como `"grip": {"x", "y", "z", "qx", "qy", "qz", "qw"}`: la posición en metros
+y la rotación del control libre, en los ejes del control del arma, para un arma en la mano derecha (en la izquierda se
+usa espejado).
+
 ## Otros
 
 | Comando | Qué hace |

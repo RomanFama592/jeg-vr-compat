@@ -136,7 +136,13 @@ public final class VrConfigScreen extends Screen {
                 .create(0, 0, width, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.handsFollowAnimations"),
                         (button, follow) -> VrClientConfig.setHandsFollowAnimations(follow)));
-        right.add(new GlowRangeSlider(width));
+        right.add(CycleButton.<VrClientConfig.GripHint>builder(hint -> Component.translatable(gripHintKey(hint)))
+                .withValues(VrClientConfig.GripHint.values())
+                .withInitialValue(VrClientConfig.gripHint())
+                .withTooltip(hint -> Tooltip.create(Component.translatable(gripHintKey(hint) + ".tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.gripHint"),
+                        (button, hint) -> VrClientConfig.setGripHint(hint)));
+        right.add(new GripRangeSlider(width));
         right.add(CycleButton.<VrClientConfig.EyeFlash>builder(flash -> Component.translatable(eyeFlashKey(flash)))
                 .withValues(VrClientConfig.EyeFlash.values())
                 .withInitialValue(VrClientConfig.eyeFlash())
@@ -175,16 +181,16 @@ public final class VrConfigScreen extends Screen {
         }
     }
 
-    /** F10.4: how close the free hand must come for a two-handed gun to glow (10 to 100 cm, in 5 cm steps). */
-    private static final class GlowRangeSlider extends AbstractSliderButton {
+    /** F10.4: how close the free hand must come for the grip particles (10 to 100 cm, in 5 cm steps). */
+    private static final class GripRangeSlider extends AbstractSliderButton {
         private static final double MIN = 0.1;
         private static final double MAX = 1.0;
         private static final double STEP = 0.05;
 
-        GlowRangeSlider(int width) {
+        GripRangeSlider(int width) {
             super(0, 0, width, BUTTON_HEIGHT, Component.empty(),
-                    (VrClientConfig.precisionGlowRange() - MIN) / (MAX - MIN));
-            setTooltip(Tooltip.create(Component.translatable("jeg_vr_compat.config.precisionGlowRange.tooltip")));
+                    (VrClientConfig.gripHintRange() - MIN) / (MAX - MIN));
+            setTooltip(Tooltip.create(Component.translatable("jeg_vr_compat.config.gripHintRange.tooltip")));
             updateMessage();
         }
 
@@ -194,13 +200,13 @@ public final class VrConfigScreen extends Screen {
 
         @Override
         protected void updateMessage() {
-            setMessage(Component.translatable("jeg_vr_compat.config.precisionGlowRange",
+            setMessage(Component.translatable("jeg_vr_compat.config.gripHintRange",
                     Math.round(metres() * 100.0)));
         }
 
         @Override
         protected void applyValue() {
-            VrClientConfig.setPrecisionGlowRange(metres());
+            VrClientConfig.setGripHintRange(metres());
         }
     }
 
@@ -223,6 +229,10 @@ public final class VrConfigScreen extends Screen {
 
     private static String throwModeKey(VrClientConfig.ThrowMode mode) {
         return "jeg_vr_compat.config.throwMode." + mode.name().toLowerCase(Locale.ROOT);
+    }
+
+    private static String gripHintKey(VrClientConfig.GripHint hint) {
+        return "jeg_vr_compat.config.gripHint." + hint.name().toLowerCase(Locale.ROOT);
     }
 
     private static String eyeFlashKey(VrClientConfig.EyeFlash flash) {

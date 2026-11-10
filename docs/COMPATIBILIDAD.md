@@ -46,7 +46,8 @@ Revisado desmontando los jars con `javap`.
 | Cajas guía | `debugFilledBox` y `lines` | Solo depuración, apagadas por defecto | — |
 | Brillos de recarga (F10.1) | Cuadrados que miran al visor, `RenderType.entityTranslucentEmissive` con texturas propias, luz máxima y sin escribir profundidad | Pasan por el programa de entidades del pack | Que se vean igual con BSL y Complementary, de día y de noche |
 | Caja de munición (F10.2) | El modelo del bloque `jeg:ammo_box` con `Sheets.cutoutBlockSheet()` y la luz del lugar | Pasa por el programa de entidades del pack | Que se vea con su textura y su luz, de día y de noche |
-| Brillo del agarre sobre el arma (F10.4) | Copia de las caras del arma en `RenderType.eyes` con su misma textura (suma de color, sin escribir profundidad), dibujada justo después del arma. La textura sale del `RenderType` del arma con accesores de Minecraft (conviven con los de Oculus) | Con shaders no se usa la capa: se tiñen los vértices del propio arma (color y luz), que pasan por el mismo programa que el arma. En la primera prueba la capa `eyes` no se veía sobre la mano con shaders | Que se vea la onda con BSL y Complementary, y sin parpadeo sin shaders |
+| Mano fantasma del agarre (F10.4) | El modelo de la mano de Vivecraft, dibujado otra vez en `entityTranslucent` con la piel del jugador, más claro y transparente | Pasa por el programa de entidades del pack | Que se vea transparente con BSL y Complementary |
+| Partículas del agarre (F10.4) | Partículas de polvo vanilla (`DustParticleOptions`) | Las dibuja el pack como cualquier partícula | Que se vean suaves con y sin shaders |
 | Resto de la Fase 10 (sin hacer) | Munición en la mano | Pendiente | — |
 
 El addon no trae shaders ni `RenderType` propios, y no importa clases de Sodium, Iris ni OptiFine. Para saber si hay

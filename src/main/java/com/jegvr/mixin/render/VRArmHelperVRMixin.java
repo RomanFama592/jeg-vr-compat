@@ -1,6 +1,7 @@
 package com.jegvr.mixin.render;
 
 import com.jegvr.client.VrGunHud;
+import com.jegvr.client.VrGripHint;
 import com.jegvr.client.VrGunMirror;
 import com.jegvr.client.VrHands;
 import com.jegvr.client.VrHandFollow;
@@ -19,6 +20,7 @@ import org.vivecraft.client_vr.render.helpers.VRArmHelper;
 /**
  * F9.9: the panels beside the hands are drawn after the hands, so the guns cannot cover them ({@link VrGunHud}).
  * Phase H: the hands let go of the controllers while an animation plays ({@link VrHandFollow}).
+ * F10.4: the ghost hand showing how to hold a two-handed gun ({@link VrGripHint}).
  */
 @Mixin(value = VRArmHelper.class, remap = false)
 public abstract class VRArmHelperVRMixin {
@@ -41,6 +43,7 @@ public abstract class VRArmHelperVRMixin {
                                                  CallbackInfo ci) {
         if (!menuHandMain && !menuHandOff) {
             VrHandFollow.drawFollowing(poseStack);
+            VrGripHint.drawGhost(poseStack);
         }
     }
 

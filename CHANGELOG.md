@@ -6,10 +6,11 @@
   and a glow with rippling rings rises from it (blue, green with the hand in it). While holding a magazine, another
   glow marks the gun's magazine well (white, green on contact). The free hand's grip or the inspect key now puts the
   magazine back, or stops the reload it started.
-- Two-handed guns glow where the free hand can hold them (precision mode) when it comes close: the gun's own texture
-  lights up in blue (green with the hand on it, violet while holding), with soft rings rippling along the gun. The
-  distance is configurable ("Grip glow range", 35 cm by default). These hints share the option "VR hints" (on by
-  default).
+- Two-handed guns show where the free hand can hold them (precision mode). The first two times you take one, a ghost
+  of your free hand leaves it and goes to the grip, twice. After that, soft particles mark the grip when the free hand
+  comes close, and it buzzes while it is there until it grabs, with a firm buzz when it does. New options
+  "Two-handed grip hint" (particles and buzz, buzz only, off) and "Grip hint range" (35 cm by default). The grip comes
+  from each gun's model; `/jegvr grip capture` takes it from your own hand for guns where it looks wrong.
 
 ## 0.1.1 (2026-11-09)
 
