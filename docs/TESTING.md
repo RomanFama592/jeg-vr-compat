@@ -535,7 +535,9 @@ Con `/jegvr zones` para ver la caja.
 - [ ] Arma en la secundaria (espejada): brilla igual y en el lado correcto.
 - [ ] Arma animada (rifle) y arma clásica (Holy Shotgun, si es a dos manos): las dos brillan.
 - [ ] Con BSL o Complementary: anotar cómo se ve.
-- [ ] (corrección) Con shaders, agarrar con las dos manos y mantener un rato (más de un minuto), soltar y volver a acercar la mano: el brillo sigue apareciendo. Antes se apagaba a los pocos momentos. Si vuelve a pasar, probar lo mismo sin shaders, para saber si es del shader.
+- [ ] (corrección) Con shaders el brillo no aparecía. Ahora, con shaders, el arma se tiñe en sus propios vértices (color hacia el del estado y luz al máximo donde pasa la onda) en vez de la capa aditiva. Probar con BSL o Complementary: se ve la onda azul / verde / violeta sobre el arma y sigue apareciendo después de agarrar un rato. Si no se ve, mandar `logs/latest.log` (líneas `Gun glow:`).
+- [ ] (corrección) Disparar con el brillo encendido: el fogonazo del arma conserva su color, sin el tinte.
+- [ ] Sin shaders: igual que antes (capa aditiva).
 - [ ] (ajuste) Más intenso que la primera versión.
 - [ ] Calibrar con el visor: cuánto color suma, ancho y velocidad de los aros (constantes en `VrGlow` y `VrGunGlow`).
 - [ ] "Indicadores en VR" apagado: no brilla. Pantalla de opciones con 14 opciones: entra en el panel.
