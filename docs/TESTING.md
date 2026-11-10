@@ -537,7 +537,7 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Después de las demostraciones: al acercar la mano libre a menos de 35 cm aparecen partículas azules suaves en el agarre; con la mano en la zona, verdes, y la mano vibra suave y continuo. Al agarrar: una vibración fuerte y deja de vibrar.
 - [ ] "Aviso de agarre a dos manos" en "Solo vibración": sin partículas, con vibración. En "Apagado": ni una ni otra. La distancia de las partículas cambia con el deslizador.
 - [ ] Con shaders (BSL o Complementary): se ven la mano fantasma y las partículas.
-- [ ] `/jegvr grip ghost`: muestra la demostración sin gastar las veces.
+- [ ] (corrección) `/jegvr grip ghost` con un arma a dos manos: al cerrar el chat, medio segundo después aparece la demostración, sin gastar las veces. Antes no aparecía (el chat abierto la cancelaba).
 - [ ] `/jegvr grip capture`: con un arma en la mano, poner la mano libre donde la agarrarías; a los 5 s (una vibración por segundo) dice que guardó el agarre. `/jegvr grip ghost`: la mano fantasma va a ese lugar. `/jegvr grip reset`: vuelve al automático.
 - [ ] Desde el proyecto: la captura queda en `src/main/resources/assets/jeg_vr_compat/gun_poses.json` (campo `grip` del arma). La tecla de depuración captura al instante.
 - [ ] Flat: sin cambios.

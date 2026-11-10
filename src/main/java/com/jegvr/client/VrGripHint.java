@@ -66,6 +66,9 @@ public final class VrGripHint {
     /** Client tick since which {@link #lastHoldable} has been held; whether its lesson already showed. */
     private static long holdingSince;
     private static boolean lessonDone;
+    /** {@code /jegvr grip ghost} asked for a demonstration: it starts once a two-handed gun is held (chat closed). */
+    private static boolean ghostRequested;
+    private static final int REQUESTED_DELAY_TICKS = 10;
     /** Client tick at which the ghost's demonstration starts (or started); -1 without one. */
     private static long demoStart = -1;
     /** Where the free controller holds the gun, in the world, from the last left-eye view; null when unknown. */
@@ -104,6 +107,10 @@ public final class VrGripHint {
             lessonDone = false;
             demoStart = -1;
         }
+        if (ghostRequested && holdable != null) {
+            ghostRequested = false;
+            showGhost(REQUESTED_DELAY_TICKS);
+        }
         int left = VrClientConfig.gripGhostShowsLeft();
         if (holdable != null && !lessonDone && left > 0 && player.tickCount - holdingSince >= HOLD_BEFORE_DEMO_TICKS) {
             lessonDone = true;
@@ -128,8 +135,16 @@ public final class VrGripHint {
         }
     }
 
-    /** Shows the ghost hand's demonstration after {@code delayTicks} ({@code /jegvr grip ghost} uses 0). */
-    public static void showGhost(int delayTicks) {
+    /**
+     * {@code /jegvr grip ghost}: shows the demonstration without counting it. The command runs with the chat open, when
+     * no gun counts as held, so it waits for the chat to close and a two-handed gun to be in hand.
+     */
+    public static void requestGhost() {
+        ghostRequested = true;
+    }
+
+    /** Shows the ghost hand's demonstration after {@code delayTicks}. */
+    private static void showGhost(int delayTicks) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
             demoStart = player.tickCount + delayTicks;

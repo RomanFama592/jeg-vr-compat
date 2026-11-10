@@ -95,7 +95,7 @@ public final class VrDebugCommands {
                                 .executes(c -> startCapture(c, IntegerArgumentType.getInteger(c, "seconds")))))
                 .then(Commands.literal("reset").executes(c -> reply(c, VrGripHint.resetGrip())))
                 .then(Commands.literal("ghost").executes(c -> {
-                    VrGripHint.showGhost(0);
+                    VrGripHint.requestGhost();
                     return reply(c, Component.translatable(KEY + "grip.ghost"));
                 })));
         root.then(Commands.literal("help").executes(c -> {
