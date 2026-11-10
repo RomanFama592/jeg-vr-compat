@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 (2026-11-10)
+
 - Reloading by hand: JEG's ammo box now sits at the hip while you hold a gun. Its lid opens when you can grab ammo,
   and a glow with rippling rings rises from it (blue, green with the hand in it). While holding a magazine, another
   glow marks the gun's magazine well (white, green on contact). The free hand's grip or the inspect key now puts the
