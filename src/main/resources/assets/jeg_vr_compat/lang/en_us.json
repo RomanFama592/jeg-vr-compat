@@ -15,8 +15,6 @@
   "jeg_vr_compat.config.gripHintRange.tooltip": "How close the free hand must come to a two-handed gun for the particles to show where it can be held.",
   "jeg_vr_compat.config.lockHotbarInPrecision": "Lock hotbar while gripping with both hands",
   "jeg_vr_compat.config.lockHotbarInPrecision.tooltip": "While holding a gun with both hands, touching the hotbar, its buttons, reaching over the shoulder and the swap-hands key do nothing, so the grip is not ended by accident.",
-  "jeg_vr_compat.config.selfDamage": "Self-damage",
-  "jeg_vr_compat.config.selfDamage.tooltip": "Your own bullets can hit your head (a shot there kills) or your other hand (the gun's normal damage). Not the free hand while holding a gun with both hands. Needs this mod on the server. Off by default.",
   "jeg_vr_compat.config.gripHint": "Two-handed grip hint",
   "jeg_vr_compat.config.gripHint.particles_and_buzz": "Particles and buzz",
   "jeg_vr_compat.config.gripHint.particles_and_buzz.tooltip": "Soft particles show where the free hand can hold a two-handed gun when it comes close, and the hand buzzes while it is there, until it grabs.",

@@ -51,8 +51,6 @@ aplica solo (el log dice `VR server rules reloaded`).
 - [ ] `throwMode = "TRIGGER"` con tu opción en "Gesto": las granadas se lanzan con el gatillo, hacia donde apunta la mano.
   `throwMode = "VIVECRAFT"`: como arco de Vivecraft.
 - [ ] `bowLaser = "DENY"`: el arco compuesto no muestra el láser aunque tu opción esté encendida.
-- [ ] `selfDamage = "ALLOW"` con tu opción "Daño propio" apagada: tus balas te pegan (ver F9.8). `"DENY"` con tu opción
-  encendida: no te pegan. En los dos casos la fila está gris en la pantalla de opciones.
 - [ ] Con algo distinto de `PLAYER` y el VR prendido, al entrar al mundo sale una vez el aviso "Este servidor define
   algunas opciones de VR por vos".
 - [ ] Al salir del mundo y entrar a otro sin cambios, vuelven tus opciones.
@@ -553,28 +551,6 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Al soltar el agarre (grip de la mano libre), la hotbar y el cambio de manos vuelven a funcionar.
 - [ ] Opción "Bloquear hotbar al agarrar a dos manos" apagada: como antes, cualquiera de esas acciones cambia el objeto y suelta el agarre.
 - [ ] Sin agarrar a dos manos: la hotbar funciona como siempre.
-
-## F9.8 — Daño propio
-- [x] (auto) Compila; pruebas de `VrSelfDamage` (esferas de cabeza y mano); `checkMixins` sin problemas; con
-  `runClientAudit -Pcompat` entran en `ProjectileEntity` los enganches de `findEntityOnPath`, `findEntitiesOnPath` y
-  `onHitEntity`. Config: `combat.selfDamage = false`; servidor `rules.selfDamage = "PLAYER"`.
-- Primera prueba del usuario (2026-11-10): no funcionaba. Usaba la caja del jugador de Minecraft, y en VR el arma casi
-  siempre está adentro de esa caja. Ahora los blancos son la cabeza (el visor) y la otra mano (el control).
-- [ ] En **supervivencia** (en creativo no se recibe daño), opción "Daño propio" apagada: apuntarte a la cabeza o a la otra
-  mano y disparar no te hace nada (como JEG).
-- [ ] Opción encendida, con un arma en una mano y la otra vacía: un tiro a la palma de la otra mano te hace el daño normal
-  del arma, con el sonido y la marca de impacto de JEG.
-- [ ] Con un arma en cada mano: el disparo de una que pasa por la otra mano te pega (también con el arma de la secundaria).
-- [ ] Un tiro en tu propia cabeza te mata, aun con casco: desde unos 40 cm, y también con la boca apoyada en la cabeza
-  apuntando hacia adentro. El mensaje de muerte dice que te mató tu propia arma.
-- [ ] Disparar normalmente no te pega nunca: apuntando con mira (el arma pegada a la cara), con la pistola al lado de la
-  cara apuntando hacia arriba, con la otra mano cerca del arma pero sin cruzar el disparo, corriendo y saltando.
-- [ ] Agarrando un rifle con las dos manos (modo precisión): la mano del guardamanos nunca recibe el disparo.
-- [ ] Escopeta (varios perdigones): apuntando a la otra mano, te pegan los que la alcanzan.
-- [ ] En plano (VR apagado) con la opción encendida: no te podés pegar (como JEG).
-- [ ] En un servidor solo JEG con la opción encendida: no te podés pegar (la decisión es del servidor).
-- [ ] En un servidor con `pvp=false` en `server.properties` no te podés pegar: Minecraft no deja que un jugador se lastime
-  con su propio disparo (lo mismo con una flecha propia).
 
 ## F10.3 — Munición en la mano libre
 - [x] (auto) Compila; `checkMixins` sin problemas. Usa el `@ModifyArg` que ya tenía `VRArmHelperVRMixin` sobre el ítem de
