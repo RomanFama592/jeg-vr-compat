@@ -28,8 +28,9 @@ import java.nio.file.Path;
 /**
  * F10.4: how a two-handed gun shows where the free hand can hold it (precision mode, {@link VrPrecision}).
  * <ul>
- *   <li>The first times a two-handed gun is taken ({@code gripGhostShowsLeft}, 2 by default), a see-through copy of the
- *   free hand leaves it and goes to the grip, twice, showing where and how to hold the gun.</li>
+ *   <li>The first times a two-handed gun is taken and held for 3 seconds without changing it ({@code gripGhostShowsLeft},
+ *   2 by default), a see-through copy of the free hand leaves it and goes to the grip, twice, showing where and how to
+ *   hold the gun.</li>
  *   <li>After that, soft particles mark the grip while the free hand is near, and the free hand buzzes lightly while it
  *   is on the foregrip, until it grabs (then a firm buzz, from {@link VrPrecision}). Option {@code gripHint}.</li>
  * </ul>
@@ -38,7 +39,8 @@ import java.nio.file.Path;
  * fixed place ahead of the gun hand (guns without bones).
  */
 public final class VrGripHint {
-    private static final int DEMO_DELAY_TICKS = 10;
+    /** The ghost shows once the same two-handed gun has been held this long without changing it (3 s). */
+    private static final int HOLD_BEFORE_DEMO_TICKS = 60;
     /** One demonstration: the ghost appears on the hand, goes to the grip, stays a moment and fades. */
     private static final float TAP_TICKS = 32.0F;
     private static final int TAPS = 2;
@@ -61,6 +63,9 @@ public final class VrGripHint {
 
     /** The two-handed gun last held (null: none), to notice a new one being taken. */
     private static Item lastHoldable;
+    /** Client tick since which {@link #lastHoldable} has been held; whether its lesson already showed. */
+    private static long holdingSince;
+    private static boolean lessonDone;
     /** Client tick at which the ghost's demonstration starts (or started); -1 without one. */
     private static long demoStart = -1;
     /** Where the free controller holds the gun, in the world, from the last left-eye view; null when unknown. */
@@ -93,14 +98,17 @@ public final class VrGripHint {
         InteractionHand gunHand = VrPrecision.active() ? null : VrPrecision.holdableHand(player);
         Item holdable = gunHand == null ? null : player.getItemInHand(gunHand).getItem();
         if (holdable != lastHoldable) {
+            // Another gun (or none): the wait starts again, and a lesson on its way stops.
             lastHoldable = holdable;
-            int left = VrClientConfig.gripGhostShowsLeft();
-            if (holdable == null) {
-                demoStart = -1;
-            } else if (left > 0) {
-                showGhost(DEMO_DELAY_TICKS);
-                VrClientConfig.setGripGhostShowsLeft(left - 1);
-            }
+            holdingSince = player.tickCount;
+            lessonDone = false;
+            demoStart = -1;
+        }
+        int left = VrClientConfig.gripGhostShowsLeft();
+        if (holdable != null && !lessonDone && left > 0 && player.tickCount - holdingSince >= HOLD_BEFORE_DEMO_TICKS) {
+            lessonDone = true;
+            showGhost(0);
+            VrClientConfig.setGripGhostShowsLeft(left - 1);
         }
         if (demoStart >= 0 && player.tickCount - demoStart > TAPS * TAP_TICKS) {
             demoStart = -1;

@@ -528,8 +528,9 @@ Con `/jegvr zones` para ver la caja.
 ## F10.4 (cómo agarrar un arma a dos manos: mano fantasma, partículas y vibración)
 Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y no se veía con shaders).
 - [x] (auto) Compila; pruebas de `VrGripPose` (captura y vuelta, metros con cualquier escala, espejo) y del campo `grip` de las poses en verde; `checkMixins` sin problemas; `runClientAudit -Pcompat` sin errores. Config: `reload.gripHint = "PARTICLES_AND_BUZZ"`, `reload.gripHintRange = 0.35`, `reload.gripGhostShowsLeft = 2`.
-- [ ] Tomar un arma a dos manos con la otra mano vacía: medio segundo después, una mano celeste y transparente sale de tu mano libre, va al lugar del agarre, se queda un momento y se desvanece. Lo hace dos veces.
+- [ ] Tomar un arma a dos manos con la otra mano vacía y sostenerla 3 segundos sin cambiarla: una mano celeste y transparente sale de tu mano libre, va al lugar del agarre, se queda un momento y se desvanece. Lo hace dos veces.
 - [ ] La segunda vez que tomás un arma a dos manos pasa lo mismo; la tercera ya no (`gripGhostShowsLeft` llega a 0).
+- [ ] Cambiar de arma o soltarla antes de los 3 segundos: no aparece y no se gasta una de las veces.
 - [ ] El lugar del agarre tiene sentido en un rifle, una escopeta y una ametralladora (sale del brazo de apoyo de cada modelo). Anotar las armas donde queda mal para capturarlas.
 - [ ] Arma clásica a dos manos, si hay: la mano va unos 22 cm delante del gatillo.
 - [ ] Arma en la secundaria (espejada): la mano fantasma sale de la principal y va al lado correcto.
