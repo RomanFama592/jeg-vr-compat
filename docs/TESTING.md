@@ -544,8 +544,8 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Flat: sin cambios.
 
 ## Hotbar bloqueada en el modo precisión
-- [x] (auto) Compila; `checkMixins` sin problemas; con `runClientAudit -Pcompat` aplican `input.InteractTrackerVRMixin`, `input.BackpackTrackerVRMixin` e `input.MCVRVRMixin`. Config: `reload.lockHotbarInPrecision = true`.
-- [ ] Agarrando un rifle con las dos manos: tocar un slot de la hotbar de la muñeca con la otra mano no cambia de objeto, y tocar el slot de la mano secundaria no intercambia las manos. El agarre sigue.
+- [x] (auto) Compila; `checkMixins` sin problemas; con `runClientAudit -Pcompat` aplican `input.BackpackTrackerVRMixin` e `input.MCVRVRMixin` (`processHotbar` y `changeHotbar`). Config: `reload.lockHotbarInPrecision = true`.
+- [ ] Agarrando un rifle con las dos manos: tocar un slot de la hotbar de la muñeca con la otra mano no cambia de objeto ni resalta el slot (no salta entre el slot y el arma), y tocar el slot de la mano secundaria no intercambia las manos. El agarre sigue.
 - [ ] Lo mismo con los botones de la hotbar (siguiente / anterior, deslizar) y llevando la mano del arma por encima del hombro.
 - [ ] La tecla de cambiar de mano (si está asignada) no mueve el arma: solo una vibración corta.
 - [ ] Al soltar el agarre (grip de la mano libre), la hotbar y el cambio de manos vuelven a funcionar.

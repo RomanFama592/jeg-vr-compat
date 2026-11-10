@@ -85,8 +85,8 @@ public final class VrPrecision {
 
     /**
      * While holding a gun with both hands, with {@code lockHotbarInPrecision} on: Vivecraft's hotbar (touch, buttons,
-     * shoulder) and the swap-hands key do nothing, so nothing ends the grip by accident ({@code InteractTrackerVRMixin},
-     * {@code MCVRVRMixin}, {@code BackpackTrackerVRMixin}).
+     * shoulder) and the swap-hands key do nothing, so nothing ends the grip by accident ({@code MCVRVRMixin},
+     * {@code BackpackTrackerVRMixin}).
      */
     public static boolean locksHotbar() {
         return active && VrClientConfig.lockHotbarInPrecision();
