@@ -1,8 +1,10 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
+import com.jegvr.config.VrClientConfig;
 import com.jegvr.config.VrRules;
 import com.jegvr.network.C2SVrHello;
+import com.jegvr.network.C2SVrSelfDamage;
 import com.jegvr.network.VrNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -21,7 +23,11 @@ import java.lang.ref.WeakReference;
  */
 public final class VrRulesClient {
     private static volatile VrRules.Rules rules = VrRules.Rules.PLAYER_CHOICE;
+    /** F9.8: apart from {@link #rules}, in its own packet. */
+    private static volatile VrRules.Toggle selfDamageRule = VrRules.Toggle.PLAYER;
     private static WeakReference<Connection> helloSentTo = new WeakReference<>(null);
+    private static WeakReference<Connection> selfDamageSentTo = new WeakReference<>(null);
+    private static boolean selfDamageSent;
     private static boolean helloVr;
     private static boolean noticeShown;
 
@@ -32,12 +38,27 @@ public final class VrRulesClient {
         return rules;
     }
 
+    public static VrRules.Toggle selfDamageRule() {
+        return selfDamageRule;
+    }
+
     /** Network thread: the server's answer. */
     public static void receive(VrRules.Rules received) {
         rules = received;
+        noticeIfDecided(received.decidesAny());
+    }
+
+    /** Network thread: the server's self-damage rule (F9.8). */
+    public static void receiveSelfDamage(VrRules.Toggle rule) {
+        selfDamageRule = rule;
+        noticeIfDecided(rule != VrRules.Toggle.PLAYER);
+    }
+
+    /** Once per server: tells a VR player that the server decides some options. */
+    private static void noticeIfDecided(boolean decides) {
         Minecraft mc = Minecraft.getInstance();
         mc.execute(() -> {
-            if (!noticeShown && received.decidesAny() && mc.player != null && VR.active()) {
+            if (!noticeShown && decides && mc.player != null && VR.active()) {
                 noticeShown = true;
                 mc.player.displayClientMessage(Component.translatable("jeg_vr_compat.rules.notice"), false);
             }
@@ -60,12 +81,23 @@ public final class VrRulesClient {
             helloVr = vr;
             VrNetwork.CHANNEL.sendToServer(new C2SVrHello(VrNetwork.PROTOCOL, vr));
         }
+        // F9.8: the server decides bullet hits, so it needs the player's own option.
+        if (VrNetwork.serverProtocol(connection) >= VrNetwork.SELF_DAMAGE_PROTOCOL) {
+            boolean selfDamage = VrClientConfig.ownSelfDamage();
+            if (selfDamageSentTo.get() != connection || selfDamageSent != selfDamage) {
+                selfDamageSentTo = new WeakReference<>(connection);
+                selfDamageSent = selfDamage;
+                VrNetwork.CHANNEL.sendToServer(new C2SVrSelfDamage(selfDamage));
+            }
+        }
     }
 
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         rules = VrRules.Rules.PLAYER_CHOICE;
+        selfDamageRule = VrRules.Toggle.PLAYER;
         helloSentTo = new WeakReference<>(null);
+        selfDamageSentTo = new WeakReference<>(null);
         noticeShown = false;
     }
 }

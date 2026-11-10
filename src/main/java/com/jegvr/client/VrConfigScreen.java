@@ -154,6 +154,12 @@ public final class VrConfigScreen extends Screen {
                 .create(0, 0, width, BUTTON_HEIGHT,
                         Component.translatable("jeg_vr_compat.config.eyeFlash"),
                         (button, flash) -> VrClientConfig.setEyeFlash(flash)));
+        boolean selfDamageDecided = VrRulesClient.selfDamageRule() != VrRules.Toggle.PLAYER;
+        right.add(serverDecides(CycleButton.onOffBuilder(
+                        selfDamageDecided ? VrClientConfig.selfDamage() : VrClientConfig.ownSelfDamage())
+                .withTooltip(on -> tooltip("jeg_vr_compat.config.selfDamage.tooltip", selfDamageDecided))
+                .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.selfDamage"),
+                        (button, on) -> VrClientConfig.setSelfDamage(on)), selfDamageDecided));
 
         if (!twoColumns) {
             left.addAll(right);

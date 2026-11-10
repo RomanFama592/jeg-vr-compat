@@ -20,6 +20,7 @@ import com.jegvr.client.VrRecoil;
 import com.jegvr.network.VrNetwork;
 import com.jegvr.server.VrInsertRound;
 import com.jegvr.server.VrOffhand;
+import com.jegvr.server.VrSelfDamage;
 import com.jegvr.server.VrServerAim;
 import com.jegvr.server.VrServerRules;
 import com.jegvr.server.VrServerThrow;
@@ -55,6 +56,7 @@ public class JegVrCompat {
         VrNetwork.init();
         MinecraftForge.EVENT_BUS.register(VrServerRules.class);
         MinecraftForge.EVENT_BUS.register(VrServerAim.class);
+        MinecraftForge.EVENT_BUS.register(VrSelfDamage.class);
         MinecraftForge.EVENT_BUS.register(VrServerThrow.class);
         if (ModList.get().isLoaded("jeg")) {
             MinecraftForge.EVENT_BUS.register(VrOffhand.class);

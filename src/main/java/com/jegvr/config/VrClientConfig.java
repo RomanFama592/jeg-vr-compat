@@ -82,6 +82,7 @@ public final class VrClientConfig {
     public static final ForgeConfigSpec.EnumValue<HudPlacement> HUD_PLACEMENT;
     public static final ForgeConfigSpec.BooleanValue MIRROR_LEFT_HAND;
     public static final ForgeConfigSpec.BooleanValue BOW_LASER;
+    public static final ForgeConfigSpec.BooleanValue SELF_DAMAGE;
     public static final ForgeConfigSpec.BooleanValue GUN_HUD;
     public static final ForgeConfigSpec.BooleanValue HANDS_FOLLOW_ANIMATIONS;
     public static final ForgeConfigSpec.EnumValue<EyeFlash> EYE_FLASH;
@@ -133,6 +134,13 @@ public final class VrClientConfig {
                         "direction and strength from the hand's motion; strength needs this mod on the server too),",
                         "VIVECRAFT (like a bow, drawn with the other hand).")
                 .defineEnum("throwMode", ThrowMode.GESTURE);
+        builder.pop();
+        builder.push("combat");
+        SELF_DAMAGE = builder
+                .comment("Your own bullets can hit you (for example, the gun in one hand aimed at the other hand or at",
+                        "your feet), and a shot to your own head kills. Only bullets fired in VR. Needs this mod on the",
+                        "server, whose selfDamage rule may decide it instead.")
+                .define("selfDamage", false);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -300,6 +308,21 @@ public final class VrClientConfig {
     public static void setGunHud(boolean hud) {
         GUN_HUD.set(hud);
         GUN_HUD.save();
+    }
+
+    /** F9.8, in effect: the server's rule when it decides, the player's own option otherwise. */
+    public static boolean selfDamage() {
+        return VrRules.resolve(VrRulesClient.selfDamageRule(), ownSelfDamage());
+    }
+
+    /** The player's own option, whatever the server decides. Off until the file is loaded. */
+    public static boolean ownSelfDamage() {
+        return SPEC.isLoaded() && SELF_DAMAGE.get();
+    }
+
+    public static void setSelfDamage(boolean on) {
+        SELF_DAMAGE.set(on);
+        SELF_DAMAGE.save();
     }
 
     public static void setBowLaser(boolean laser) {

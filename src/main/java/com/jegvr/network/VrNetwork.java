@@ -26,7 +26,9 @@ public final class VrNetwork {
     public static final int THROW_PROTOCOL = 7;
     /** Adds {@link C2SVrHello} and {@link S2CVrRules} (S.8, server rules). */
     public static final int RULES_PROTOCOL = 8;
-    public static final int PROTOCOL = RULES_PROTOCOL;
+    /** Adds {@link C2SVrSelfDamage} and {@link S2CVrSelfDamageRule} (F9.8). */
+    public static final int SELF_DAMAGE_PROTOCOL = 9;
+    public static final int PROTOCOL = SELF_DAMAGE_PROTOCOL;
 
     private static final ResourceLocation NAME = new ResourceLocation(JegVrCompat.MOD_ID, "main");
 
@@ -94,6 +96,16 @@ public final class VrNetwork {
                 .encoder(S2CVrRules::encode)
                 .decoder(S2CVrRules::decode)
                 .consumerNetworkThread(S2CVrRules::handle)
+                .add();
+        CHANNEL.messageBuilder(C2SVrSelfDamage.class, 11, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrSelfDamage::encode)
+                .decoder(C2SVrSelfDamage::decode)
+                .consumerMainThread(C2SVrSelfDamage::handle)
+                .add();
+        CHANNEL.messageBuilder(S2CVrSelfDamageRule.class, 12, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CVrSelfDamageRule::encode)
+                .decoder(S2CVrSelfDamageRule::decode)
+                .consumerNetworkThread(S2CVrSelfDamageRule::handle)
                 .add();
     }
 

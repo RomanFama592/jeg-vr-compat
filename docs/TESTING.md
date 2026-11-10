@@ -51,6 +51,8 @@ aplica solo (el log dice `VR server rules reloaded`).
 - [ ] `throwMode = "TRIGGER"` con tu opción en "Gesto": las granadas se lanzan con el gatillo, hacia donde apunta la mano.
   `throwMode = "VIVECRAFT"`: como arco de Vivecraft.
 - [ ] `bowLaser = "DENY"`: el arco compuesto no muestra el láser aunque tu opción esté encendida.
+- [ ] `selfDamage = "ALLOW"` con tu opción "Daño propio" apagada: tus balas te pegan (ver F9.8). `"DENY"` con tu opción
+  encendida: no te pegan. En los dos casos la fila está gris en la pantalla de opciones.
 - [ ] Con algo distinto de `PLAYER` y el VR prendido, al entrar al mundo sale una vez el aviso "Este servidor define
   algunas opciones de VR por vos".
 - [ ] Al salir del mundo y entrar a otro sin cambios, vuelven tus opciones.
@@ -551,3 +553,22 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Al soltar el agarre (grip de la mano libre), la hotbar y el cambio de manos vuelven a funcionar.
 - [ ] Opción "Bloquear hotbar al agarrar a dos manos" apagada: como antes, cualquiera de esas acciones cambia el objeto y suelta el agarre.
 - [ ] Sin agarrar a dos manos: la hotbar funciona como siempre.
+
+## F9.8 — Daño propio
+- [x] (auto) Compila; pruebas de `VrSelfDamage`; `checkMixins` sin problemas; con `runClientAudit -Pcompat` entran en
+  `ProjectileEntity` los cuatro enganches nuevos (búsqueda de objetivos en `findEntityOnPath` y `findEntitiesOnPath`, caja
+  del tirador en `getHitResult`, daño en `onHitEntity`). Config: `combat.selfDamage = false`; servidor `rules.selfDamage = "PLAYER"`.
+- [ ] En **supervivencia** (en creativo no se recibe daño), opción "Daño propio" apagada: apuntarte con el arma de la otra
+  mano o a los pies y disparar no te hace nada (como JEG).
+- [ ] Opción encendida: un tiro al pie o al cuerpo te hace el daño normal del arma, con el sonido y la marca de impacto
+  de JEG. El mensaje de muerte dice que te mató tu propia arma.
+- [ ] Un tiro en tu propia cabeza (apuntando el arma de una mano a tu cara, desde unos 40 cm) te mata, aun con casco.
+- [ ] Disparar normalmente hacia adelante, con la pistola pegada al pecho, corriendo, saltando y con dos armas cruzadas:
+  ninguna bala te pega.
+- [ ] Con la boca del arma apoyada sobre el cuerpo (adentro de tu caja), la bala no te pega: la prueba de impacto de
+  Minecraft solo cuenta las cajas en las que la bala entra.
+- [ ] Escopeta (varios perdigones): apuntando a tus pies, te pegan los que te alcanzan.
+- [ ] En plano (VR apagado) con la opción encendida: no te podés pegar (como JEG).
+- [ ] En un servidor solo JEG con la opción encendida: no te podés pegar (la decisión es del servidor).
+- [ ] En un servidor con `pvp=false` en `server.properties` no te podés pegar: Minecraft no deja que un jugador se lastime
+  con su propio disparo (lo mismo con una flecha propia).

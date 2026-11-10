@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- New option "Self-damage" (off by default): your own bullets can hit you, for example the gun in one hand aimed at
+  the other hand or at your feet, and a shot to your own head kills. Only bullets fired in VR, from the gun's
+  muzzle, so firing never hits the shooter. Needs this mod on the server, whose new `selfDamage` rule may decide it
+  for everyone.
+
 ## 0.2.0 (2026-11-10)
 
 - Reloading by hand: JEG's ammo box now sits at the hip while you hold a gun. Its lid opens when you can grab ammo,
