@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import com.jegvr.config.VrRules;
 import com.jegvr.config.VrServerConfig;
 import com.jegvr.network.S2CVrRules;
-import com.jegvr.network.S2CVrSelfDamageRule;
 import com.jegvr.network.VrNetwork;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -78,16 +77,12 @@ public final class VrServerRules {
                 }
             }
         });
-        LOGGER.info("VR server rules reloaded: {}, selfDamage={}", VrServerConfig.rules(), VrServerConfig.selfDamageRule());
+        LOGGER.info("VR server rules reloaded: {}", VrServerConfig.rules());
     }
 
     private static void send(ServerPlayer player, int protocol) {
         if (protocol >= VrNetwork.RULES_PROTOCOL) {
             VrNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new S2CVrRules(rules()));
-        }
-        if (protocol >= VrNetwork.SELF_DAMAGE_PROTOCOL) {
-            VrNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                    new S2CVrSelfDamageRule(VrServerConfig.selfDamageRule()));
         }
     }
 }

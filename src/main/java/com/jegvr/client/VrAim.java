@@ -1,9 +1,7 @@
 package com.jegvr.client;
 
 import com.jegvr.compat.VR;
-import com.jegvr.config.VrClientConfig;
 import com.jegvr.network.C2SVrAim;
-import com.jegvr.network.C2SVrSelfTargets;
 import com.jegvr.network.VrNetwork;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -83,27 +81,6 @@ public final class VrAim {
     private static void sendMuzzle(InteractionHand hand, VR.Aim aim, Vec3 barrel) {
         Vec3 muzzle = aim.pos().add(barrel.scale(MUZZLE_FORWARD * VR.worldScale()));
         VrNetwork.CHANNEL.sendToServer(new C2SVrAim(hand, muzzle, barrel));
-        sendSelfTargets();
-    }
-
-    /**
-     * F9.8: with self-damage on, where the headset and hands are, for the server to tell whether the shot hits them.
-     * While holding a gun with both hands no hand is a target: the free one is on the handguard, near the muzzle.
-     */
-    private static void sendSelfTargets() {
-        if (!VrClientConfig.selfDamage()
-                || VrNetwork.serverProtocol(connection()) < VrNetwork.SELF_DAMAGE_PROTOCOL) {
-            return;
-        }
-        VR.Aim head = VR.hmdAim();
-        if (head == null) {
-            return;
-        }
-        boolean hands = !VrPrecision.active();
-        VR.Aim main = hands ? VR.mainHandAim() : null;
-        VR.Aim off = hands ? VR.offHandAim() : null;
-        VrNetwork.CHANNEL.sendToServer(new C2SVrSelfTargets(head.pos(), head.dir(),
-                main == null ? null : main.pos(), off == null ? null : off.pos(), VR.worldScale()));
     }
 
     /** {yaw, pitch} in degrees, as Minecraft measures them, for a direction; drift adds to yaw, climb raises pitch. */

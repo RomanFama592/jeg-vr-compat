@@ -21,8 +21,6 @@ import java.lang.ref.WeakReference;
  */
 public final class VrRulesClient {
     private static volatile VrRules.Rules rules = VrRules.Rules.PLAYER_CHOICE;
-    /** F9.8: apart from {@link #rules}, in its own packet. */
-    private static volatile VrRules.Toggle selfDamageRule = VrRules.Toggle.PLAYER;
     private static WeakReference<Connection> helloSentTo = new WeakReference<>(null);
     private static boolean helloVr;
     private static boolean noticeShown;
@@ -34,27 +32,12 @@ public final class VrRulesClient {
         return rules;
     }
 
-    public static VrRules.Toggle selfDamageRule() {
-        return selfDamageRule;
-    }
-
     /** Network thread: the server's answer. */
     public static void receive(VrRules.Rules received) {
         rules = received;
-        noticeIfDecided(received.decidesAny());
-    }
-
-    /** Network thread: the server's self-damage rule (F9.8). */
-    public static void receiveSelfDamage(VrRules.Toggle rule) {
-        selfDamageRule = rule;
-        noticeIfDecided(rule != VrRules.Toggle.PLAYER);
-    }
-
-    /** Once per server: tells a VR player that the server decides some options. */
-    private static void noticeIfDecided(boolean decides) {
         Minecraft mc = Minecraft.getInstance();
         mc.execute(() -> {
-            if (!noticeShown && decides && mc.player != null && VR.active()) {
+            if (!noticeShown && received.decidesAny() && mc.player != null && VR.active()) {
                 noticeShown = true;
                 mc.player.displayClientMessage(Component.translatable("jeg_vr_compat.rules.notice"), false);
             }
@@ -82,7 +65,6 @@ public final class VrRulesClient {
     @SubscribeEvent
     public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
         rules = VrRules.Rules.PLAYER_CHOICE;
-        selfDamageRule = VrRules.Toggle.PLAYER;
         helloSentTo = new WeakReference<>(null);
         noticeShown = false;
     }

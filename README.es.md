@@ -16,8 +16,8 @@ Addon no oficial para Forge 1.20.1 que hace jugable [Just Enough Guns](https://m
 - Vivecraft 1.20.1-1.2.5
 
 Se instala en el cliente. También en el servidor, suma las armas en la mano libre, las balas que salen de la boca del
-arma (con la opción "Daño propio", también te pueden pegar en la cabeza o en la otra mano), y deja que el servidor
-decida algunas opciones de VR (`serverconfig/jeg_vr_compat-server.toml` en la carpeta del mundo).
+arma, y deja que el servidor decida algunas opciones de VR (`serverconfig/jeg_vr_compat-server.toml` en la carpeta del
+mundo).
 
 Probado con unas Meta Quest 3 a través de SteamVR. Otros visores y runtimes deberían andar a través de Vivecraft,
 pero no están probados: se agradecen los reportes.

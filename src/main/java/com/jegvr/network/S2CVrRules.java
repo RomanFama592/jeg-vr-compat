@@ -27,5 +27,7 @@ public record S2CVrRules(VrRules.Rules rules) {
     public static void handle(S2CVrRules msg, Supplier<NetworkEvent.Context> ctx) {
         // The client class is only touched on the client (a dedicated server never runs this).
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> com.jegvr.client.VrRulesClient.receive(msg.rules));
+        // Network-thread handlers must say so, or Forge reports the packet as unknown (a warning in the log).
+        ctx.get().setPacketHandled(true);
     }
 }

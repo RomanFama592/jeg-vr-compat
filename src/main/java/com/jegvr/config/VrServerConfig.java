@@ -14,7 +14,6 @@ public final class VrServerConfig {
     public static final ForgeConfigSpec.EnumValue<VrRules.Toggle> RELOAD_WITH_BOTH_GUNS;
     public static final ForgeConfigSpec.EnumValue<VrRules.Throw> THROW_MODE;
     public static final ForgeConfigSpec.EnumValue<VrRules.Toggle> BOW_LASER;
-    public static final ForgeConfigSpec.EnumValue<VrRules.Toggle> SELF_DAMAGE;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -31,11 +30,6 @@ public final class VrServerConfig {
         BOW_LASER = builder
                 .comment("Laser sight on JEG's compound bow: PLAYER, ALLOW or DENY. Only drawn by the player's game.")
                 .defineEnum("bowLaser", VrRules.Toggle.PLAYER);
-        SELF_DAMAGE = builder
-                .comment("Whether a VR player's own bullets can hit their head (it kills) or their other hand:",
-                        "PLAYER (each player's own option, off by default), ALLOW or DENY. Minecraft still spares",
-                        "players on a server with pvp off, or in a team without friendly fire.")
-                .defineEnum("selfDamage", VrRules.Toggle.PLAYER);
         builder.pop();
         SPEC = builder.build();
     }
@@ -53,10 +47,5 @@ public final class VrServerConfig {
             return VrRules.Rules.PLAYER_CHOICE;
         }
         return new VrRules.Rules(RELOAD_WITH_BOTH_GUNS.get(), THROW_MODE.get(), BOW_LASER.get());
-    }
-
-    /** F9.8: kept apart from {@link #rules()}, whose packet has a fixed format. */
-    public static VrRules.Toggle selfDamageRule() {
-        return SPEC.isLoaded() ? SELF_DAMAGE.get() : VrRules.Toggle.PLAYER;
     }
 }

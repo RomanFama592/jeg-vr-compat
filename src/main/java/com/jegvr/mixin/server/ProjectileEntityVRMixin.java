@@ -1,13 +1,10 @@
 package com.jegvr.mixin.server;
 
 import com.jegvr.server.VrOffhand;
-import com.jegvr.server.VrSelfDamage;
 import com.jegvr.server.VrServerAim;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,40 +13,19 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.entity.projectile.ProjectileEntity;
 import ttv.migami.jeg.item.GunItem;
 
-import java.util.List;
-
 /**
  * JEG places every new projectile at the shooter's eye. For VR players that told us where their gun is, start it at
  * the muzzle instead; the direction (player rotation from the shoot message, plus spread) is left to JEG.
- * <p>
- * F9.8: such a bullet may also hit its own shooter's head or other hand, when {@link VrSelfDamage#allows} says so.
- * JEG skips the shooter when looking for targets; the shooter is added to what JEG found, as spheres around the
- * headset and the hand (not Minecraft's box, which a gun held in VR is almost always inside). What follows (damage,
- * effects, hit marker) is JEG's own, except that a headshot kills.
  */
 @Mixin(value = ProjectileEntity.class, remap = false)
 public abstract class ProjectileEntityVRMixin {
-    @Shadow
-    protected LivingEntity shooter;
-
-    @Shadow
-    private ItemStack weapon;
-
-    /** F9.8: set at spawn; only for a bullet that started at a VR muzzle. */
-    @Unique
-    private boolean jegvr$hitsShooter;
-    @Unique
-    private InteractionHand jegvr$firingHand = InteractionHand.MAIN_HAND;
-
     @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lttv/migami/jeg/item/GunItem;Lttv/migami/jeg/common/Gun;)V",
             at = @At("RETURN"))
     private void jegvr$startAtMuzzle(EntityType<? extends Entity> type, Level level, LivingEntity shooter,
@@ -67,9 +43,10 @@ public abstract class ProjectileEntityVRMixin {
         self.xo = muzzle.x;
         self.yo = muzzle.y;
         self.zo = muzzle.z;
-        this.jegvr$hitsShooter = VrSelfDamage.allows(shooter);
-        this.jegvr$firingHand = hand;
     }
+
+    @Shadow
+    private ItemStack weapon;
 
     /**
      * JEG decides some hit rules (the Holy Shotgun spares non-hostile targets) from the shooter's main-hand item. Read
@@ -79,47 +56,5 @@ public abstract class ProjectileEntityVRMixin {
             target = "Lnet/minecraft/world/entity/LivingEntity;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"))
     private ItemStack jegvr$firingGun(LivingEntity shooter, Operation<ItemStack> original) {
         return weapon == null || weapon.isEmpty() ? original.call(shooter) : weapon;
-    }
-
-    /** F9.8: JEG's single-target search (no Collateral): the shooter's head or other hand, if it comes first. */
-    @Inject(method = "findEntityOnPath", at = @At("RETURN"), cancellable = true)
-    private void jegvr$shooterFirst(Vec3 start, Vec3 end, CallbackInfoReturnable<ProjectileEntity.EntityResult> cir) {
-        VrSelfDamage.Hit hit = jegvr$selfHit(start, end);
-        if (hit == null) {
-            return;
-        }
-        ProjectileEntity.EntityResult found = cir.getReturnValue();
-        if (found == null || start.distanceToSqr(hit.point()) < start.distanceToSqr(found.getHitPos())) {
-            cir.setReturnValue(new ProjectileEntity.EntityResult(this.shooter, hit.point(), hit.head()));
-        }
-    }
-
-    /** F9.8: JEG's piercing search (Collateral): the shooter joins the targets. */
-    @Inject(method = "findEntitiesOnPath", at = @At("RETURN"))
-    private void jegvr$shooterToo(Vec3 start, Vec3 end,
-                                  CallbackInfoReturnable<List<ProjectileEntity.EntityResult>> cir) {
-        VrSelfDamage.Hit hit = jegvr$selfHit(start, end);
-        if (hit != null) {
-            cir.getReturnValue().add(new ProjectileEntity.EntityResult(this.shooter, hit.point(), hit.head()));
-        }
-    }
-
-    @Unique
-    private VrSelfDamage.Hit jegvr$selfHit(Vec3 start, Vec3 end) {
-        if (!this.jegvr$hitsShooter || this.shooter == null || !this.shooter.isAlive()) {
-            return null;
-        }
-        return VrSelfDamage.hit(this.shooter, this.jegvr$firingHand, start, end);
-    }
-
-    /** F9.8: a bullet that hit its own shooter in the head kills. */
-    @WrapOperation(method = "onHitEntity", at = @At(value = "INVOKE", remap = true,
-            target = "Lnet/minecraft/world/entity/Entity;hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z"))
-    private boolean jegvr$selfHeadshot(Entity target, DamageSource source, float amount, Operation<Boolean> original,
-                                       @Local(argsOnly = true) boolean headshot) {
-        if (this.jegvr$hitsShooter && target == this.shooter) {
-            amount = VrSelfDamage.damage(amount, headshot);
-        }
-        return original.call(target, source, amount);
     }
 }
