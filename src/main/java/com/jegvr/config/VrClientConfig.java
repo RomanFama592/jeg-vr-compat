@@ -103,7 +103,8 @@ public final class VrClientConfig {
         SHOW_SPRITES = builder
                 .comment("JEG's ammo box at the hip while a gun is held (open when ammo can be grabbed), and a glow with",
                         "rippling rings where the free hand can grab ammo and where the magazine goes in. Colours: blue",
-                        "ready, green with the hand in it, white to aim for.")
+                        "ready, green with the hand in it, white to aim for. The grabbed magazine or round is drawn in",
+                        "the free hand.")
                 .define("showSprites", true);
         GRIP_HINT = builder
                 .comment("Two-handed guns (precision mode): PARTICLES_AND_BUZZ shows soft particles where the free hand can",

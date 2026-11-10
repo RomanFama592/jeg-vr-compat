@@ -25,7 +25,7 @@
   "jeg_vr_compat.config.gripHint.off": "Off",
   "jeg_vr_compat.config.gripHint.off.tooltip": "No particles and no buzz. The first times you take a two-handed gun, a ghost hand still shows how to hold it.",
   "jeg_vr_compat.config.showSprites": "Reload box and glows",
-  "jeg_vr_compat.config.showSprites.tooltip": "JEG's ammo box sits at the hip while you hold a gun, open when you can grab ammo, with a glow rising from it (blue, green with the hand in it). Another glow marks where the magazine goes in (white, green on contact).",
+  "jeg_vr_compat.config.showSprites.tooltip": "JEG's ammo box sits at the hip while you hold a gun, open when you can grab ammo, with a glow rising from it (blue, green with the hand in it). The grabbed magazine or round is in your hand, and another glow marks where it goes in (white, green on contact).",
   "jeg_vr_compat.config.showGuides": "Helper boxes",
   "jeg_vr_compat.config.showGuides.tooltip": "Shows the coloured boxes of the hip, the magazine and the foregrip. Also: /jegvr zones.",
   "jeg_vr_compat.config.hudPlacement": "Hotbar with an off-hand gun",

@@ -1,5 +1,6 @@
 package com.jegvr.mixin.render;
 
+import com.jegvr.client.VrGrabReload;
 import com.jegvr.client.VrGunHud;
 import com.jegvr.client.VrGripHint;
 import com.jegvr.client.VrGunMirror;
@@ -21,6 +22,7 @@ import org.vivecraft.client_vr.render.helpers.VRArmHelper;
  * F9.9: the panels beside the hands are drawn after the hands, so the guns cannot cover them ({@link VrGunHud}).
  * Phase H: the hands let go of the controllers while an animation plays ({@link VrHandFollow}).
  * F10.4: the ghost hand showing how to hold a two-handed gun ({@link VrGripHint}).
+ * F10.3: the magazine in the free hand while reloading by hand ({@link VrGrabReload#heldItem}).
  */
 @Mixin(value = VRArmHelper.class, remap = false)
 public abstract class VRArmHelperVRMixin {
@@ -63,13 +65,13 @@ public abstract class VRArmHelperVRMixin {
     @ModifyArg(method = "renderVRHand_Main", index = 5,
             at = @At(value = "INVOKE", target = RENDER_ARM_WITH_ITEM, remap = true))
     private static ItemStack jegvr$mainHandItem(ItemStack stack) {
-        return VrHandFollow.heldItem(stack, true);
+        return VrHandFollow.heldItem(VrGrabReload.heldItem(stack, true), true);
     }
 
     @ModifyArg(method = "renderVRHand_Offhand", index = 5,
             at = @At(value = "INVOKE", target = RENDER_ARM_WITH_ITEM, remap = true))
     private static ItemStack jegvr$offHandItem(ItemStack stack) {
-        return VrHandFollow.heldItem(stack, false);
+        return VrHandFollow.heldItem(VrGrabReload.heldItem(stack, false), false);
     }
 
     @Inject(method = "renderVRHands", at = @At("RETURN"))

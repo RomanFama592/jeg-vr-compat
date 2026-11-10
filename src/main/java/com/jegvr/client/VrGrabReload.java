@@ -17,12 +17,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import ttv.migami.jeg.client.handler.ReloadHandler;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ReloadType;
@@ -73,6 +76,8 @@ public final class VrGrabReload {
     private static boolean holding;
     /** While holding: the hand with the gun being loaded (the other hand holds the magazine). */
     private static InteractionHand heldGunHand = InteractionHand.MAIN_HAND;
+    /** F10.3: while holding, what the free hand shows: one of the gun's magazines or rounds (only drawn). */
+    private static ItemStack heldAmmo = ItemStack.EMPTY;
     private static int heldTicks;
     private static int slot;
     private static boolean grabWasDown;
@@ -108,6 +113,7 @@ public final class VrGrabReload {
         }
         holding = true;
         heldGunHand = VrGunHand.of(player);
+        heldAmmo = ammoStack(player, heldGunHand);
         heldTicks = 0;
         slot = player.getInventory().selected;
         VrGunHand.haptic(VrGunHand.other(heldGunHand), 0.05F, 0.6F);
@@ -285,6 +291,33 @@ public final class VrGrabReload {
         }
         boolean hasAmmo = player.isCreative() || !Gun.findAmmo(player, ammoItem(gun)).stack().isEmpty();
         return hasAmmo ? Pouch.READY : Pouch.NO_AMMO;
+    }
+
+    /**
+     * F10.3: the stack Vivecraft draws in a hand ({@code VRArmHelperVRMixin}). While holding a magazine, the free hand
+     * (empty, or there would be no grab) shows it; Vivecraft keeps drawing the hand around it.
+     */
+    public static ItemStack heldItem(ItemStack stack, boolean main) {
+        if (!holding || !stack.isEmpty() || heldAmmo.isEmpty() || !VrClientConfig.showSprites()) {
+            return stack;
+        }
+        boolean freeIsMain = VrGunHand.other(heldGunHand) == InteractionHand.MAIN_HAND;
+        return freeIsMain == main ? heldAmmo : stack;
+    }
+
+    /** One of the rounds or magazines the reload takes: from the inventory (as it looks there), else a new one (creative). */
+    private static ItemStack ammoStack(LocalPlayer player, InteractionHand gunHand) {
+        ItemStack stack = player.getItemInHand(gunHand);
+        if (!(stack.getItem() instanceof GunItem gunItem)) {
+            return ItemStack.EMPTY;
+        }
+        ResourceLocation id = ammoItem(gunItem.getModifiedGun(stack));
+        ItemStack found = Gun.findAmmo(player, id).stack();
+        if (!found.isEmpty()) {
+            return found.copyWithCount(1);
+        }
+        Item item = id == null ? null : ForgeRegistries.ITEMS.getValue(id);
+        return item == null || item == Items.AIR ? ItemStack.EMPTY : new ItemStack(item);
     }
 
     /** The item JEG looks for in the inventory: the reload item for SINGLE_ITEM guns, the round for the rest. */

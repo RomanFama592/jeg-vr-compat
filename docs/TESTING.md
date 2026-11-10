@@ -572,3 +572,18 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] En un servidor solo JEG con la opción encendida: no te podés pegar (la decisión es del servidor).
 - [ ] En un servidor con `pvp=false` en `server.properties` no te podés pegar: Minecraft no deja que un jugador se lastime
   con su propio disparo (lo mismo con una flecha propia).
+
+## F10.3 — Munición en la mano libre
+- [x] (auto) Compila; `checkMixins` sin problemas. Usa el `@ModifyArg` que ya tenía `VRArmHelperVRMixin` sobre el ítem de
+  cada mano (no hay mixins nuevos).
+- [ ] Rifle de cargador en la mano principal: al agarrar en la caja de la cadera, la mano libre muestra el cargador del
+  arma (el mismo ítem que tenés en el inventario) y la mano sigue dibujándose alrededor. Al tocar el pozo, el cargador
+  desaparece y empieza la recarga.
+- [ ] Soltar con otro grip, o la tecla de inspeccionar: el cargador desaparece de la mano.
+- [ ] Escopeta (carga de a uno): cada agarre muestra un cartucho en la mano, que desaparece al meterlo; el siguiente
+  agarre muestra otro.
+- [ ] Con el arma en la mano secundaria (y el addon en el servidor): el cargador aparece en la mano principal.
+- [ ] En creativo sin munición en el inventario: igual se ve el cargador del arma.
+- [ ] Opción "Caja y brillos de recarga" apagada: la mano libre queda vacía al agarrar (como antes).
+- [ ] Si el cargador queda torcido o muy grande en la mano: anotar qué arma y cómo se ve (se puede corregir con una
+  rotación propia para la munición).

@@ -25,7 +25,7 @@
   "jeg_vr_compat.config.gripHint.off": "Apagado",
   "jeg_vr_compat.config.gripHint.off.tooltip": "Sin partículas ni vibración. Las primeras veces que tomás un arma a dos manos, una mano fantasma igual muestra cómo agarrarla.",
   "jeg_vr_compat.config.showSprites": "Caja y brillos de recarga",
-  "jeg_vr_compat.config.showSprites.tooltip": "La caja de munición de JEG va en la cadera mientras tenés un arma, abierta cuando podés agarrar munición, y de ella sale un brillo (azul, verde con la mano adentro). Otro brillo marca dónde entra el cargador (blanco, verde al tocarlo).",
+  "jeg_vr_compat.config.showSprites.tooltip": "La caja de munición de JEG va en la cadera mientras tenés un arma, abierta cuando podés agarrar munición, y de ella sale un brillo (azul, verde con la mano adentro). El cargador o cartucho que agarrás se ve en la mano, y otro brillo marca dónde entra (blanco, verde al tocarlo).",
   "jeg_vr_compat.config.showGuides": "Cajas de ayuda",
   "jeg_vr_compat.config.showGuides.tooltip": "Muestra las cajas de colores de la cadera, el cargador y el guardamanos. También: /jegvr zones.",
   "jeg_vr_compat.config.hudPlacement": "Hotbar con arma en la secundaria",
