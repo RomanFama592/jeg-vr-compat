@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.VR;
 import com.jegvr.config.VrClientConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -23,7 +24,7 @@ import java.util.Locale;
 public final class VrDebugCommands {
     private static final String KEY = "jeg_vr_compat.command.";
     private static final int CAPTURE_SECONDS = 5;
-    private static final int HELP_LINES = 8;
+    private static final int HELP_LINES = 9;
 
     private VrDebugCommands() {
     }
@@ -76,6 +77,13 @@ public final class VrDebugCommands {
 
         root.then(Commands.literal("show").executes(c -> edit(c, p -> {
         })));
+        // The axes of "move" and the rings of "rot", drawn on the main-hand controller.
+        root.then(Commands.literal("axes").executes(c -> {
+            if (!VR.active()) {
+                return reply(c, Component.translatable(KEY + "axes.novr"));
+            }
+            return reply(c, Component.translatable(KEY + (VrAxesGuide.toggle() ? "axes.on" : "axes.off")));
+        }));
         root.then(Commands.literal("zones").executes(c ->
                 reply(c, Component.translatable(KEY + (VrGrabReload.toggleZones() ? "zones.on" : "zones.off")))));
         LiteralArgumentBuilder<CommandSourceStack> grabZone = Commands.literal("grabzone");

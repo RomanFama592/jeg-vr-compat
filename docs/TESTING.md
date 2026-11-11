@@ -615,6 +615,10 @@ Vivecraft 1.3.15). Son los puntos donde el addon toca algo que cambió; unos 10 
 - [ ] Encuadre de la motosierra y el martillo neumático (M.10): con cada una en la mano, la herramienta sale derecha
   hacia adelante desde el control (la espada de la motosierra, de canto; la punta del martillo, al frente) y la mano
   queda en la empuñadura trasera. En la mano izquierda, igual en espejo. Si queda corrida, `/jegvr move` y `/jegvr save`.
+- [ ] `/jegvr axes` (F9.32) con un arma en la principal: sobre el control salen tres flechas (X roja a la derecha, Y verde
+  arriba, Z azul hacia vos) y tres círculos con marcas cada 90 y 45 grados. `/jegvr rot 0 45 0` mueve la línea clara del
+  círculo verde hasta la primera marca corta, del lado de la punta de flecha, y el arma gira hacia ese mismo lado. Se va
+  al repetir el comando y al cambiar de arma. En plano responde que hace falta VR. Con shaders se ve en los dos ojos.
 - [ ] Vibración (M.11): disparar un rifle con la mano libre vacía y sin agarrarlo vibra solo el control del arma; en modo
   precisión vibran los dos; con el arma en la secundaria vibra solo ese.
 - [ ] Mover con fuerza la motosierra, el martillo, el Libro de Salmos o la pistola de dedos no pega como espada.

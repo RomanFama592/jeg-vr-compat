@@ -6,6 +6,7 @@ import com.jegvr.config.VrClientConfig;
 import com.jegvr.config.VrServerConfig;
 import com.jegvr.client.VrRulesClient;
 import com.jegvr.client.VrConfigScreen;
+import com.jegvr.client.VrAxesGuide;
 import com.jegvr.client.VrDebugCommands;
 import com.jegvr.client.VrGunConfig;
 import com.jegvr.client.VrDiag;
@@ -74,6 +75,7 @@ public class JegVrCompat {
         if (ModList.get().isLoaded("jeg")) {
             // These classes use JEG types: only register them when JEG is present.
             MinecraftForge.EVENT_BUS.register(VrDebugCommands.class);
+            MinecraftForge.EVENT_BUS.register(VrAxesGuide.class);
             MinecraftForge.EVENT_BUS.register(VrGunConfig.class);
             MinecraftForge.EVENT_BUS.register(VrRecoil.class);
             MinecraftForge.EVENT_BUS.register(VrOffhandShooting.class);
