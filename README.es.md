@@ -12,8 +12,11 @@ Addon no oficial para Forge 1.20.1 que hace jugable [Just Enough Guns](https://m
 ## Requisitos
 
 - Minecraft 1.20.1, Forge 47.2+
-- Just Enough Guns 0.13.2, con Framework y GeckoLib
-- Vivecraft 1.20.1-1.2.5
+- Just Enough Guns 0.13.2 o 0.14.x, con Framework y GeckoLib
+- Vivecraft 1.20.1-1.2.5 o 1.20.1-1.3.x
+
+El mismo archivo sirve para cualquier combinación de esas versiones. JEG 0.14 y Vivecraft 1.3 están comprobados de forma
+automática, pero todavía no se jugaron en VR de punta a punta.
 
 Se instala en el cliente. También en el servidor, suma las armas en la mano libre, las balas que salen de la boca del
 arma, y deja que el servidor decida algunas opciones de VR (`serverconfig/jeg_vr_compat-server.toml` en la carpeta del
@@ -43,9 +46,10 @@ El jar que se usa es `build/libs/jeg_vr_compat-<versión>.jar`. El `-slim` no tr
 
 | Tarea | Qué hace |
 |---|---|
-| `./gradlew runClient` | Cliente de prueba (sumá `-PnoVivecraft`, o `-Pcompat` para Embeddium y Oculus) |
-| `./gradlew runClientAudit` | Aplica todos los mixins, anota los que fallan y cierra |
-| `./gradlew checkMixins` | Revisa los nombres de los mixins contra los jars que tienen los jugadores (necesita Python) |
+| `./gradlew runClient` | Cliente de prueba con el JEG y el Vivecraft más viejos que se soportan (sumá `-Platest`, `-PlatestJeg` o `-PlatestVivecraft` para los más nuevos, `-PnoVivecraft`, o `-Pcompat` para Embeddium y Oculus) |
+| `./gradlew runClientAudit` | Aplica todos los mixins, anota los que fallan y cierra (mismas opciones) |
+| `./gradlew checkMixins` | Revisa los nombres de los mixins contra los jars que tienen los jugadores, en cada versión soportada (necesita Python) |
+| `./gradlew checkMatrix` | Compila contra cada combinación soportada de JEG y Vivecraft, y después `checkMixins` |
 | `./gradlew test` | Pruebas de la matemática pura: ángulos de puntería, cajas de recarga y precisión, archivos de poses, caras espejadas |
 | `tools/jegdiff.sh <jar viejo> <jar nuevo>` | Antes de soportar otra versión de JEG: qué clases y nombres de JEG que usa el addon cambiaron |
 

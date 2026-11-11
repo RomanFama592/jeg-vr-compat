@@ -34,7 +34,21 @@ El token no va nunca en un archivo del repo.
    revisión) y en **Releases** de GitHub.
 
 El workflow frena antes de publicar si la etiqueta no coincide con `mod_version`, si el `CHANGELOG.md` no tiene la
-sección de esa versión o si todavía dice `(unreleased)`, o si fallan la compilación o las pruebas.
+sección de esa versión o si todavía dice `(unreleased)`, o si fallan la compilación, las pruebas o `checkMatrix`
+(el addon contra cada combinación soportada de JEG y Vivecraft).
+
+**Cuando sale una versión nueva de JEG o de Vivecraft** dentro de los rangos de `gradle.properties` (JEG 0.14.x,
+Vivecraft 1.3.x), antes de anunciar que anda:
+
+1. Poner la versión en `jeg_version_latest` o `vivecraft_version_latest` (o probarla sin tocar el archivo:
+   `-Pjeg_version_latest=0.14.6`).
+2. `./gradlew checkMatrix`.
+3. `./gradlew runClientAudit -Platest` y `python tools/check_audit.py <ruta a javap>`: sin errores del addon y sin
+   enganches sueltos.
+4. El checklist corto en VR de [TESTING.md](TESTING.md) ("Fase M").
+
+Una versión fuera de los rangos (JEG 0.15, Vivecraft 1.4) no carga con el addon: Forge muestra su pantalla de error.
+Para aceptarla hay que repetir esos pasos y ampliar el rango.
 
 **Tipo de versión:** `0.x` sale como *alpha*; si la versión dice `beta` (p. ej. `0.5.0-beta`), como *beta*; de `1.0.0`
 en adelante, como *release*.

@@ -1,7 +1,8 @@
 # Compatibilidad con mods de optimización y shaders
 
 Estado al 2026-11-07, con JEG 0.13.2 y Vivecraft 1.20.1-1.2.5. "Mixins OK" significa que todos los mixins aplicaron juntos
-sin errores, no que se vea bien en VR.
+sin errores, no que se vea bien en VR. Las versiones de JEG y Vivecraft que acepta el addon están en
+[Versiones de JEG y Vivecraft](#versiones-de-jeg-y-vivecraft), al final.
 
 Las pruebas con visor se hicieron con unas **Meta Quest 3 a través de SteamVR**. Otros visores y runtimes no están
 probados.
@@ -98,3 +99,39 @@ Para revisar los nombres en producción (necesita Python):
 ```bash
 ./gradlew checkMixins
 ```
+
+## Versiones de JEG y Vivecraft
+
+Desde la Fase M (2026-11-11) un mismo jar sirve para dos líneas de cada mod. `mods.toml` acepta **JEG `[0.13.2,0.15)`** y
+**Vivecraft `[1.20.1-1.2.5,1.20.1-1.4)`**; con otra versión, Forge muestra su pantalla de error en lugar de crashear en
+medio de una partida.
+
+| | Vivecraft 1.2.5 | Vivecraft 1.3.x |
+|---|---|---|
+| **JEG 0.13.2** | Jugado en VR (es la combinación de las versiones 0.1 y 0.2 del addon) | Automático; falta jugarlo en VR |
+| **JEG 0.14.x** | Automático; falta jugarlo en VR | Automático; falta jugarlo en VR |
+
+"Automático" es todo esto, sin visor:
+
+| Qué | Cómo | Resultado (2026-11-11) |
+|---|---|---|
+| El código compila contra las cuatro combinaciones | `./gradlew checkMatrix` (JEG 0.13.2 y 0.14.5, Vivecraft 1.2.5 y 1.3.15) | Compila |
+| Los nombres que usan los mixins existen en los jars que tienen los jugadores | `./gradlew checkMixins`, en las cuatro combinaciones | 0 problemas |
+| Lo mismo contra las versiones intermedias | `checkMatrix` con `-Pvivecraft_version_latest` (1.3.0, 1.3.2 a 1.3.9 y 1.3.13) y `-Pjeg_version_latest` (0.14.0 a 0.14.4) | Las 15 compilan, con 0 problemas |
+| Cada mixin se aplica en el juego | `./gradlew runClientAudit` con cada combinación (`-PlatestJeg`, `-PlatestVivecraft`, `-Platest`), y `tools/check_audit.py`: ningún enganche queda sin su punto de inyección | Las cuatro: sin errores y sin enganches sueltos. También con los extremos de cada línea (Vivecraft 1.3.0, JEG 0.14.0) y con Embeddium + Oculus sobre las versiones nuevas |
+| Se elige el código de la línea correcta | La línea `Detected JEG ... / Vivecraft ... (vc12 o vc13)` del log | Correcta en las cuatro |
+
+Lo que cambia entre las líneas, para quien lea un reporte:
+
+- **Vivecraft 1.3** reorganizó la interacción: la hotbar que se toca con la mano es un módulo
+  (`InteractiveHotbarModule`), los trackers procesan en `activeProcess`, y trae una API oficial (`org.vivecraft.api`). El
+  addon usa esa API para saber si hay VR, quién juega en VR, la vibración, el modo sentado, la mano hábil, la escala de
+  mundo y qué vista se dibuja. Las poses de los controles salen de los mismos internos en las dos líneas, para que un
+  arma quede exactamente igual en una que en otra.
+- **JEG 0.14** agrega la motosierra y el martillo neumático (minan en lugar de disparar), el Libro de Salmos, el lanzador
+  bajo el cañón, el disparo desde una montura y las cajas de suministros, y calienta las armas por disparo en lugar de
+  por tiempo. El addon sigue esas reglas en la mano secundaria; las mecánicas nuevas funcionan como en JEG, sin gestos de
+  VR propios todavía.
+- Al cambiar de Vivecraft 1.2 a 1.3 con la misma carpeta de configuración, Vivecraft anota un error al leer una opción
+  vieja (`WeaponCollision`). Es de Vivecraft y no afecta al addon.
+

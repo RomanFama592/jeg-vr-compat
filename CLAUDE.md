@@ -1,13 +1,17 @@
 # JEG x Vivecraft — Addon de compatibilidad VR
 
-Addon de Forge 1.20.1 (`jeg_vr_compat`) que hace compatible **Just Enough Guns 0.13.2**
-(https://github.com/MigaMiDev/Just-Enough-Guns) con **Vivecraft** sin modificar ninguno de los dos.
+Addon de Forge 1.20.1 (`jeg_vr_compat`) que hace compatible **Just Enough Guns** (0.13.2 y 0.14.x,
+https://github.com/MigaMiDev/Just-Enough-Guns) con **Vivecraft** (1.2.5 y 1.3.x) sin modificar ninguno de los dos.
+Un mismo jar sirve para las cuatro combinaciones (Fase M).
 El plan de trabajo detallado está en `notas/PLAN.md` (privado: fuera de git, junto con `notas/AUDITORIA.md` y `notas/PUBLICACION.md`). Leelo antes de empezar y marcá las tareas a medida que se completen.
 
 ## Stack
 - Minecraft 1.20.1, Forge 47.2.x, ForgeGradle 6, Java 17, mappings oficiales (Mojang).
-- JEG 0.13.2 (paquete raíz `ttv.migami.jeg`), usa GeckoLib `4.4.4` para armas animadas.
-- Vivecraft **1.20.1-1.2.5-forge** (decisión del usuario). Solo trae `org.vivecraft.api_beta` (`VivecraftAPI.isVRPlayer`, `VivecraftClientAPI.isVrActive`); el resto se toma de internals (`VRPlayer.get().vrdata_world_render`: `c0` mano principal, `c1` libre, `hmd`; `MCVR.get().triggerHapticPulse`; `ClientDataHolderVR.getInstance().vrSettings.reverseHands`). `VivecraftBridge` los llama directo (Vivecraft es `compileOnly` + `runtimeOnly`), sin reflexión; `VR` captura `Throwable` y se desactiva si algo falla.
+- JEG **0.13.2** y **0.14.5** (paquete raíz `ttv.migami.jeg`), usa GeckoLib `4.4.4` para armas animadas. `main` se compila
+  contra 0.13.2; lo que solo existe en 0.14 se reconoce por nombre (`compat/jeg/JegItems`) o por versión (`compat/Versions`).
+- Vivecraft **1.20.1-1.2.5-forge** y **1.20.1-1.3.15-forge**. 1.2 solo trae `org.vivecraft.api_beta` (`VivecraftAPI.isVRPlayer`, `VivecraftClientAPI.isVrActive`); 1.3 trae la API oficial `org.vivecraft.api` (`VRAPI`, `VRClientAPI`, `VRRenderingAPI`; `RenderPass` pasó a `org.vivecraft.api.client.data`). El resto se toma de internals que no cambiaron entre las dos (`VRPlayer.get().vrdata_world_render`: `c0` mano principal, `c1` libre, `hmd`; `MCVR.get().triggerHapticPulse`; `ClientDataHolderVR.getInstance().vrSettings.reverseHands`). Los bridges los llaman directo (Vivecraft es `compileOnly` + `runtimeOnly`), sin reflexión; `VR` captura `Throwable` y se desactiva si algo falla.
+- Tres source sets en un jar: `main` (compila contra las cuatro combinaciones), `src/vc12` (contra Vivecraft 1.2.5) y `src/vc13` (contra 1.3.15). `compat/Versions` detecta qué hay instalado sin cargar clases, y de ahí salen el bridge y los mixins.
+- ForgeGradle solo desofusca **una** versión de cada mod por build (dos se pisan en su configuración interna de originales). La otra versión se usa tal como se publica (`jegDependency`/`vivecraftDependency` en `build.gradle`): sus nombres propios y los nombres de clase del juego son los mismos, que es lo que el compilador necesita.
 - JEG requiere además **MrCrayfish Framework >= 0.7.0** (obligatorio) y GeckoLib >= 4.4.4. Vienen de repositorios públicos, sin archivos locales: JEG de Modrinth Maven (`maven.modrinth:just-enough-guns`, el mismo jar que publica Modrinth) y Framework de Curse Maven (`curse.maven:framework-549225:<id de archivo>`, porque no está en Modrinth). Se compila y se prueba con Framework 0.7.12. Las versiones están en `gradle.properties`.
 - Toolchain local (no instalado en el sistema): JDK 17 en `.tools/jdk-17*`, Gradle wrapper 8.1.1. Usar `JAVA_HOME=.tools/jdk-17.0.20.1+1`.
 - Mixin (SpongePowered) + MixinExtras 0.3.5 (`@WrapWithCondition`, `@WrapOperation`).
@@ -21,11 +25,13 @@ El plan de trabajo detallado está en `notas/PLAN.md` (privado: fuera de git, ju
    `mixins` del json, solo requieren `jeg`; nunca importan clases de cliente ni de Vivecraft).
 2. **Flat intacto.** Toda intervención está detrás de `VR.active()` (jugador local) o `VR.isVRPlayer(p)`
    (jugadores remotos). Con VR apagado o Vivecraft ausente, el comportamiento debe ser idéntico al de JEG.
-3. **Vivecraft opcional.** Fuera de los mixins (que `JegVrMixinPlugin` condiciona), ninguna clase salvo
-   `compat/vivecraft/VivecraftBridge.java` puede importar `org.vivecraft.*`. Lo que se le pide a un mod de VR está en
+3. **Vivecraft opcional.** Fuera de los mixins (que `JegVrMixinPlugin` condiciona), ninguna clase salvo las de
+   `compat/vivecraft/` puede importar `org.vivecraft.*`. Lo que se le pide a un mod de VR está en
    la interfaz `compat/VrBackend`, y el resto del addon usa `VR`, que comprueba `ModList.isLoaded("vivecraft")` antes de
-   crear el backend. Una línea nueva de Vivecraft es otra implementación de `VrBackend`.
-4. **Mixins condicionales.** `JegVrMixinPlugin.shouldApplyMixin` devuelve false si falta `jeg` o `vivecraft`.
+   crear el backend. `VR` nombra el bridge (`Versions.vivecraft().bridgeClass()`) y lo crea por reflexión: nunca lo
+   referencia, para que no se cargue el de la otra línea. Una línea nueva de Vivecraft es otro bridge y otro source set.
+4. **Mixins condicionales.** `JegVrMixinPlugin.shouldApplyMixin` devuelve false si falta `jeg` o `vivecraft`, y para los
+   mixins de `mixin.vc12` / `mixin.vc13` cuando el Vivecraft instalado es de la otra línea.
 5. Mixins sobre clases de JEG: `@Mixin(value = X.class, remap = false)`; los `@At(INVOKE)` que apuntan a
    métodos vanilla llevan `remap = true`.
 6. No esconder bones de GeckoLib para quitar brazos: los hijos (cargador en mano, balas) deben seguir visibles.
@@ -40,6 +46,13 @@ El plan de trabajo detallado está en `notas/PLAN.md` (privado: fuera de git, ju
     comportamiento actual por defecto; `guns.json` lleva `schema`. No se renombran teclas `key.jeg_vr_compat.*` ni
     subcomandos de `/jegvr`. Datos propios en ítems: bajo un sub-compuesto `jeg_vr_compat`. Mejora nueva: con su
     interruptor. Textos para el jugador: en `en_us` y `es_es`. Claves y constantes de JEG: en `compat/jeg/JegKeys`.
+11. **Dos versiones de cada mod.** `main` tiene que compilar contra las cuatro combinaciones: no puede nombrar una clase,
+    un campo ni un método que solo exista en una versión. Lo exclusivo de una línea de Vivecraft va en `src/vc12` o
+    `src/vc13` (un bridge, o un mixin en `mixin.vc12` / `mixin.vc13`, sin `@At` a métodos vanilla: esos source sets no
+    tienen refmap). Un método que cambió de nombre se nombra con los dos (`{"doProcess", "activeProcess"}`), y un handler
+    de `@Inject` puede no tomar los argumentos del método si su tipo cambió. Una clase que solo existe en JEG 0.14 se
+    reconoce por nombre en `compat/jeg/JegItems`. Después de tocar algo de esto, `./gradlew checkMatrix` y
+    `runClientAudit` con cada combinación.
 
 ## Estructura esperada
 En la raíz solo van `README.md` (inglés), `README.es.md` (español, mismo contenido), `CHANGELOG.md`, `LICENSE`, `.github/` (plantillas de issues), este
@@ -49,8 +62,10 @@ src/main/java/com/jegvr/
   JegVrCompat.java                 # @Mod("jeg_vr_compat")
   compat/VR.java                   # fachada segura
   compat/VrBackend.java            # lo que se le pide a un mod de VR
-  compat/vivecraft/VivecraftBridge.java  # VrBackend para Vivecraft 1.2
+  compat/Versions.java             # qué JEG y qué Vivecraft hay instalados (sin cargar clases); elige bridge y mixins
+  compat/vivecraft/VivecraftBridge.java  # la parte de VrBackend común a Vivecraft 1.2 y 1.3 (abstracta)
   compat/jeg/JegKeys.java          # claves NBT y constantes privadas de JEG
+  compat/jeg/JegItems.java         # tipos de ítem que solo tiene JEG 0.14, por nombre
   mixin/JegVrMixinPlugin.java
   mixin/render/GunRenderingHandlerVRMixin.java
   mixin/render/AnimatedGunRendererVRMixin.java
@@ -73,6 +88,8 @@ src/main/java/com/jegvr/
   config/VrRules.java              # reglas del servidor y cómo se combinan con la opción del jugador (tiene pruebas)
   server/VrServerRules.java        # C2SVrHello -> S2CVrRules; quién juega en VR; reenvío al editar el archivo
   client/VrRulesClient.java        # reglas recibidas; se borran al salir
+src/vc12/java/com/jegvr/         # solo Vivecraft 1.2: compat/vivecraft/Vivecraft12Bridge, mixin/vc12/HotbarTouchVRMixin
+src/vc13/java/com/jegvr/         # solo Vivecraft 1.3: compat/vivecraft/Vivecraft13Bridge, mixin/vc13/HotbarTouchVRMixin
 src/main/resources/
   META-INF/mods.toml
   jeg_vr_compat.mixins.json
@@ -94,8 +111,10 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 
 ## Comandos
 - `./gradlew build` — compila (debe pasar sin warnings de mixin). Publicar `build/libs/jeg_vr_compat-<versión>.jar`, nunca el `-slim`.
-- `./gradlew runClientAudit [-Pcompat]` — aplica todos los mixins de todos los mods, loguea lo que falla y cierra (carpeta `run-audit/`, VR apagado). `-Pcompat` suma Embeddium y Oculus.
-- `./gradlew checkMixins` — revisa los nombres de los mixins `remap = false` contra los jars que tienen los jugadores (necesita Python).
+- Versiones de una corrida: por defecto las más viejas (JEG 0.13.2 + Vivecraft 1.2.5, con las que se compila el jar). `-PlatestJeg`, `-PlatestVivecraft` o `-Platest` (las dos) usan las más nuevas, en `runClient`, `runClientAudit` y `runServer`.
+- `./gradlew runClientAudit [-Pcompat]` — aplica todos los mixins de todos los mods, loguea lo que falla y cierra (carpeta `run-audit/`, VR apagado). `-Pcompat` suma Embeddium y Oculus. Después, `python tools/check_audit.py <javap>` lista los handlers `require = 0` que no encontraron dónde inyectar (el log no lo dice). El log trae el perfil: `Detected JEG 0.14.5 [mining, mounts] / Vivecraft 1.20.1-1.3.15 (vc13)`.
+- `./gradlew checkMixins` — revisa los nombres de los mixins `remap = false` contra los jars que tienen los jugadores, en las cuatro combinaciones (necesita Python).
+- `./gradlew checkMatrix` — compila `main` contra las cuatro combinaciones, `vc12` y `vc13` contra su Vivecraft, y corre `checkMixins`. Para probar otra versión puntual: `-Pjeg_version_latest=0.14.3` o `-Pvivecraft_version_latest=1.20.1-1.3.13-forge`.
 - `./gradlew test` — pruebas de la matemática pura (`src/test`). La lógica nueva que se pueda separar del juego va en una clase sin
   estado de Vivecraft ni de Forge (como `VrZones`, `VrGunPoseFile`) y suma su prueba.
 - `tools/jegdiff.sh <jar viejo> <jar nuevo>` — antes de soportar otra versión de JEG: qué clases de JEG que usa el addon

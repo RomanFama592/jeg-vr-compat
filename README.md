@@ -12,8 +12,11 @@ Unofficial Forge 1.20.1 addon that makes [Just Enough Guns](https://modrinth.com
 ## Requirements
 
 - Minecraft 1.20.1, Forge 47.2+
-- Just Enough Guns 0.13.2, with Framework and GeckoLib
-- Vivecraft 1.20.1-1.2.5
+- Just Enough Guns 0.13.2 or 0.14.x, with Framework and GeckoLib
+- Vivecraft 1.20.1-1.2.5 or 1.20.1-1.3.x
+
+The same file works with any combination of those. JEG 0.14 and Vivecraft 1.3 are checked automatically but not yet
+played through in VR.
 
 Install it on the client. Also installed on the server, it adds off-hand guns and bullets that start at the muzzle,
 and lets the server decide some VR options (`serverconfig/jeg_vr_compat-server.toml` in the world folder).
@@ -42,9 +45,10 @@ The jar to use is `build/libs/jeg_vr_compat-<version>.jar`. The `-slim` one lack
 
 | Task | What it does |
 |---|---|
-| `./gradlew runClient` | Test client (add `-PnoVivecraft` or `-Pcompat` for Embeddium and Oculus) |
-| `./gradlew runClientAudit` | Applies every mixin, logs failures and closes |
-| `./gradlew checkMixins` | Checks mixin names against the jars players have (needs Python) |
+| `./gradlew runClient` | Test client with the oldest supported JEG and Vivecraft (add `-Platest`, `-PlatestJeg` or `-PlatestVivecraft` for the newest, `-PnoVivecraft`, or `-Pcompat` for Embeddium and Oculus) |
+| `./gradlew runClientAudit` | Applies every mixin, logs failures and closes (same options) |
+| `./gradlew checkMixins` | Checks mixin names against the jars players have, for every supported version (needs Python) |
+| `./gradlew checkMatrix` | Compiles against every supported combination of JEG and Vivecraft, then `checkMixins` |
 | `./gradlew test` | Unit tests of the pure math: aim angles, reload and precision boxes, gun pose files, mirrored faces |
 | `tools/jegdiff.sh <old jar> <new jar>` | Before supporting a new JEG: which JEG classes and names the addon uses changed |
 

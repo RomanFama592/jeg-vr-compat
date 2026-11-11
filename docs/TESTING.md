@@ -30,7 +30,7 @@ Oculus en plano.
 - [x] Con shaders, láser del arco compuesto: se ve bien (usuario, 2026-11-07).
 - [x] Crash de Acedium: sin Acedium, apagar y prender shaders en un mundo no crashea (usuario, 2026-11-07).
 - [ ] (opcional) Con Acedium y sin el addon: confirmar que crashea igual.
-- [ ] Versión equivocada: con Vivecraft 1.3 o JEG 0.14, Forge muestra el error de versión en lugar de crashear.
+- [ ] Versión equivocada: con Vivecraft 1.2.4 o JEG 0.13.1 (desde la Fase M se aceptan Vivecraft 1.3 y JEG 0.14), Forge muestra el error de versión en lugar de crashear.
 - [x] VR: arma en la mano izquierda (espejada): caras correctas, sin agujeros ni bajones de FPS (usuario, 2026-11-08).
 - [ ] VR: dos armas animadas distintas: recargar una y disparar otra no anima a la otra, tampoco en la hotbar (G2).
 - [ ] `guns.json`: romperlo a propósito con el juego abierto: un solo error en el log; al arreglarlo, se aplica solo.
@@ -566,3 +566,55 @@ Reemplaza al brillo sobre el arma (descartado: se perdía al cambiar de arma y n
 - [ ] Opción "Caja y brillos de recarga" apagada: la mano libre queda vacía al agarrar (como antes).
 - [ ] Si el cargador queda torcido o muy grande en la mano: anotar qué arma y cómo se ve (se puede corregir con una
   rotación propia para la munición).
+
+## Fase M — JEG 0.14 y Vivecraft 1.3 (M.7)
+Un mismo jar para JEG {0.13.2, 0.14.x} × Vivecraft {1.2.5, 1.3.x}. En desarrollo, las versiones se eligen con
+`-PlatestJeg`, `-PlatestVivecraft` o `-Platest`; en un modpack, cambiando los jars de JEG y de Vivecraft.
+- [x] (auto) `./gradlew build checkMatrix`: compila contra las cuatro combinaciones, `checkMixins` sin problemas en las
+  cuatro y pruebas de `Versions` (línea de Vivecraft, comparación de versiones).
+- [x] (auto) `runClientAudit` con las cuatro combinaciones: sin errores del addon, y `tools/check_audit.py` no encuentra
+  enganches sin punto de inyección. El log dice el perfil correcto en cada una (`vc12` o `vc13`).
+- [x] (auto) El jar trae `Vivecraft12Bridge`, `Vivecraft13Bridge` y los dos `HotbarTouchVRMixin`, con los nombres del
+  juego ya traducidos.
+- [x] (auto) `runClientAudit -Platest -Pcompat` (Embeddium y Oculus con JEG 0.14.5 y Vivecraft 1.3.15): igual.
+- [x] (auto) Versiones intermedias: `checkMatrix` contra Vivecraft 1.3.0, 1.3.2 a 1.3.9 y 1.3.13, y JEG 0.14.0 a 0.14.4
+  (compila y 0 problemas en las 15); `runClientAudit` con los extremos, Vivecraft 1.3.0 y JEG 0.14.0: igual.
+
+**En VR, con cada combinación nueva** (JEG 0.13.2 + Vivecraft 1.3.15; JEG 0.14.5 + Vivecraft 1.2.5; JEG 0.14.5 +
+Vivecraft 1.3.15). Son los puntos donde el addon toca algo que cambió; unos 10 minutos por combinación:
+- [ ] El log tiene `Detected JEG <versión> / Vivecraft <versión> (vc12 o vc13)` y `VR backend: Vivecraft 1.2` o `1.3`,
+  y ninguna línea `Vivecraft bridge failed`.
+- [ ] El arma sigue la mano y la bala va adonde apunta el cañón (en un mundo propio sale de la boca del arma).
+- [ ] Vibra al disparar, en la mano del arma (en 1.3 la vibración va por la API nueva).
+- [ ] Recarga a mano: caja en la cadera, cargador en la mano libre, entra al tocar el arma.
+- [ ] Modo precisión con un rifle: mientras se agarra con las dos manos, tocar la hotbar con la mano, los botones de
+  hotbar y llevar la mano al hombro no cambian de ítem. Al soltar, vuelven a funcionar. (En 1.3 es un mixin distinto.)
+- [ ] Con el HUD de Vivecraft en la mano o la muñeca y un arma en la mano libre: el HUD va al antebrazo o al codo según
+  la opción, y la hotbar se toca donde se ve.
+- [ ] Golpe con el arma (moverla con fuerza contra un mob): pega con el daño de JEG.
+- [ ] Granada: se lanza con el gatillo o con el gesto, y sale de la mano.
+- [ ] Destello de la granada aturdidora y humo: cubren lo que ve cada ojo.
+- [ ] Recargar un arma animada: las manos siguen la animación y vuelven a los controles; con la mano hábil izquierda,
+  cada mano dibuja la que corresponde.
+- [ ] Arma en la mano secundaria (con el addon en el servidor o en un mundo propio): dispara con su gatillo, no
+  teletransporta, y los paneles muestran su munición.
+- [ ] Con un arma en la mano no se ve la mira de Vivecraft en el mundo.
+- [ ] Cámara en tercera persona o espejo de Vivecraft: el arma se ve una sola vez y en la mano.
+- [ ] Modo sentado de Vivecraft: se puede disparar y recargar con botón; la recarga a mano queda apagada.
+
+**Solo con JEG 0.14:**
+- [ ] Un arma que se sobrecalienta (minigun, lanzallamas) en la mano secundaria: se calienta por disparo, al mismo
+  ritmo que en la principal, y se enfría igual.
+- [ ] Motosierra y martillo neumático en la mano principal: minan hacia donde apunta el arma (el rayo sale de los ojos,
+  como en JEG). En la mano secundaria el gatillo no los acciona y el teletransporte sigue andando.
+- [ ] Mover con fuerza la motosierra, el martillo, el Libro de Salmos o la pistola de dedos no pega como espada.
+- [ ] Armas nuevas (Rusty Striker, Dummy Tommy, Libro de Salmos, motosierra, martillo): cómo quedan en la mano. Si alguna
+  queda torcida, calibrarla con `/jegvr` (ver [COMANDOS.md](COMANDOS.md)) y anotarla.
+- [ ] La bengala (ahora llama al Terror Phantom): se lanza como las granadas, con el gatillo o con el gesto.
+- [ ] Lanzador bajo el cañón: se dispara con agacharse + correr + gatillo, como en JEG (incómodo en VR: anotar).
+- [ ] Montado en el Terror Phantom con la mano vacía: el gatillo dispara.
+
+**Con JEG 0.13.2 + Vivecraft 1.2.5** (lo que ya andaba): repetir tres puntos que cambiaron por dentro.
+- [ ] HUD en el antebrazo con un arma en la mano libre, y tocar la hotbar ahí.
+- [ ] Hotbar bloqueada en el modo precisión (tocar con la mano).
+- [ ] Golpe con el arma.

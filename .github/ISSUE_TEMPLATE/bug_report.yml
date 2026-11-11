@@ -36,7 +36,7 @@ body:
     id: versions
     attributes:
       label: Forge, Just Enough Guns and Vivecraft versions
-      placeholder: "Forge 47.2.0, JEG 0.13.2, Vivecraft 1.20.1-1.2.5"
+      placeholder: "Forge 47.2.0, JEG 0.14.5, Vivecraft 1.20.1-1.3.15 (the log has a line starting with 'Detected JEG')"
     validations:
       required: true
   - type: dropdown
