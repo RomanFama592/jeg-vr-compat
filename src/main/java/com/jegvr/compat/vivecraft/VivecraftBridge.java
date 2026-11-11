@@ -4,16 +4,11 @@ import com.jegvr.compat.VR;
 import com.jegvr.compat.VrBackend;
 import com.jegvr.mixin.input.MCOpenVRAccessor;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.world.entity.player.Player;
-import org.vivecraft.client.network.ClientNetworking;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.vivecraft.api_beta.VivecraftAPI;
 import org.vivecraft.client.VivecraftVRMod;
-import org.vivecraft.api_beta.client.VivecraftClientAPI;
 import org.vivecraft.client_vr.ClientDataHolderVR;
 import org.vivecraft.client_vr.VRData;
 import org.vivecraft.client_vr.gameplay.VRPlayer;
@@ -22,30 +17,17 @@ import org.vivecraft.client_vr.provider.ControllerType;
 import org.vivecraft.client_vr.provider.MCVR;
 import org.vivecraft.client_vr.provider.openvr_lwjgl.MCOpenVR;
 import org.vivecraft.client_vr.provider.openvr_lwjgl.VRInputAction;
-import org.vivecraft.client_vr.render.RenderPass;
 import org.vivecraft.client_vr.settings.VRSettings;
 import org.vivecraft.mod_compat_vr.shaders.ShadersHelper;
 
 /**
- * {@link VrBackend} for Vivecraft 1.2.x. Outside the mixins, the only class that touches Vivecraft directly. Never load it
- * unless the "vivecraft" mod is present; go through {@link VR}.
+ * The part of {@link VrBackend} that is the same for every supported line of Vivecraft: internals whose names and types
+ * did not change between 1.2.5 and 1.3.15 ({@code checkMatrix} compiles this class against both). What differs is in
+ * {@code Vivecraft12Bridge} and {@code Vivecraft13Bridge}, each in the source set compiled against its Vivecraft
+ * ({@code src/vc12}, {@code src/vc13}); {@link VR} picks one at startup. Outside the mixins, these are the only classes
+ * that touch Vivecraft directly. Never load them unless the "vivecraft" mod is present; go through {@link VR}.
  */
-public final class VivecraftBridge implements VrBackend {
-    @Override
-    public String name() {
-        return "Vivecraft 1.2";
-    }
-
-    @Override
-    public boolean isActive() {
-        return VivecraftClientAPI.getInstance().isVrActive() && data() != null;
-    }
-
-    @Override
-    public boolean isVRPlayer(Player player) {
-        return VivecraftAPI.getInstance().isVRPlayer(player);
-    }
-
+public abstract class VivecraftBridge implements VrBackend {
     @Override
     public VR.Aim mainHand() {
         VRData d = data();
@@ -103,11 +85,6 @@ public final class VivecraftBridge implements VrBackend {
     }
 
     @Override
-    public boolean isLeftEyePass() {
-        return ClientDataHolderVR.getInstance().currentPass == RenderPass.LEFT;
-    }
-
-    @Override
     public Vec3[] handAxes(boolean mainHand) {
         VRData d = data();
         VRData.VRDevicePose c = d == null ? null : mainHand ? d.c0 : d.c1;
@@ -134,12 +111,6 @@ public final class VivecraftBridge implements VrBackend {
     public float roomYaw() {
         VRData d = data();
         return d == null ? 0.0F : d.rotation_radians;
-    }
-
-    @Override
-    public boolean isEyePass() {
-        RenderPass pass = ClientDataHolderVR.getInstance().currentPass;
-        return pass != RenderPass.THIRD && pass != RenderPass.CAMERA;
     }
 
     @Override
@@ -205,11 +176,6 @@ public final class VivecraftBridge implements VrBackend {
     }
 
     @Override
-    public void setActiveHand(InteractionHand hand) {
-        ClientNetworking.sendActiveHand(hand);
-    }
-
-    @Override
     public boolean isHudOnHand() {
         VRSettings.HUDLock lock = ClientDataHolderVR.getInstance().vrSettings.vrHudLockMode;
         return lock == VRSettings.HUDLock.HAND || lock == VRSettings.HUDLock.WRIST;
@@ -236,7 +202,8 @@ public final class VivecraftBridge implements VrBackend {
         return ShadersHelper.isShaderActive();
     }
 
-    private static VRData data() {
+    /** The poses the frame is drawn with, or the last ticked ones before the first frame. Null outside VR. */
+    protected static VRData data() {
         VRPlayer vrPlayer = VRPlayer.get();
         if (vrPlayer == null) {
             return null;

@@ -9,7 +9,7 @@ import org.joml.Matrix4f;
 
 /**
  * Everything the addon needs from a VR mod. One implementation per supported line of Vivecraft, chosen by {@link VR} at
- * startup; nothing else outside the mixins touches {@code org.vivecraft.*}. A method may throw: {@link VR} catches it and
+ * startup from {@link Versions}; nothing else outside the mixins touches {@code org.vivecraft.*}. A method may throw: {@link VR} catches it and
  * turns VR support off for the session.
  */
 public interface VrBackend {
@@ -49,6 +49,9 @@ public interface VrBackend {
 
     /** False while a view that is not the player's own eyes is drawn (third-person or mixed-reality camera). */
     boolean isEyePass();
+
+    /** While the VR mod draws the first-person hands: true for the main hand, false for the off hand. */
+    boolean isDrawingMainHand();
 
     /** Vibrates a controller; {@code mainHand} false targets the free hand. */
     void haptic(boolean mainHand, float seconds, float amplitude);

@@ -14,7 +14,8 @@ import org.vivecraft.client_vr.gameplay.trackers.BackpackTracker;
  */
 @Mixin(value = BackpackTracker.class, remap = false)
 public abstract class BackpackTrackerVRMixin {
-    @Inject(method = "doProcess", at = @At("HEAD"), cancellable = true, require = 0)
+    // Vivecraft 1.2 names it doProcess; 1.3, activeProcess.
+    @Inject(method = {"doProcess", "activeProcess"}, at = @At("HEAD"), cancellable = true, require = 0)
     private void jegvr$noBackpackWhileAiming(LocalPlayer player, CallbackInfo ci) {
         if (VrPrecision.locksHotbar()) {
             ci.cancel();

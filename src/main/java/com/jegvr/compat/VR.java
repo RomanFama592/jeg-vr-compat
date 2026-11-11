@@ -1,7 +1,6 @@
 package com.jegvr.compat;
 
 import com.jegvr.JegVrCompat;
-import com.jegvr.compat.vivecraft.VivecraftBridge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -66,17 +65,22 @@ public final class VR {
         return loaded && !broken;
     }
 
-    /** The backend for the Vivecraft that is installed. Only called with Vivecraft present (see the class's Javadoc). */
-    private static VrBackend backend() {
+    /**
+     * The backend for the line of Vivecraft that is installed ({@link Versions#vivecraft}). Each one is compiled against
+     * its own Vivecraft, so it is named here, never referenced: the other line's class must not load. Only called with
+     * Vivecraft present; a failure reaches the caller, which turns VR support off.
+     */
+    private static VrBackend backend() throws ReflectiveOperationException {
         if (backend == null) {
-            backend = new VivecraftBridge();
+            String bridge = Versions.vivecraft().bridgeClass();
+            backend = (VrBackend) Class.forName(bridge).getDeclaredConstructor().newInstance();
         }
         return backend;
     }
 
     /** The VR mod's line for bug reports, or a note that there is none. */
     public static String description() {
-        return loaded() ? backend().name() : "none";
+        return installed(VrBackend::name, "none");
     }
 
     /** Forces the classes we mix into to load now, so injection problems surface at startup. */
@@ -195,6 +199,11 @@ public final class VR {
     /** True while Vivecraft draws the left eye, once per frame; false outside VR. */
     public static boolean isLeftEyePass() {
         return inVr(VrBackend::isLeftEyePass, false);
+    }
+
+    /** While Vivecraft draws the first-person hands: true for the main hand's turn. False outside VR. */
+    public static boolean drawingMainHand() {
+        return inVr(VrBackend::isDrawingMainHand, false);
     }
 
     /** False while Vivecraft draws a view that is not the player's eyes (third-person or mixed-reality camera). */
