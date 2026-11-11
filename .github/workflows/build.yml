@@ -19,6 +19,9 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
       - name: Build and test
         run: ./gradlew build test
+      # Compiles against every supported combination of JEG and Vivecraft and checks the mixin names in their jars.
+      - name: Check every supported version
+        run: ./gradlew checkMatrix
       - uses: actions/upload-artifact@v5
         with:
           name: jeg_vr_compat-${{ github.sha }}

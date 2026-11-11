@@ -53,7 +53,7 @@ jobs:
           fi
 
       - name: Build and test
-        run: ./gradlew build test
+        run: ./gradlew build test checkMatrix
 
       - uses: Kir-Antipov/mc-publish@v3.3
         with:

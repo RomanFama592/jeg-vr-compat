@@ -5,7 +5,11 @@ Development runs on deobfuscated jars, where a method that overrides a vanilla o
 that method has its SRG name (m_108829_), and a remap=false mixin is not translated, so it only fails outside of
 development. This script reads the mixin sources and looks every name up in the original jars:
 
-  python tools/check_mixins.py <javap> <classpath of the original jars, separated by ;>
+  python tools/check_mixins.py <javap> <classpath of the original jars> [mixin source folder]...
+
+Without folders it reads src/main. `./gradlew checkMixins` runs it once per supported combination of JEG and Vivecraft,
+with src/main (the mixins for every version) plus the folder of that Vivecraft's own mixins (src/vc12 or src/vc13). A
+mixin in src/main whose target is named differently in two versions lists both names: one of them has to exist.
 
 Exits with 1 if a name is missing. Run it after any change to a mixin and against every new JEG or Vivecraft version.
 """
@@ -14,10 +18,11 @@ import re
 import subprocess
 import sys
 
-SOURCES = pathlib.Path(__file__).resolve().parent.parent / 'src/main/java/com/jegvr/mixin'
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+DEFAULT_SOURCES = ['src/main/java/com/jegvr/mixin']
 
 
-def main(javap, classpath):
+def main(javap, classpath, folders):
     cache = {}
 
     def dump(cls):
@@ -34,7 +39,8 @@ def main(javap, classpath):
         return name == '<init>' or re.search(r'[\s.]' + re.escape(name) + r'[(;\s]', text) is not None
 
     problems = 0
-    for path in sorted(SOURCES.rglob('*.java')):
+    sources = [path for folder in folders or DEFAULT_SOURCES for path in sorted((ROOT / folder).rglob('*.java'))]
+    for path in sources:
         text = path.read_text(encoding='utf-8')
         header = re.search(r'@Mixin\((.*?)\)\s*\n?public', text, re.S)
         if not header or 'remap = false' not in header.group(1):
@@ -67,4 +73,4 @@ def main(javap, classpath):
 
 
 if __name__ == '__main__':
-    sys.exit(main(sys.argv[1], sys.argv[2]))
+    sys.exit(main(sys.argv[1], sys.argv[2], sys.argv[3:]))
