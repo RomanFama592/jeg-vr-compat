@@ -7,7 +7,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ttv.migami.jeg.common.Gun;
-import ttv.migami.jeg.common.GripType;
 import ttv.migami.jeg.event.GunFireEvent;
 import ttv.migami.jeg.item.GunItem;
 import ttv.migami.jeg.util.GunModifierHelper;
@@ -59,8 +58,8 @@ public final class VrRecoil {
 
         float strength = Mth.clamp(angle / 10.0F, 0.2F, 1.0F);
         VR.haptic(true, 0.06F, strength);
-        // The supporting hand only feels a two-handed gun when it is free, not when it holds its own gun or item.
-        if (!GripType.ONE_HANDED.equals(gun.getGeneral().getGripType()) && event.getEntity().getOffhandItem().isEmpty()) {
+        // The other hand only feels the shot while it holds the gun too (precision mode).
+        if (VrPrecision.active()) {
             VR.haptic(false, 0.05F, strength * 0.6F);
         }
     }
