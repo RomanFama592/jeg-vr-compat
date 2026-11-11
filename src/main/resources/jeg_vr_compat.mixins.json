@@ -5,7 +5,7 @@
   "plugin": "com.jegvr.mixin.JegVrMixinPlugin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "jeg_vr_compat.refmap.json",
-  "mixins": ["server.AttachmentContainerVRMixin", "server.FlashlightEventVRMixin", "server.GunEventBusVRMixin","server.GunModifierHelperVRMixin","server.ProjectileEntityVRMixin", "server.ReloadTrackerVRMixin", "server.ServerPlayHandlerVRMixin", "server.ThrowableItemVRMixin"],
+  "mixins": ["jeg014.HarvestingVRMixin", "server.AttachmentContainerVRMixin", "server.FlashlightEventVRMixin", "server.GunEventBusVRMixin","server.GunModifierHelperVRMixin","server.ProjectileEntityVRMixin", "server.ReloadTrackerVRMixin", "server.ServerPlayHandlerVRMixin", "server.ThrowableItemVRMixin"],
   "client": ["input.AimingHandlerVRMixin", "input.BackpackTrackerVRMixin", "input.BowTrackerVRMixin", "input.MCVRVRMixin", "input.ClientHandlerVRMixin", "input.InspectHandlerVRMixin", "input.ItemCooldownInstanceAccessor", "input.ItemCooldownsAccessor", "input.ShootingHandlerAccessor", "input.SwingTrackerVRMixin","input.KeyMappingAccessor", "input.KeyMappingVRMixin", "input.ReloadHandlerAccessor",
     "input.MCOpenVRAccessor", "input.ReloadHandlerVRMixin", "input.ShootingHandlerVRMixin", "model.ItemInHandLayerVRMixin", "model.OneHandedPoseVRMixin", "model.WeaponPosePitchVRMixin", "model.WeaponPoseVRMixin", "net.C2SMessageShootVRMixin", "recoil.GunRecoilVRMixin", "render.AnimatedGunItemVRMixin", "render.AnimatedGunRendererVRMixin", "render.AnimationProcessorVRMixin", "render.AttachmentScreenVRMixin",
     "render.CrosshairHandlerVRMixin", "render.GuiGraphicsVRMixin", "render.GuiHandlerVRMixin", "render.GuiRendererVRMixin", "render.GunAnimationsVRMixin", "render.GunRenderingHandlerVRMixin", "render.ItemInHandRendererVRMixin", "render.ItemRendererVRMixin",

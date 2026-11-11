@@ -14,11 +14,14 @@ import java.util.Set;
  *   <li>server mixins ({@code mixin.server}) need only JEG, since dedicated servers usually lack Vivecraft;</li>
  *   <li>the rest (client) need both JEG and Vivecraft;</li>
  *   <li>those in {@code mixin.vc12} and {@code mixin.vc13} are for one line of Vivecraft: their targets do not exist
- *   in the other.</li>
+ *   in the other;</li>
+ *   <li>those in {@code mixin.jeg014} (server side, like {@code mixin.server}) need JEG 0.14: they target methods an
+ *   older JEG does not have.</li>
  * </ul>
  */
 public class JegVrMixinPlugin implements IMixinConfigPlugin {
     private static final String SERVER_PACKAGE = "com.jegvr.mixin.server.";
+    private static final String JEG_014_PACKAGE = "com.jegvr.mixin.jeg014.";
 
     private boolean hasJeg;
     private boolean hasVivecraft;
@@ -41,6 +44,9 @@ public class JegVrMixinPlugin implements IMixinConfigPlugin {
         }
         if (mixinClassName.startsWith(SERVER_PACKAGE)) {
             return true;
+        }
+        if (mixinClassName.startsWith(JEG_014_PACKAGE)) {
+            return Versions.jegHasHarvesting();
         }
         return hasVivecraft && Versions.mixinFitsVivecraft(mixinClassName);
     }

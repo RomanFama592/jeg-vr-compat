@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ttv.migami.jeg.common.Gun;
 import ttv.migami.jeg.common.ShootTracker;
 import ttv.migami.jeg.common.network.ServerPlayHandler;
@@ -24,6 +26,7 @@ import ttv.migami.jeg.network.message.C2SMessagePreFireSound;
 import ttv.migami.jeg.network.message.C2SMessageShoot;
 import ttv.migami.jeg.util.GunModifierHelper;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -44,7 +47,10 @@ public final class VrOffhand {
     private static final Map<UUID, ShootTracker> OFF_HAND_TRACKERS = new ConcurrentHashMap<>();
     private static final Set<UUID> RELOADING = ConcurrentHashMap.newKeySet();
 
+    private static final Logger LOGGER = LogManager.getLogger("jeg_vr_compat");
     private static boolean firing;
+    private static Method harvesting;
+    private static boolean harvestingFailed;
     private static boolean attachmentsPass;
     private static boolean clientMenuForOffhand;
 
@@ -53,8 +59,7 @@ public final class VrOffhand {
 
     /** Guns that can be used from the off hand. */
     public static boolean canDualWield(ItemStack stack) {
-        // JEG 0.14's mining guns do not shoot: JEG mines with the main-hand one, from its own code path.
-        return stack.getItem() instanceof GunItem && !JegItems.isHarvestingGun(stack.getItem());
+        return stack.getItem() instanceof GunItem;
     }
 
     /**
@@ -71,10 +76,34 @@ public final class VrOffhand {
         float mainCharge = data.getFloat(JegKeys.CHARGE_PROGRESS);
         data.putFloat(JegKeys.CHARGE_PROGRESS, Mth.clamp(charge, 0.0F, 1.0F));
         try {
-            ServerPlayHandler.handleShoot(new C2SMessageShoot(yaw, pitch), player);
+            C2SMessageShoot shot = new C2SMessageShoot(yaw, pitch);
+            if (JegItems.isHarvestingGun(player.getOffhandItem().getItem())) {
+                harvest(shot, player);
+            } else {
+                ServerPlayHandler.handleShoot(shot, player);
+            }
         } finally {
             data.putFloat(JegKeys.CHARGE_PROGRESS, mainCharge);
             firing = false;
+        }
+    }
+
+    /**
+     * JEG 0.14 sends the shot of a chainsaw or a jackhammer to {@code handleHarvesting} instead of {@code handleShoot}
+     * ({@code C2SMessageShoot.handle}). The method does not exist in the JEG this addon is compiled against, so it is
+     * called by name; {@code mixin.jeg014.HarvestingVRMixin} makes it read the off-hand tool meanwhile.
+     */
+    private static void harvest(C2SMessageShoot shot, ServerPlayer player) {
+        try {
+            if (harvesting == null) {
+                harvesting = ServerPlayHandler.class.getMethod("handleHarvesting", C2SMessageShoot.class, ServerPlayer.class);
+            }
+            harvesting.invoke(null, shot, player);
+        } catch (ReflectiveOperationException e) {
+            if (!harvestingFailed) {
+                harvestingFailed = true;
+                LOGGER.error("JEG's mining handler could not be called for the off-hand tool", e);
+            }
         }
     }
 
@@ -147,6 +176,11 @@ public final class VrOffhand {
     }
 
     /** True while JEG's server code for one action is running on the off-hand gun (server thread only). */
+    /** The hand whose gun JEG's server code is handling right now: the off hand during {@link #fire}. */
+    public static InteractionHand firingHand() {
+        return firing ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
+    }
+
     public static boolean firing() {
         return firing;
     }

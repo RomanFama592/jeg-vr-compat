@@ -130,7 +130,8 @@ Lo que cambia entre las líneas, para quien lea un reporte:
   arma quede exactamente igual en una que en otra.
 - **JEG 0.14** agrega la motosierra y el martillo neumático (minan en lugar de disparar), el Libro de Salmos, el lanzador
   bajo el cañón, el disparo desde una montura y las cajas de suministros, y calienta las armas por disparo en lugar de
-  por tiempo. El addon sigue esas reglas en la mano secundaria; las mecánicas nuevas funcionan como en JEG, sin gestos de
+  por tiempo. El addon sigue esas reglas en la mano secundaria, y con el addon en el servidor la motosierra y el martillo minan
+  desde la herramienta, en cualquiera de las dos manos; el resto de las mecánicas nuevas funciona como en JEG, sin gestos de
   VR propios todavía.
 - Al cambiar de Vivecraft 1.2 a 1.3 con la misma carpeta de configuración, Vivecraft anota un error al leer una opción
   vieja (`WeaponCollision`). Es de Vivecraft y no afecta al addon.

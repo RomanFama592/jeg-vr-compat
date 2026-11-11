@@ -38,9 +38,13 @@ def main(javap, classpath, folders):
             return re.search(r'[\s.]' + pattern + r'\(', text) is not None
         return name == '<init>' or re.search(r'[\s.]' + re.escape(name) + r'[(;\s]', text) is not None
 
+    # Mixins in a jeg014 package target what only JEG 0.14 has: skipped when this classpath has an older JEG.
+    has_jeg_014 = dump('ttv.migami.jeg.item.HarvestingGunItem') is not None
     problems = 0
     sources = [path for folder in folders or DEFAULT_SOURCES for path in sorted((ROOT / folder).rglob('*.java'))]
     for path in sources:
+        if 'jeg014' in path.parts and not has_jeg_014:
+            continue
         text = path.read_text(encoding='utf-8')
         header = re.search(r'@Mixin\((.*?)\)\s*\n?public', text, re.S)
         if not header or 'remap = false' not in header.group(1):

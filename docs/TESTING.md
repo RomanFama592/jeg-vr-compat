@@ -605,8 +605,15 @@ Vivecraft 1.3.15). Son los puntos donde el addon toca algo que cambió; unos 10 
 **Solo con JEG 0.14:**
 - [ ] Un arma que se sobrecalienta (minigun, lanzallamas) en la mano secundaria: se calienta por disparo, al mismo
   ritmo que en la principal, y se enfría igual.
-- [ ] Motosierra y martillo neumático en la mano principal: minan hacia donde apunta el arma (el rayo sale de los ojos,
-  como en JEG). En la mano secundaria el gatillo no los acciona y el teletransporte sigue andando.
+- [ ] Motosierra y martillo neumático (M.8, M.9), en un mundo propio o con el addon en el servidor: rompen el bloque y
+  lastiman al mob que toca la herramienta, hasta 4 bloques desde ella, sin importar adónde mire la cabeza. Probar
+  mirando para otro lado y apuntando la herramienta al bloque.
+- [ ] Lo mismo con la motosierra o el martillo en la mano secundaria, con su gatillo: mina, gasta su combustible y
+  respeta su cadencia; con una en cada mano, cada una mina lo suyo.
+- [ ] (auto) `runClientAudit -Platest`: los cinco enganches de `handleHarvesting` se aplican; con JEG 0.13.2 el mixin
+  se omite. Hecho 2026-11-11.
+- [ ] Vibración (M.11): disparar un rifle con la mano libre vacía y sin agarrarlo vibra solo el control del arma; en modo
+  precisión vibran los dos; con el arma en la secundaria vibra solo ese.
 - [ ] Mover con fuerza la motosierra, el martillo, el Libro de Salmos o la pistola de dedos no pega como espada.
 - [ ] Armas nuevas (Rusty Striker, Dummy Tommy, Libro de Salmos, motosierra, martillo): cómo quedan en la mano. Si alguna
   queda torcida, calibrarla con `/jegvr` (ver [COMANDOS.md](COMANDOS.md)) y anotarla.

@@ -51,7 +51,9 @@ El plan de trabajo detallado está en `notas/PLAN.md` (privado: fuera de git, ju
     `src/vc13` (un bridge, o un mixin en `mixin.vc12` / `mixin.vc13`, sin `@At` a métodos vanilla: esos source sets no
     tienen refmap). Un método que cambió de nombre se nombra con los dos (`{"doProcess", "activeProcess"}`), y un handler
     de `@Inject` puede no tomar los argumentos del método si su tipo cambió. Una clase que solo existe en JEG 0.14 se
-    reconoce por nombre en `compat/jeg/JegItems`. Después de tocar algo de esto, `./gradlew checkMatrix` y
+    reconoce por nombre en `compat/jeg/JegItems`; un método que solo existe en JEG 0.14 se intercepta desde
+    `mixin.jeg014` (en `main`, lista `mixins`: el plugin lo aplica solo con JEG 0.14 y `checkMixins` lo revisa solo contra
+    0.14) y se llama por reflexión. Después de tocar algo de esto, `./gradlew checkMatrix` y
     `runClientAudit` con cada combinación.
 
 ## Estructura esperada
