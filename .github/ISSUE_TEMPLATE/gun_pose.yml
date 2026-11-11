@@ -1,0 +1,51 @@
+name: Gun pose
+description: Share how a gun should sit in the hand, to make it the default for everyone.
+title: "Pose: "
+labels: ["gun pose"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        English or Spanish are both fine. / Podés escribir en inglés o en español.
+
+        Calibrate the gun with `/jegvr` (see `/jegvr help` and `/jegvr axes`), save it with `/jegvr save`, and paste its
+        values here. Accepted poses go into the next version and you are credited in `docs/CREDITOS.md` and in the
+        changelog. By sending a pose you agree to it being published under the project's license (GPL-3.0-or-later).
+  - type: input
+    id: gun
+    attributes:
+      label: Gun
+      description: The item id, as the chat shows it after `/jegvr show` (for example `jeg:minigun`). Guns from other packs that use JEG are welcome too.
+    validations:
+      required: true
+  - type: textarea
+    id: pose
+    attributes:
+      label: Pose
+      description: The line the chat shows after `/jegvr show`, or the gun's entry from `config/jeg_vr_compat/guns.json` (with its `grip`, if you captured one).
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Just Enough Guns, Vivecraft and this addon.
+      placeholder: JEG 0.14.5, Vivecraft 1.20.1-1.3.15, addon 0.3.0-beta
+    validations:
+      required: true
+  - type: input
+    id: headset
+    attributes:
+      label: Headset and controllers
+      placeholder: Meta Quest 3 through SteamVR
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: The gun in the hand, before and after if you can. They help to check the pose without a headset at hand.
+  - type: input
+    id: credit
+    attributes:
+      label: Name for the credits
+      description: How you want to be credited. Leave it empty to stay anonymous.

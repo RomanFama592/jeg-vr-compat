@@ -15,8 +15,8 @@ Unofficial Forge 1.20.1 addon that makes [Just Enough Guns](https://modrinth.com
 - Just Enough Guns 0.13.2 or 0.14.x, with Framework and GeckoLib
 - Vivecraft 1.20.1-1.2.5 or 1.20.1-1.3.x
 
-The same file works with any combination of those. JEG 0.14 and Vivecraft 1.3 are checked automatically but not yet
-played through in VR.
+The same file works with any combination of those. It is played in VR with JEG 0.13.2 + Vivecraft 1.2.5 and with
+JEG 0.14.5 + Vivecraft 1.3.15; the other versions are checked automatically.
 
 Install it on the client. Also installed on the server, it adds off-hand guns and bullets that start at the muzzle,
 and lets the server decide some VR options (`serverconfig/jeg_vr_compat-server.toml` in the world folder).
@@ -32,6 +32,13 @@ reports are welcome.
 - **Precision mode:** free hand on the handguard of a two-handed gun, then grip.
 - **Melee:** swing the gun.
 - **Options:** Config button in the mod list. **Calibrate a gun:** `/jegvr help`.
+
+## Share your gun poses
+
+How each gun sits in the hand is calibrated by eye, with the headset on, and there are many guns. If you tuned one
+with `/jegvr` and it looks right, send it with the
+[Gun pose](https://github.com/RomanFama592/jeg-vr-compat/issues/new?template=gun_pose.yml) issue template: accepted
+poses become the default for everyone, and you are credited in [the credits](docs/CREDITOS.md) and in the changelog.
 
 ## Building
 

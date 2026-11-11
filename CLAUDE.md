@@ -124,7 +124,10 @@ Los números de línea son de `master` a fecha 2026-10; **verificar siempre cont
 - `tools/jegdiff.sh <jar viejo> <jar nuevo>` — antes de soportar otra versión de JEG: qué clases de JEG que usa el addon
   faltan o cambiaron, y qué textos de `JegKeys` ya no están. Comparar jars del mismo tipo (los dos de Modrinth).
 - Publicar: subir `mod_version`, pasar `## Unreleased` del `CHANGELOG.md` a `## X.Y.Z (fecha)`, commit y etiqueta `vX.Y.Z`;
-  `.github/workflows/release.yml` sube a CurseForge y crea el release de GitHub (ver `docs/PUBLICAR.md`).
+  `.github/workflows/release.yml` sube a CurseForge y crea el release de GitHub (ver `docs/PUBLICAR.md`). El tipo sale
+  de la versión: con `beta` en el nombre (`0.3.0-beta`, etiqueta `v0.3.0-beta`) es beta; `0.x` sin eso, alpha.
+- Poses que manda la comunidad (plantilla de issue `gun_pose.yml`): a `gun_poses.json`, con crédito en `docs/CREDITOS.md`
+  y en el `CHANGELOG.md`.
 - `./gradlew runClient` — cliente de prueba (flat).
 - `./gradlew runClient -Pzgc` — lo mismo con `-XX:+UseZGC` (perfil de IntelliJ `runClient (ZGC)`). Los `vmOptions` de un perfil Gradle de IntelliJ van a Gradle, no al juego.
 - Dos jugadores: `runServer` + `runClient` (VR) + `runClient2` (`run-client2/`, usuario `Flat`, VR apagado); ver `docs/MULTIJUGADOR.md`.

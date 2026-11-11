@@ -2,14 +2,19 @@
 
 ## Unreleased
 
+## 0.3.0-beta (2026-11-11)
+
+First beta.
+
 - Now also for **Just Enough Guns 0.14** and **Vivecraft 1.3**, with the same file: it accepts JEG 0.13.2 to 0.14.x
-  and Vivecraft 1.2.5 to 1.3.x, in any combination. Checked without a headset against every version in those
-  ranges (it builds, and in the game every hook finds its place with JEG 0.13.2 and 0.14.5, Vivecraft 1.2.5 and
-  1.3.15); playing in VR with the new versions is still to be confirmed, so reports are welcome.
+  and Vivecraft 1.2.5 to 1.3.x, in any combination. Played in VR with JEG 0.13.2 + Vivecraft 1.2.5 and with
+  JEG 0.14.5 + Vivecraft 1.3.15; the other versions in those ranges are checked without a headset (it builds, and in
+  the game every hook finds its place), so reports are welcome.
 - With JEG 0.14: a gun in the off hand heats up with every shot, as JEG's own guns now do. With this mod on the
   server (or in your own world), the chainsaw and the jackhammer work from where the tool is and where it points,
   instead of from your eyes, and in either hand. Like in JEG, they, the Book of Psalms and the finger gun have no
-  gun-butt melee attack. Both tools now point straight ahead from the controller, held by the rear handle.
+  gun-butt melee attack. Both tools have a first pose of their own, pointing straight ahead from the controller;
+  it is not tuned with a headset yet.
 - With this mod on the server (or in your own world), a stun grenade blinds and deafens you by where your head looks.
   Before, as Vivecraft turns the player towards the main controller's aim, pointing that hand at the grenade blinded
   you even when looking away. Option `grenades.stunByHead`.
@@ -17,6 +22,8 @@
   every 90 and 45 degrees and the positive direction. The guide moves and turns with the gun.
 - Firing a two-handed gun no longer buzzes the free hand's controller, unless that hand is holding the gun too
   (precision mode).
+- Gun poses from players are welcome and credited: calibrate a gun with `/jegvr`, and send it with the "Gun pose"
+  issue template (see `docs/CREDITOS.md`).
 - The log now says which versions were found, for bug reports:
   `Detected JEG 0.14.5 [mining, mounts] / Vivecraft 1.20.1-1.3.15 (vc13)`.
 - Reloading by hand: the magazine (or the shotgun shell) you grab from the ammo box is now in your free hand until

@@ -15,8 +15,8 @@ Addon no oficial para Forge 1.20.1 que hace jugable [Just Enough Guns](https://m
 - Just Enough Guns 0.13.2 o 0.14.x, con Framework y GeckoLib
 - Vivecraft 1.20.1-1.2.5 o 1.20.1-1.3.x
 
-El mismo archivo sirve para cualquier combinación de esas versiones. JEG 0.14 y Vivecraft 1.3 están comprobados de forma
-automática, pero todavía no se jugaron en VR de punta a punta.
+El mismo archivo sirve para cualquier combinación de esas versiones. Está jugado en VR con JEG 0.13.2 + Vivecraft 1.2.5 y
+con JEG 0.14.5 + Vivecraft 1.3.15; las demás versiones están comprobadas de forma automática.
 
 Se instala en el cliente. También en el servidor, suma las armas en la mano libre, las balas que salen de la boca del
 arma, y deja que el servidor decida algunas opciones de VR (`serverconfig/jeg_vr_compat-server.toml` en la carpeta del
@@ -52,6 +52,13 @@ El jar que se usa es `build/libs/jeg_vr_compat-<versión>.jar`. El `-slim` no tr
 | `./gradlew checkMatrix` | Compila contra cada combinación soportada de JEG y Vivecraft, y después `checkMixins` |
 | `./gradlew test` | Pruebas de la matemática pura: ángulos de puntería, cajas de recarga y precisión, archivos de poses, caras espejadas |
 | `tools/jegdiff.sh <jar viejo> <jar nuevo>` | Antes de soportar otra versión de JEG: qué clases y nombres de JEG que usa el addon cambiaron |
+
+## Compartí tus poses de armas
+
+Cómo queda cada arma en la mano se calibra a ojo, con el visor puesto, y hay muchas armas. Si ajustaste una con
+`/jegvr` y te quedó bien, mandala con la plantilla de issue
+[Gun pose](https://github.com/RomanFama592/jeg-vr-compat/issues/new?template=gun_pose.yml): las poses aceptadas pasan
+a ser las del addon para todos, y figurás en [los créditos](docs/CREDITOS.md) y en el changelog.
 
 ## Documentación
 

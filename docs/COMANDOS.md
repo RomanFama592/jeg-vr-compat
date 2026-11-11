@@ -96,6 +96,11 @@ El agarre se guarda en la entrada del arma como `"grip": {"x", "y", "z", "qx", "
 y la rotación del control libre, en los ejes del control del arma, para un arma en la mano derecha (en la izquierda se
 usa espejado).
 
+## Compartir una pose
+
+Si una pose te quedó bien, mandala para que sea la del addon: está explicado en [CREDITOS.md](CREDITOS.md). Las poses
+aceptadas llevan el nombre de quien las mandó.
+
 ## Otros
 
 | Comando | Qué hace |

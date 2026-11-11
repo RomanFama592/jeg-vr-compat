@@ -50,8 +50,19 @@ Vivecraft 1.3.x), antes de anunciar que anda:
 Una versión fuera de los rangos (JEG 0.15, Vivecraft 1.4) no carga con el addon: Forge muestra su pantalla de error.
 Para aceptarla hay que repetir esos pasos y ampliar el rango.
 
-**Tipo de versión:** `0.x` sale como *alpha*; si la versión dice `beta` (p. ej. `0.5.0-beta`), como *beta*; de `1.0.0`
-en adelante, como *release*.
+**Tipo de versión.** Sale de `mod_version`, que es también la etiqueta; no hay que tocar nada en CurseForge:
+
+| `mod_version` | Etiqueta | Sale en CurseForge como |
+|---|---|---|
+| dice `beta` (`0.3.0-beta`, `1.2.0-beta.2`) | `v0.3.0-beta` | *Beta* |
+| dice `alpha`, o empieza con `0.` y no dice `beta` (`0.2.0`, `1.2.0-alpha`) | `v0.2.0` | *Alpha* |
+| el resto (`1.0.0`) | `v1.0.0` | *Release* |
+
+La sección del `CHANGELOG.md` lleva el mismo texto que `mod_version` (`## 0.3.0-beta (fecha)`).
+
+**Poses de la comunidad.** Las poses que llegan con la plantilla de issue *Gun pose* se prueban en VR, se pasan a
+`gun_poses.json` y se anotan en [CREDITOS.md](CREDITOS.md) y en el `CHANGELOG.md` de esa versión, con el nombre que
+pidió quien la mandó.
 
 **Dependencias en CurseForge:** Just Enough Guns y Vivecraft van como requeridas. Para cambiarlo, la lista
 `dependencies` de `release.yml`.

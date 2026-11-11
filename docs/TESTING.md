@@ -3,7 +3,7 @@
 Una sección por fase del plan de trabajo. Las pruebas en VR las hace el usuario manualmente.
 
 ## Pendientes con servidor (el usuario las deja para más adelante)
-**Decisión (2026-11-08):** la alpha sale sin estas pruebas; la página avisa que el servidor no se probó en un servidor
+**Decisión (2026-11-08):** la alpha (y la beta 0.3.0, 2026-11-11) sale sin estas pruebas; la página avisa que el servidor no se probó en un servidor
 dedicado. Quedan para cuando alguien reporte o el usuario decida correrlas.
 Correr antes de las últimas fases del plan (F9.1/F9.4, Fase V, Fase M). Se arman con [MULTIJUGADOR.md](MULTIJUGADOR.md).
 - [ ] Matriz de servidores F8.3 / S.6: solo JEG | JEG + Vivecraft | JEG + Vivecraft + addon, con cliente VR y flat.
@@ -615,7 +615,7 @@ Vivecraft 1.3.15). Son los puntos donde el addon toca algo que cambió; unos 10 
 - [ ] Encuadre de la motosierra y el martillo neumático (M.10): con cada una en la mano, la herramienta sale derecha
   hacia adelante desde el control (la espada de la motosierra, de canto; la punta del martillo, al frente) y la mano
   queda en la empuñadura trasera. En la mano izquierda, igual en espejo. Si queda corrida, `/jegvr move` y `/jegvr save`.
-- [ ] Granada cegadora (F9.31), en un mundo propio o con el addon en el servidor: tirarla, darle la espalda con la cabeza y
+- [x] Granada cegadora (F9.31; probado por el usuario en VR, 2026-11-11), en un mundo propio o con el addon en el servidor: tirarla, darle la espalda con la cabeza y
   apuntar el control principal hacia ella: no ciega ni ensordece. Mirarla con la cabeza y apuntar el control para otro
   lado: ciega. Con `grenades.stunByHead = false` vuelve a contar la mano. En plano, sin cambios.
 - [x] (auto) `runClientAudit` con JEG 0.13.2 + Vivecraft 1.2.5 y con 0.14.5 + 1.3.15: `StunGrenadeVRMixin` se aplica y su enganche encuentra dónde. Hecho 2026-11-11.
