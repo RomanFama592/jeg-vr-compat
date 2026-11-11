@@ -42,23 +42,24 @@ Los ejes son los del control, no los del mundo:
 
 ### Guía de ejes y giros
 
-`/jegvr axes` dibuja sobre el control de la mano principal, solo en VR:
+`/jegvr axes` dibuja sobre el arma de la mano principal, solo en VR. La guía está pegada al arma: sale de su origen
+y se mueve y gira con ella en cada cambio de pose.
 
-- **Tres flechas**, hacia el lado positivo de cada eje de `/jegvr move`: X en rojo, Y en verde, Z en azul.
-- **Tres círculos**, uno por ángulo de `/jegvr rot`: `pitch` en rojo, `yaw` en verde y `roll` en azul. Cada uno tiene
-  una marca larga cada 90 grados, una corta cada 45 y una más larga en el cero. La punta de flecha sobre el círculo
-  indica hacia dónde gira un valor positivo, y la línea clara que sale del centro, el valor actual del arma.
-- Los círculos están encadenados en el orden en que se aplican los giros (yaw, pitch, roll): el de `pitch` gira con el
-  `yaw` y el de `roll` con los dos, así que cada uno queda donde ese ángulo gira el arma en ese momento.
+- **Tres flechas**, hacia el lado positivo de cada eje del arma: X en rojo, Y en verde, Z en azul.
+- **Tres círculos**, uno alrededor de cada eje: `pitch` en rojo (eje X), `yaw` en verde (eje Y) y `roll` en azul
+  (eje Z). Cada uno tiene una marca larga cada 90 grados, una corta cada 45 y una más larga en el cero. La punta de
+  flecha sobre el círculo indica hacia dónde gira un valor positivo.
+- Como los ejes son los del arma, coinciden con los de `/jegvr move` y `/jegvr rot` mientras el arma no esté girada.
+  Con el arma girada, `move` sigue corriendo sobre los ejes del control, y `yaw` y `pitch` giran sobre los ejes de
+  antes de aplicar los giros que les siguen (el orden es yaw, pitch, roll); `roll` siempre gira sobre el eje Z del arma.
 
-La guía se actualiza con cada cambio de pose. Se va al repetir el comando o al cambiar lo que tenés en la mano
-principal.
+Se va al repetir el comando o al cambiar lo que tenés en la mano principal.
 
 ### Comandos
 
 | Comando | Qué hace |
 |---|---|
-| `/jegvr axes` | Muestra u oculta la guía sobre el control de la mano principal (ver abajo). |
+| `/jegvr axes` | Muestra u oculta la guía sobre el arma de la mano principal (ver abajo). |
 | `/jegvr move <dx> <dy> <dz>` | Corre el arma esa cantidad desde donde está. En los ejes que no querés tocar poné `0`. |
 | `/jegvr rot <dpitch> <dyaw> <droll>` | La gira esos grados desde donde está. En los que no querés tocar poné `0`. |
 | `/jegvr scale <factor>` | Tamaño final, el mismo número que muestra el chat (más grande = arma más grande). |

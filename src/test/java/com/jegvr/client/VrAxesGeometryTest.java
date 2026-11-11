@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class VrAxesGeometryTest {
     private static void assertNear(Vec3 expected, Vec3 actual) {
-        assertTrue(expected.distanceTo(actual) < 1.0E-9, expected + " vs " + actual);
+        assertTrue(expected.distanceTo(actual) < 1.0E-6, expected + " vs " + actual);
     }
 
     @Test
@@ -22,22 +22,19 @@ class VrAxesGeometryTest {
     }
 
     @Test
-    void theRollNeedleIsTheTopOfTheGun() {
-        List<VrAxesGeometry.Segment> lines = VrAxesGeometry.build(90.0F, 90.0F, 0.0F);
-        List<VrAxesGeometry.Segment> needles = lines.stream().filter(VrAxesGeometry.Segment::needle).toList();
-        assertEquals(3, needles.size());
-        // Yaw 90 then pitch 90: the barrel points up and the top of the gun points to the right (+X).
-        VrAxesGeometry.Segment pitch = needles.stream().filter(s -> s.axis() == VrAxesGeometry.X).findFirst().orElseThrow();
-        VrAxesGeometry.Segment roll = needles.stream().filter(s -> s.axis() == VrAxesGeometry.Z).findFirst().orElseThrow();
-        assertNear(new Vec3(0, VrAxesGeometry.PITCH_RADIUS, 0), pitch.to());
-        assertNear(new Vec3(VrAxesGeometry.ROLL_RADIUS, 0, 0), roll.to());
+    void theGuideFollowsThePose() {
+        // Yaw 90 then pitch 90: the barrel (-Z) points up and the top of the gun (+Y) to the right; then the offset.
+        assertNear(new Vec3(0.1, 1.2, 0.3), VrAxesGeometry.posed(new Vec3(0, 0, -1), 90, 90, 0, 0.1F, 0.2F, 0.3F));
+        assertNear(new Vec3(1.1, 0.2, 0.3), VrAxesGeometry.posed(new Vec3(0, 1, 0), 90, 90, 0, 0.1F, 0.2F, 0.3F));
+        // Roll turns about the barrel, wherever the barrel points: it stays put.
+        assertNear(new Vec3(0, 1, 0), VrAxesGeometry.posed(new Vec3(0, 0, -1), 90, 90, 57, 0, 0, 0));
     }
 
     @Test
     void everyRingHasEightMarksAndStaysOnItsRadius() {
-        List<VrAxesGeometry.Segment> lines = VrAxesGeometry.build(20.0F, -35.0F, 70.0F);
-        // 3 arrows of 3 lines; per ring: 48 of the circle, 8 marks, 2 of the arrow head, 1 needle.
-        assertEquals(9 + 3 * (48 + 8 + 2 + 1), lines.size());
+        List<VrAxesGeometry.Segment> lines = VrAxesGeometry.build();
+        // 3 arrows of 3 lines; per ring: 48 of the circle, 8 marks, 2 of the arrow head.
+        assertEquals(9 + 3 * (48 + 8 + 2), lines.size());
         for (VrAxesGeometry.Segment s : lines) {
             assertTrue(s.to().length() <= VrAxesGeometry.AXIS_LENGTH + 1.0E-9);
         }

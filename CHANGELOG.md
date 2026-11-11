@@ -10,8 +10,8 @@
   server (or in your own world), the chainsaw and the jackhammer work from where the tool is and where it points,
   instead of from your eyes, and in either hand. Like in JEG, they, the Book of Psalms and the finger gun have no
   gun-butt melee attack. Both tools now point straight ahead from the controller, held by the rear handle.
-- `/jegvr axes` draws, on the main-hand controller, the axes that `/jegvr move` uses and a ring for each angle of
-  `/jegvr rot`, with marks every 90 and 45 degrees, the positive direction and the gun's current pose.
+- `/jegvr axes` draws, on the gun in the main hand, its axes and a ring for each turn (pitch, yaw, roll), with marks
+  every 90 and 45 degrees and the positive direction. The guide moves and turns with the gun.
 - Firing a two-handed gun no longer buzzes the free hand's controller, unless that hand is holding the gun too
   (precision mode).
 - The log now says which versions were found, for bug reports:
