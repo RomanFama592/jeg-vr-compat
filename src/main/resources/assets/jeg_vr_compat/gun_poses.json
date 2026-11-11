@@ -64,6 +64,24 @@
       "tz": -0.14,
       "scale": 1.0
     },
+    "jeg:chainsaw": {
+      "pitch": -28.2,
+      "yaw": 15.4,
+      "roll": -79.6,
+      "tx": 0.0,
+      "ty": -0.118,
+      "tz": 0.148,
+      "scale": 0.6
+    },
+    "jeg:jackhammer": {
+      "pitch": -3.1,
+      "yaw": -12.5,
+      "roll": -29.4,
+      "tx": 0.0,
+      "ty": -0.155,
+      "tz": 0.023,
+      "scale": 0.6
+    },
     "jeg:grenade": {
       "pitch": 0.0,
       "yaw": 0.0,

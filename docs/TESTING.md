@@ -612,6 +612,9 @@ Vivecraft 1.3.15). Son los puntos donde el addon toca algo que cambió; unos 10 
   respeta su cadencia; con una en cada mano, cada una mina lo suyo.
 - [ ] (auto) `runClientAudit -Platest`: los cinco enganches de `handleHarvesting` se aplican; con JEG 0.13.2 el mixin
   se omite. Hecho 2026-11-11.
+- [ ] Encuadre de la motosierra y el martillo neumático (M.10): con cada una en la mano, la herramienta sale derecha
+  hacia adelante desde el control (la espada de la motosierra, de canto; la punta del martillo, al frente) y la mano
+  queda en la empuñadura trasera. En la mano izquierda, igual en espejo. Si queda corrida, `/jegvr move` y `/jegvr save`.
 - [ ] Vibración (M.11): disparar un rifle con la mano libre vacía y sin agarrarlo vibra solo el control del arma; en modo
   precisión vibran los dos; con el arma en la secundaria vibra solo ese.
 - [ ] Mover con fuerza la motosierra, el martillo, el Libro de Salmos o la pistola de dedos no pega como espada.
