@@ -84,6 +84,7 @@ src/main/java/com/jegvr/
   client/VrZones.java              # geometría de las cajas (cadera, pozo, guardamanos), sin estado del juego: tiene pruebas
   client/VrThrow.java              # granadas, molotov y bomba de agua: gatillo o gesto (F9.26); VrThrowMotion, el gesto
   server/VrServerThrow.java        # la granada sale de la mano (mixin.server.ThrowableItemVRMixin)
+  server/VrServerHead.java         # hacia dónde mira la cabeza, para la granada cegadora (client/VrStunLook, mixin.server.StunGrenadeVRMixin)
   client/VrDebugCommands.java      # /jegvr help|pose|move|rot|scale|save|reset, axes, zones, grabzone (ver docs/COMANDOS.md)
   client/VrAxesGuide.java          # /jegvr axes: ejes y círculos de giro sobre el arma; VrAxesGeometry, sus líneas (tiene pruebas)
   config/VrClientConfig.java       # config/jeg_vr_compat-client.toml (ForgeConfigSpec CLIENT); getters = lo que rige

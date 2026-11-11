@@ -615,6 +615,10 @@ Vivecraft 1.3.15). Son los puntos donde el addon toca algo que cambió; unos 10 
 - [ ] Encuadre de la motosierra y el martillo neumático (M.10): con cada una en la mano, la herramienta sale derecha
   hacia adelante desde el control (la espada de la motosierra, de canto; la punta del martillo, al frente) y la mano
   queda en la empuñadura trasera. En la mano izquierda, igual en espejo. Si queda corrida, `/jegvr move` y `/jegvr save`.
+- [ ] Granada cegadora (F9.31), en un mundo propio o con el addon en el servidor: tirarla, darle la espalda con la cabeza y
+  apuntar el control principal hacia ella: no ciega ni ensordece. Mirarla con la cabeza y apuntar el control para otro
+  lado: ciega. Con `grenades.stunByHead = false` vuelve a contar la mano. En plano, sin cambios.
+- [x] (auto) `runClientAudit` con JEG 0.13.2 + Vivecraft 1.2.5 y con 0.14.5 + 1.3.15: `StunGrenadeVRMixin` se aplica y su enganche encuentra dónde. Hecho 2026-11-11.
 - [ ] `/jegvr axes` (F9.32) con un arma en la principal: sobre el arma salen tres flechas (X roja a su derecha, Y verde
   hacia arriba, Z azul hacia la culata) y tres círculos con marcas cada 90 y 45 grados. `/jegvr rot 0 45 0` gira el arma
   y la guía juntas, hacia donde apuntaba la punta de flecha del círculo verde; `/jegvr move` corre las dos. Se va

@@ -52,6 +52,8 @@
   "jeg_vr_compat.config.handsFollowAnimations.tooltip": "The hands let go of the controllers during the guns' animations, and the controller carries the gun with a delay. Off: they always stay with the controllers.",
   "jeg_vr_compat.config.reloadWithBothGuns": "Reload with a gun in each hand",
   "jeg_vr_compat.config.reloadWithBothGuns.tooltip": "Off: with a gun in each hand you cannot reload, as there is no free hand for the magazine. Put one away first. Trying it gives a short double buzz.",
+  "jeg_vr_compat.config.stunByHead": "Stun grenades follow the head",
+  "jeg_vr_compat.config.stunByHead.tooltip": "A stun grenade blinds you only if your head looks towards it. Off: as JEG measures it, which in VR is where the main controller points. Needs this mod on the server (or your own world).",
   "jeg_vr_compat.config.throwMode": "Grenades",
   "jeg_vr_compat.config.throwMode.trigger": "Trigger",
   "jeg_vr_compat.config.throwMode.trigger.tooltip": "Hold the trigger of the hand with the grenade to pull the pin, release it to throw where that hand points. Grenades cook while held.",

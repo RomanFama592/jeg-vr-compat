@@ -143,6 +143,10 @@ public final class VrConfigScreen extends Screen {
                 .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.gripHint"),
                         (button, hint) -> VrClientConfig.setGripHint(hint)));
         right.add(new GripRangeSlider(width));
+        left.add(CycleButton.onOffBuilder(VrClientConfig.stunByHead())
+                .withTooltip(head -> Tooltip.create(Component.translatable("jeg_vr_compat.config.stunByHead.tooltip")))
+                .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.stunByHead"),
+                        (button, head) -> VrClientConfig.setStunByHead(head)));
         left.add(CycleButton.onOffBuilder(VrClientConfig.lockHotbarInPrecision())
                 .withTooltip(lock -> Tooltip.create(Component.translatable("jeg_vr_compat.config.lockHotbarInPrecision.tooltip")))
                 .create(0, 0, width, BUTTON_HEIGHT, Component.translatable("jeg_vr_compat.config.lockHotbarInPrecision"),

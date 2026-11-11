@@ -71,6 +71,7 @@ public final class VrClientConfig {
 
     public static final ForgeConfigSpec SPEC;
     public static final ForgeConfigSpec.EnumValue<ThrowMode> THROW_MODE;
+    public static final ForgeConfigSpec.BooleanValue STUN_BY_HEAD;
     public static final ForgeConfigSpec.EnumValue<GrabZone> GRAB_ZONE;
     public static final ForgeConfigSpec.BooleanValue SHOW_GUIDES;
     public static final ForgeConfigSpec.BooleanValue SHOW_SPRITES;
@@ -134,6 +135,10 @@ public final class VrClientConfig {
                         "direction and strength from the hand's motion; strength needs this mod on the server too),",
                         "VIVECRAFT (like a bow, drawn with the other hand).")
                 .defineEnum("throwMode", ThrowMode.GESTURE);
+        STUN_BY_HEAD = builder
+                .comment("A stun grenade blinds and deafens you by where your head looks. Off: as JEG measures it, which in",
+                        "VR is where the main controller points. Needs this mod on the server (or your own world).")
+                .define("stunByHead", true);
         builder.pop();
         builder.push("visuals");
         HUD_PLACEMENT = builder
@@ -331,6 +336,15 @@ public final class VrClientConfig {
     /** The player's own option, whatever the server decides. */
     public static ThrowMode ownThrowMode() {
         return SPEC.isLoaded() ? THROW_MODE.get() : ThrowMode.GESTURE;
+    }
+
+    public static boolean stunByHead() {
+        return !SPEC.isLoaded() || STUN_BY_HEAD.get();
+    }
+
+    public static void setStunByHead(boolean head) {
+        STUN_BY_HEAD.set(head);
+        STUN_BY_HEAD.save();
     }
 
     public static void setThrowMode(ThrowMode mode) {

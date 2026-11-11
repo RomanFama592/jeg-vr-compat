@@ -17,12 +17,14 @@ import com.jegvr.client.VrKeys;
 import com.jegvr.client.VrOffhandShooting;
 import com.jegvr.client.VrGripHint;
 import com.jegvr.client.VrPrecision;
+import com.jegvr.client.VrStunLook;
 import com.jegvr.client.VrThrow;
 import com.jegvr.client.VrRecoil;
 import com.jegvr.network.VrNetwork;
 import com.jegvr.server.VrInsertRound;
 import com.jegvr.server.VrOffhand;
 import com.jegvr.server.VrServerAim;
+import com.jegvr.server.VrServerHead;
 import com.jegvr.server.VrServerRules;
 import com.jegvr.server.VrServerThrow;
 import net.minecraftforge.common.MinecraftForge;
@@ -60,6 +62,7 @@ public class JegVrCompat {
         MinecraftForge.EVENT_BUS.register(VrServerRules.class);
         MinecraftForge.EVENT_BUS.register(VrServerAim.class);
         MinecraftForge.EVENT_BUS.register(VrServerThrow.class);
+        MinecraftForge.EVENT_BUS.register(VrServerHead.class);
         if (ModList.get().isLoaded("jeg")) {
             MinecraftForge.EVENT_BUS.register(VrOffhand.class);
             MinecraftForge.EVENT_BUS.register(VrInsertRound.class);
@@ -85,6 +88,7 @@ public class JegVrCompat {
             MinecraftForge.EVENT_BUS.register(VrGripHint.class);
             MinecraftForge.EVENT_BUS.register(VrBowLaser.class);
             MinecraftForge.EVENT_BUS.register(VrThrow.class);
+            MinecraftForge.EVENT_BUS.register(VrStunLook.class);
         }
         VR.preload();
         LOGGER.info("VR backend: {}, VR active at startup: {}", VR.description(), VR.active());

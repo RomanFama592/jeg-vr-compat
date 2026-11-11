@@ -26,7 +26,9 @@ public final class VrNetwork {
     public static final int THROW_PROTOCOL = 7;
     /** Adds {@link C2SVrHello} and {@link S2CVrRules} (S.8, server rules). */
     public static final int RULES_PROTOCOL = 8;
-    public static final int PROTOCOL = RULES_PROTOCOL;
+    /** Adds {@link C2SVrHead} (F9.31, stun grenades). */
+    public static final int HEAD_PROTOCOL = 9;
+    public static final int PROTOCOL = HEAD_PROTOCOL;
 
     private static final ResourceLocation NAME = new ResourceLocation(JegVrCompat.MOD_ID, "main");
 
@@ -94,6 +96,11 @@ public final class VrNetwork {
                 .encoder(S2CVrRules::encode)
                 .decoder(S2CVrRules::decode)
                 .consumerNetworkThread(S2CVrRules::handle)
+                .add();
+        CHANNEL.messageBuilder(C2SVrHead.class, 11, NetworkDirection.PLAY_TO_SERVER)
+                .encoder(C2SVrHead::encode)
+                .decoder(C2SVrHead::decode)
+                .consumerMainThread(C2SVrHead::handle)
                 .add();
     }
 
