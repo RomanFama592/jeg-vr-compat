@@ -2,6 +2,7 @@ package com.jegvr.client;
 
 import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
+import com.jegvr.compat.Versions;
 import com.jegvr.mixin.input.ItemCooldownInstanceAccessor;
 import com.jegvr.mixin.input.ItemCooldownsAccessor;
 import com.jegvr.mixin.input.ShootingHandlerAccessor;
@@ -244,9 +245,13 @@ public final class VrOffhandShooting {
         Gun.General general = gun.getGeneral();
         FireMode mode = general.getFireMode();
         Item item = stack.getItem();
-        if (general.getOverheatTimer() != 0 && overheatTimer < general.getOverheatTimer()) {
-            overheatTimer++;
-            if (overheatTimer >= general.getOverheatTimer()) {
+        int heatLimit = general.getOverheatTimer();
+        if (heatLimit != 0) {
+            // JEG up to 0.13 heats the gun while the trigger is held; since 0.14, with every shot (see fire).
+            if (!Versions.jegHeatsPerShot() && overheatTimer < heatLimit) {
+                overheatTimer++;
+            }
+            if (overheatTimer >= heatLimit && !overheated) {
                 startCooldown(item, OVERHEAT_COOLDOWN);
                 if (stack.is(ModItems.FLAMETHROWER.get())) {
                     PacketHandler.getPlayChannel().sendToServer(new C2SMessageBurnPlayer());
@@ -319,6 +324,9 @@ public final class VrOffhandShooting {
                 startCooldown(item, general.getBurstDelay());
             }
             burstCount = burstCount <= 0 ? general.getBurstAmount() - 1 : burstCount - 1;
+        }
+        if (Versions.jegHeatsPerShot()) {
+            overheatTimer++;
         }
         VrNetwork.CHANNEL.sendToServer(new C2SVrShootOffhand(rotation[0], rotation[1], charge));
 

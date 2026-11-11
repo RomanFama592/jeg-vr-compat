@@ -1,5 +1,6 @@
 package com.jegvr.client;
 
+import com.jegvr.compat.jeg.JegItems;
 import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.compat.VR;
 import com.jegvr.network.C2SVrMeleeOffhand;
@@ -40,7 +41,7 @@ public final class VrMelee {
     /** A gun with JEG's melee (the same exclusions as its {@code MeleeHandler}) in a hand that can use it. */
     public static boolean swingsLikeSword(ItemStack stack, boolean mainHand) {
         if (!VR.active() || !(stack.getItem() instanceof GunItem) || stack.getItem() instanceof AnimatedBowItem
-                || stack.is(ModItems.MINIGUN.get())) {
+                || stack.is(ModItems.MINIGUN.get()) || JegItems.meleeExcludedSince014(stack)) {
             return false;
         }
         CompoundTag tag = stack.getTag();

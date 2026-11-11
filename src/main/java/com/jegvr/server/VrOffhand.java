@@ -1,5 +1,6 @@
 package com.jegvr.server;
 
+import com.jegvr.compat.jeg.JegItems;
 import com.jegvr.compat.jeg.JegKeys;
 import com.jegvr.config.VrRules;
 import net.minecraft.nbt.CompoundTag;
@@ -52,7 +53,8 @@ public final class VrOffhand {
 
     /** Guns that can be used from the off hand. */
     public static boolean canDualWield(ItemStack stack) {
-        return stack.getItem() instanceof GunItem;
+        // JEG 0.14's mining guns do not shoot: JEG mines with the main-hand one, from its own code path.
+        return stack.getItem() instanceof GunItem && !JegItems.isHarvestingGun(stack.getItem());
     }
 
     /**
