@@ -1,6 +1,7 @@
 package com.jegvr;
 
 import com.jegvr.compat.VR;
+import com.jegvr.compat.Versions;
 import com.jegvr.config.VrClientConfig;
 import com.jegvr.config.VrServerConfig;
 import com.jegvr.client.VrRulesClient;
@@ -41,6 +42,8 @@ public class JegVrCompat {
     private static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public JegVrCompat() {
+        // What decides which mixins and which VR bridge this session uses: the first thing to read in a bug report.
+        LOGGER.info("Detected {}", Versions.profile());
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener(this::onClientSetup);
         modBus.addListener(this::onLoadComplete);
@@ -82,7 +85,7 @@ public class JegVrCompat {
             MinecraftForge.EVENT_BUS.register(VrThrow.class);
         }
         VR.preload();
-        LOGGER.info("VR backend: {}, JEG: {}, VR active at startup: {}", VR.description(), jegVersion(), VR.active());
+        LOGGER.info("VR backend: {}, VR active at startup: {}", VR.description(), VR.active());
     }
 
     /**
@@ -99,9 +102,5 @@ public class JegVrCompat {
                 System.exit(0);
             });
         }
-    }
-
-    private static String jegVersion() {
-        return ModList.get().getModContainerById("jeg").map(jeg -> jeg.getModInfo().getVersion().toString()).orElse("none");
     }
 }

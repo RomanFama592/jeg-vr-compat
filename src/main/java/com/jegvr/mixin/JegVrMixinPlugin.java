@@ -1,6 +1,6 @@
 package com.jegvr.mixin;
 
-import net.minecraftforge.fml.loading.LoadingModList;
+import com.jegvr.compat.Versions;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Server mixins ({@code mixin.server}) need only JEG, since dedicated servers usually lack Vivecraft. The rest
- * (client) need both JEG and Vivecraft.
+ * Decides which mixins apply from the installed versions ({@link Versions}):
+ * <ul>
+ *   <li>server mixins ({@code mixin.server}) need only JEG, since dedicated servers usually lack Vivecraft;</li>
+ *   <li>the rest (client) need both JEG and Vivecraft;</li>
+ *   <li>those in {@code mixin.vc12} and {@code mixin.vc13} are for one line of Vivecraft: their targets do not exist
+ *   in the other.</li>
+ * </ul>
  */
 public class JegVrMixinPlugin implements IMixinConfigPlugin {
     private static final String SERVER_PACKAGE = "com.jegvr.mixin.server.";
@@ -20,9 +25,8 @@ public class JegVrMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-        LoadingModList mods = LoadingModList.get();
-        hasJeg = mods != null && mods.getModFileById("jeg") != null;
-        hasVivecraft = mods != null && mods.getModFileById("vivecraft") != null;
+        hasJeg = Versions.hasJeg();
+        hasVivecraft = Versions.hasVivecraft();
     }
 
     @Override
@@ -32,7 +36,13 @@ public class JegVrMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return hasJeg && (hasVivecraft || mixinClassName.startsWith(SERVER_PACKAGE));
+        if (!hasJeg) {
+            return false;
+        }
+        if (mixinClassName.startsWith(SERVER_PACKAGE)) {
+            return true;
+        }
+        return hasVivecraft && Versions.mixinFitsVivecraft(mixinClassName);
     }
 
     @Override
